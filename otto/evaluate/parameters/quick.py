@@ -1,0 +1,2 @@
+N_RUNS = 10
+REL_TOL = 1
