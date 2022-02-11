@@ -7,7 +7,7 @@
 **visualize, evaluate and learn** policies for the source-tracking problem, a POMDP designed to provide a test-bed
 for **odor-based search strategies** such as the popular **"infotaxis"**.
 
-It is part of the [C0PEP0D](https://C0PEP0D.github.io/) project and has been used in a 
+OTTO is part of the [C0PEP0D](https://C0PEP0D.github.io/) project and has been used in a 
 [publication](https://arxiv.org/abs/2112.10861).
 
 ## Table of contents
@@ -69,9 +69,10 @@ OTTO provides an efficient implementation of the source-tracking POMDP (in any n
 of various heuristic policies (including infotaxis), 
 as well as a reinforcement learning algorithm able to learn near-optimal policies.
 
-OTTO also provides an efficient method to evaluate policies using a rigorous protocol. 
+OTTO also provides an efficient method to evaluate policies (including custom policies defined by the user)
+using a rigorous protocol. 
 
-Last but not least, OTTO allows you to visualize and make videos of search episodes (up to 3D!).
+Last but not least, OTTO allows you to visualize and record videos of searches (only up to 3D!).
 
 ### Infotaxis
 
