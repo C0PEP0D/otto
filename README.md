@@ -1,10 +1,20 @@
 
-OTTO: a Python package to simulate, solve and visualize the source-tracking problem
+# OTTO
+
+***TODO***
+
+**OTTO** (short for **O**dor-based **T**arget **T**racking **O**ptimization) is a Python package that provides the means to 
+**visualize, evaluate and learn** policies for the source-tracking problem, a POMDP designed to provide a test-bed
+for **odor-based search strategies** such as the popular **"infotaxis"**.
+
+It is part of the [C0PEP0D](https://C0PEP0D.github.io/) project and has been used in a 
+[publication](https://arxiv.org/abs/2112.10861).
 
 ## Table of contents
 * [Description](#description)
     * [Motivation](#motivation)
     * [The source-tracking POMDP](#the-source-tracking-pomdp)
+    * [What does OTTO do?](#what-does-otto-do)
     * [Infotaxis](#infotaxis)
     * [Space-aware infotaxis](#space-aware-infotaxis)
     * [Reinforcement learning](#reinforcement-learning)
@@ -27,21 +37,9 @@ OTTO: a Python package to simulate, solve and visualize the source-tracking prob
 * [License](#license)
 * [Acknowledgements](#acknowledgements)
 
-OTTO (Odor-based Target Tracking Optimization)
-====
-
-***TODO***
-
-## Description
-
-**OTTO** (short for Odor-based Target Tracking Optimization) is a Python package that provides the means to 
-**visualize, evaluate and learn** policies for the source-tracking problem, a POMDP designed to provide a test-bed
-for odor-based search strategies such as the popular "infotaxis".
 
 
-It is part of the [C0PEP0D](https://C0PEP0D.github.io/) project and has been used in a 
-[publication](https://arxiv.org/abs/2112.10861).
-
+## Background
 
 ### Motivation
 Imagine a treasure hunt where the player needs to find a hidden treasure using odor cues. 
@@ -65,6 +63,16 @@ Finding the optimal policy (strategy) using exact methods is not possible.
 Yet various heuristic policies have been proposed over the years, 
 and the problem is also amenable to reinforcement learning.
 
+### What does OTTO do?
+
+OTTO provides an efficient implementation of the source-tracking POMDP (in any number of space dimensions), 
+of various heuristic policies (including infotaxis), 
+as well as a reinforcement learning algorithm able to learn near-optimal policies.
+
+OTTO also provides an efficient method to evaluate policies using a rigorous protocol. 
+
+Last but not least, OTTO allows you to visualize and make videos of search episodes (up to 3D!).
+
 ### Infotaxis
 
 Infotaxis is a heuristic policy proposed by Vergassola et al. (Nature, 2007). 
@@ -87,6 +95,7 @@ Space-aware infotaxis is variant of infotaxis which has been shown to beat infot
 
 Approximately optimal solutions can be obtained using deep reinforcement learning.
 The training algorithm is a model-based version of DQN (Mnih et al., Nature, 2015).
+
 
 
 ## Installation
