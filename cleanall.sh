@@ -6,10 +6,10 @@ CURLOC=`pwd`
 cd $PROGLOC
 
 rm -rf otto/evaluate/outputs
-rm -rf otto/train/outputs
+rm -rf otto/learn/outputs
 rm -rf otto/visualize/outputs
 rm -rf otto/evaluate/tmp
-rm -rf otto/train/models
+rm -rf otto/learn/models
 
 rm -rf __pycache__
 rm -rf */__pycache__

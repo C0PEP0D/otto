@@ -131,3 +131,9 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
+#--------------------- PERSO ----------------
+otto/visualize/outputs/*
+otto/evaluate/outputs/*
+otto/learn/outputs/*
+otto/evaluate/tmp/*
+otto/learn/models/*

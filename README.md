@@ -1,8 +1,13 @@
 
-**OTTO**: a Python package to simulate, solve and visualize the source-tracking problem
+OTTO: a Python package to simulate, solve and visualize the source-tracking problem
 
 ## Table of contents
 * [Description](#description)
+    * [Motivation](#motivation)
+    * [The source-tracking POMDP](#the-source-tracking-pomdp)
+    * [Infotaxis](#infotaxis)
+    * [Space-aware infotaxis](#space-aware-infotaxis)
+    * [Reinforcement learning](#reinforcement-learning)
 * [Installation](#installation)
     * [Requirements](#requirements)
     * [Conda users](#conda-users)
@@ -29,13 +34,59 @@ OTTO (Odor-based Target Tracking Optimization)
 
 ## Description
 
-**OTTO** (short for Odor-based Target Tracking Optimization) is a Python software that simulates the 
-source-tracking problem and its solutions. 
+**OTTO** (short for Odor-based Target Tracking Optimization) is a Python package that provides the means to 
+**visualize, evaluate and learn** policies for the source-tracking problem, a POMDP designed to provide a test-bed
+for odor-based search strategies such as the popular "infotaxis".
 
-And plenty of other cool stuff. ***TODO: write description***
 
-**OTTO** is part of the [C0PEP0D](https://C0PEP0D.github.io/) project and has been used in a 
+It is part of the [C0PEP0D](https://C0PEP0D.github.io/) project and has been used in a 
 [publication](https://arxiv.org/abs/2112.10861).
+
+
+### Motivation
+Imagine a treasure hunt where the player needs to find a hidden treasure using odor cues. 
+Because the wind constantly changes direction, the player smells nothing most of the time, but occasionally catches 
+a puff. How should he move to find the treasure as fast as possible?
+This game is a common task, for example, mosquitoes looking for a prey to bite by detecting carbon dioxide or 
+sniffer robots trying to locate explosive in an airport. 
+Because of turbulence, there is no odor trail to follow in this problem, which makes it particularly challenging.
+
+### The source-tracking POMDP
+
+The source-tracking problem is a POMDP (partially observable Markov decision process) 
+where the agent (the searcher) must find, as fast as possible, 
+a stationary target (the source) hidden in a grid world 
+using stochastic observations (odor detections, called "hits").
+It was originally designed by 
+Vergassola et al. (Nature, 2007) 
+to mimic the task faced by animals or robots searching for a source of odor in a turbulent flow.
+
+Finding the optimal policy (strategy) using exact methods is not possible.
+Yet various heuristic policies have been proposed over the years, 
+and the problem is also amenable to reinforcement learning.
+
+### Infotaxis
+
+Infotaxis is a heuristic policy proposed by Vergassola et al. (Nature, 2007). 
+It states that the agent should choose the action from which it expects the greatest information gain about 
+the source location. 
+
+The physical intuition behind this strategy is, quoting the authors, that 
+``information accumulates faster close to the source because cues arrive at a higher rate, 
+hence tracking the maximum rate of information acquisition will guide the searcher to the source much like 
+concentration gradients in chemotaxis''.
+
+Infotaxis is far superior to all naive strategies, such as going to the more likely source location.
+Yet it is known to be suboptimal.
+
+### Space-aware infotaxis
+
+Space-aware infotaxis is variant of infotaxis which has been shown to beat infotaxis in most cases.
+
+### Reinforcement learning
+
+Approximately optimal solutions can be obtained using deep reinforcement learning.
+The training algorithm is a model-based version of DQN (Mnih et al., Nature, 2015).
 
 
 ## Installation
@@ -97,7 +148,7 @@ Go to the `otto` subdirectory.
 You will see that it is organized in **three main directories** corresponding to the **three main uses of OTTO**:
 
 - `evaluate`: for **evaluating the performance** of a policy
-- `train`: for **training a neural network** to solve the task
+- `learn`: for **learning a neural network policy** that solves the task
 - `visualize`: for **visualizing an episode**
 
 The other directory, `classes`, contains all the class definitions used by the main programs.
@@ -220,25 +271,25 @@ The main policies are
 
 - `POLICY = 0` for infotaxis (default)
 - `POLICY = 1` for space-aware infotaxis
-- `POLICY = -1` for a reinforcement learning policy: for that we need to train a model first!
+- `POLICY = -1` for a reinforcement learning policy: for that we need to learn a model first!
 
 
 
-### Training with reinforcement learning
+### Learning a policy
 
-The `train.py` program "trains the agent" using reinforcement learning (RL). 
+The `learn.py` program learns a policy using reinforcement learning (RL). 
 It actually trains a neural network model of the optimal value function.
 The (approximately) optimal policy is then derived from this function.
 
-To train a model, go to the `train` directory and use
+To train a model, go to the `learn` directory and use
 
 ```bash
-python train.py
+python learn.py
 ```
 
 Now go get a coffee since it will take quite some time.
 
-When you come back, you can look at the contents of the `train/outputs/YYmmdd-HHMMSS` directory.
+When you come back, you can look at the contents of the `learn/outputs/YYmmdd-HHMMSS` directory.
 There should be a figure called `YYmmdd-HHMMSS_figure_learning_progress.png` (if not you need a larger coffee).
 
 This figure shows the progress of the learning agent and is periodically updated as the training progresses. 
@@ -254,7 +305,7 @@ For reference, the trained network should achieve p_not_found < 1e-6 and mean ~ 
 
 Training will continue until 10000 iterations, but can be stopped at any time.
 
-Models are saved in the `train/model/YYmmdd-HHMMSS` directory:
+Models are saved in the `learn/model/YYmmdd-HHMMSS` directory:
 
 - `YYmmdd-HHMMSS_value_model` is the most recent model,
 - `YYmmdd-HHMMSS_value_model_bkp_i`, where i is an integer, are the models saved at evaluation points
@@ -264,17 +315,17 @@ Note: training can restart from a previously saved model.
 
 ### Visualizing and evaluating an RL policy
 
-Once is model is trained, the corresponding policy can be evaluated or visualized using the corresponding programs.
+Once is model is trained, the learned policy can be evaluated or visualized using the corresponding programs.
 For that, simply run the programs with a parameter file (using `--input`) containing
 
 ```python
 POLICY = -1
-MODEL_PATH = "../train/models/YYmmdd-HHMMSS/YYmmdd-HHMMSS_value_model_bkp_i"
+MODEL_PATH = "../learn/models/YYmmdd-HHMMSS/YYmmdd-HHMMSS_value_model_bkp_i"
 ```
 
 where `MODEL_PATH` is the path to the model you want to evaluate or visualize.
 
-Warning: parameters should be consistent. For example, if you set `N_DIMS = 2` for training then you must also 
+Warning: parameters should be consistent. For example, if you set `N_DIMS = 2` for learning then you must also 
 set `N_DIMS = 2` for evaluation and visualization.
 
 ### Pre-trained RL policies
