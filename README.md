@@ -245,7 +245,7 @@ You can try with
 python evaluate.py
 ```
 
-This will take some time (order of magnitude is 5 minutes on 8 cores ***TODO: HOW LONG DOES IT TAKE?***). 
+This will take some time (order of magnitude is 2 minutes on 8 cores ***TODO: HOW LONG DOES IT TAKE?***). 
 Logging information is displayed in the terminal while the episodes are running.
 Once the program has completed, you can look at the results in the directory `evaluate/outputs/YYmmdd-HHMMSS` 
 where 'YYmmdd-HHMMSS' is the time you started the program.
@@ -307,7 +307,7 @@ In particular, it shows the evolution of 'p_not_found', the probability that the
 the mean time to find the source provided it is ever found. 
 Note that the mean is meaningless if p_not_found is larger than 1e-3, in that case it is depicted by a cross.
 
-Other outputs are explained in the TODO: DOCUMENTATION.
+Other outputs are explained in the ***TODO: DOCUMENTATION.***
 
 Completing the training may take up to roughly 5000-10000 iterations (several hours on an 
 average laptop), but progress should be clearly visible from 500-1000 iterations. 
@@ -396,14 +396,14 @@ The generated html can be viewed by opening `docs/_build/html/index.html`.
 
 If you use **OTTO** in your publications, you can cite the package as follows:
 
-> OTTO: a Python package to simulate, solve and visualize the source-tracking problem. https://github.com/C0PEP0D/otto
+> OTTO: a Python package to simulate, solve and visualize the source-tracking POMDP. https://github.com/C0PEP0D/otto
 
 or if you use LaTeX:
 
 ```tex
 @misc{OTTO,
   author = {A. Loisy and C. Eloy},
-  title = {{OTTO}: a {P}ython package to simulate, solve and visualize the source-tracking problem.},
+  title = {{OTTO}: a {P}ython package to simulate, solve and visualize the source-tracking POMDP.},
   howpublished = {\url{https://github.com/C0PEP0D/otto}}
 }
 ```
