@@ -17,8 +17,8 @@ OTTO: a Python package to simulate, solve and visualize the source-tracking prob
     * [First steps](#first-steps)
     * [Changing parameters](#changing-parameters)
     * [Evaluating a policy](#evaluating-a-policy)
-    * [Training with reinforcement learning](#training-with-reinforcement-learning)
-    * [Visualizing and evaluating an RL policy](#visualizing-and-evaluating-an-rl-policy)
+    * [Learning a policy](#learning-a-policy)
+    * [Visualizing and evaluating a learned policy](#visualizing-and-evaluating-a-learned-policy)
     * [Cleaning up](#cleaning-up)
 * [Documentation](#documentation)
 * [How to cite OTTO?](#how-to-cite-otto)
@@ -313,7 +313,7 @@ Models are saved in the `learn/model/YYmmdd-HHMMSS` directory:
 
 Note: training can restart from a previously saved model.
 
-### Visualizing and evaluating an RL policy
+### Visualizing and evaluating a learned policy
 
 Once is model is trained, the learned policy can be evaluated or visualized using the corresponding programs.
 For that, simply run the programs with a parameter file (using `--input`) containing
