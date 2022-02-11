@@ -30,6 +30,7 @@ OTTO is part of the [C0PEP0D](https://C0PEP0D.github.io/) project and has been u
     * [Learning a policy](#learning-a-policy)
     * [Visualizing and evaluating a learned policy](#visualizing-and-evaluating-a-learned-policy)
     * [Cleaning up](#cleaning-up)
+    * [Known issues](#known-issues)
 * [Documentation](#documentation)
 * [How to cite OTTO?](#how-to-cite-otto)
 * [Authors](#authors)
@@ -245,8 +246,11 @@ You can try with
 python evaluate.py
 ```
 
-This will take some time (order of magnitude is 2 minutes on 8 cores ***TODO: HOW LONG DOES IT TAKE?***). 
+This will take some time (order of magnitude is 2 minutes on 8 cores). 
 Logging information is displayed in the terminal while the episodes are running.
+
+Windows users: if a `NameError` is raised, see [known issues](#known-issues).
+
 Once the program has completed, you can look at the results in the directory `evaluate/outputs/YYmmdd-HHMMSS` 
 where 'YYmmdd-HHMMSS' is the time you started the program.
 
@@ -297,7 +301,8 @@ To train a model, go to the `learn` directory and use
 python learn.py
 ```
 
-Now go get a coffee since it will take quite some time.
+Now go get a coffee since it will take quite some time. Logging information is displayed in the terminal while the 
+program runs (if the program seems to have frozen, see [known issues](#known-issues)).
 
 When you come back, you can look at the contents of the `learn/outputs/YYmmdd-HHMMSS` directory.
 There should be a figure called `YYmmdd-HHMMSS_figure_learning_progress.png` (if not you need a larger coffee).
@@ -376,6 +381,17 @@ The directories can be restored to their original state by running the `cleanall
 at the root of the package.
 Warning: all user-generated outputs and models will be deleted!
 
+### Known issues
+
+There are two known issues with `multiprocessing` used for parallelization in `learn.py` and `evaluate.py`:
+ 
+- Windows users may have the error `NameError: name '*' is not defined`, this is 
+because child processes do not see global variables defined only during execution (after `if __name__ == "__main__"`).
+- When using large neural networks, the code may hang, this is a 
+[known issue](https://github.com/keras-team/keras/issues/9964)
+with `tf.keras`.
+
+These issues are resolved by setting `N_PARALLEL = 1` in the parameter file, which enforces sequential computations.
 
 ## Documentation
 ***TODO: not done***
