@@ -110,3 +110,19 @@ def test_misc_methods():
         assert new_agent[0] == 2
 
 
+def test_step():
+    myenv = env(
+        Ndim=2,
+        lambda_over_dx=1.0,
+        R_dt=1.0,
+    )
+    myenv.p_source[myenv.N // 2 - 1, myenv.N // 2] += 0.8
+    myenv.p_source = myenv.p_source / np.sum(myenv.p_source)
+    myenv.entropy = myenv._entropy(myenv.p_source)
+    p_end_check = myenv.p_source[myenv.N // 2 - 1, myenv.N // 2]
+
+    hit, p_end, done = myenv.step(action=0, hit=2)
+
+    assert hit == 2
+    assert p_end == pytest.approx(p_end_check)
+    assert not done

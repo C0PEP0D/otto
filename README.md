@@ -141,8 +141,6 @@ pytest tests
 ```
 This will execute the Python pytest functions located in the folder `tests`.
 
-***TODO: proper tests***
-
 ## How to use OTTO?
 
 ### First steps
