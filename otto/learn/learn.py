@@ -702,7 +702,7 @@ def _Worker(episode, policy, eps, memorize):
     """
     # copy the env to save time, and reset (according to randomly drawn hit)
     myenv = deepcopy(MYENV)
-    myenv.restart(initial_hit=None)
+    myenv.restart()
     if policy != -1:
         mypol = HeuristicPolicies(env=myenv, policy=policy)
 

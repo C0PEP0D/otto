@@ -40,7 +40,7 @@ class SourceTracking:
 
     Methods:
         step(action): make a step in the environment
-        restart(initial_hit): restart the search
+        restart(initial_hit=None): restart the search
 
     """
 
@@ -50,7 +50,7 @@ class SourceTracking:
         lambda_over_dx,
         R_dt,
         norm_Poisson='Euclidean',
-        Ngrid=None, #TODO check behavoir
+        Ngrid=None,
         Nhits=None,
         draw_source=False,
         initial_hit=None,
@@ -122,7 +122,7 @@ class SourceTracking:
         if not dummy:
             self.restart(initial_hit)
 
-    def restart(self, initial_hit):
+    def restart(self, initial_hit=None):
         """Restart the search.
 
         Args:
@@ -390,8 +390,8 @@ class SourceTracking:
             
     # __ INITIALIZATION AND AUTOSET _______________________________________
     def _init_distributed_source(self, ):
-        # Calculating p_source, the pdf of the source location
-        self._compute_p_Poisson()
+        if not hasattr(self, 'p_Poisson'):
+            self._compute_p_Poisson()
         self.p_source = np.ones([self.N] * self.Ndim) / (self.N ** self.Ndim - 1)
         self.p_source[tuple([self.N // 2] * self.Ndim)] = 0.0
         self._update_p_source(hit=self.initial_hit)

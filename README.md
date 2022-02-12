@@ -73,7 +73,7 @@ as well as a reinforcement learning algorithm able to learn near-optimal policie
 OTTO also provides an efficient method to evaluate policies (including custom policies defined by the user)
 using a rigorous protocol. 
 
-Last but not least, OTTO allows you to visualize and record videos of searches (only up to 3D!).
+Finally, OTTO allows you to visualize and record videos of searches (only up to 3D!).
 
 ### Infotaxis
 
@@ -134,19 +134,12 @@ python setup.py install
 ```
 
 ### Testing
-Go to the `test` subdirectory and test your installation with following command:
+You can test your installation with following command:
 
 ```bash
-python -m unittest
+pytest tests
 ```
-
-You should see something like the following on the terminal:
-
-```bash
-Ran 1 test in 11.173s
-
-OK
-```
+This will execute the Python pytest functions located in the folder `tests`.
 
 ***TODO: proper tests***
 
@@ -387,9 +380,10 @@ There are two known issues with `multiprocessing` used for parallelization in `l
  
 - Windows users may have the error `NameError: name '*' is not defined`, this is 
 because child processes do not see global variables defined only during execution (after `if __name__ == "__main__"`).
+***TODO: would be nice to fix this***
 - When using large neural networks, the code may hang, this is a 
 [known issue](https://github.com/keras-team/keras/issues/9964)
-with `tf.keras`.
+with `keras`.
 
 These issues are resolved by setting `N_PARALLEL = 1` in the parameter file, which enforces sequential computations.
 
@@ -412,15 +406,15 @@ The generated html can be viewed by opening `docs/_build/html/index.html`.
 
 If you use **OTTO** in your publications, you can cite the package as follows:
 
-> OTTO: a Python package to simulate, solve and visualize the source-tracking POMDP. https://github.com/C0PEP0D/otto
+> OTTO: a Python package to simulate, solve and visualize the source-tracking POMDP. http://github.com/C0PEP0D/otto
 
 or if you use LaTeX:
 
 ```tex
 @misc{OTTO,
   author = {A. Loisy and C. Eloy},
-  title = {{OTTO}: a {P}ython package to simulate, solve and visualize the source-tracking POMDP.},
-  howpublished = {\url{https://github.com/C0PEP0D/otto}}
+  title = {{OTTO}: a {P}ython package to simulate, solve and visualize the source-tracking {POMDP}},
+  howpublished = {\url{http://github.com/C0PEP0D/otto}}
 }
 ```
 

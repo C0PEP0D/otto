@@ -24,7 +24,7 @@ def policy_name(policy):
     elif policy == 6:
         name = "greedy"
     elif policy == 7:
-        name = "lower bound (mean distance)"
+        name = "mean distance"
     elif policy == 8:
         name = "voting"
     elif policy == 9:
@@ -64,9 +64,10 @@ class HeuristicPolicies:
             policy (int): policy index, with
                 0 infotaxis (default)
                 1 space-aware infotaxis
+                2 custom policy (to be implemented by the user)
                 5 random policy
                 6 greedy policy
-                7 mean distance (lower bound) policy
+                7 mean distance policy
                 8 voting policy (Cassandra, Kaelbling & Kurien, IEEE 1996)
                 9 most likely state policy (Cassandra, Kaelbling & Kurien, IEEE 1996)
             policy_name (str): name of the policy
@@ -99,7 +100,7 @@ class HeuristicPolicies:
                 1 space-aware infotaxis
                 5 random policy
                 6 greedy policy
-                7 mean distance (lower bound) policy
+                7 mean distance policy
                 8 voting policy (Cassandra, Kaelbling & Kurien, IEEE 1996)
                 9 most likely state policy (Cassandra, Kaelbling & Kurien, IEEE 1996)
 
@@ -112,37 +113,37 @@ class HeuristicPolicies:
 
         if self.policy == 0:
             if self.steps_ahead == 1:
-                action_chosen = self._infotaxis()
+                action_chosen, _ = self._infotaxis()
             elif self.steps_ahead > 1:
                 if self.discount == 1.0:
-                    action_chosen = self._infotaxis_n_steps_no_discount(self.steps_ahead)
+                    action_chosen, _ = self._infotaxis_n_steps_no_discount(self.steps_ahead)
                 elif 0 <= self.discount < 1:
-                    action_chosen = self._infotaxis_n_steps(self.steps_ahead, self.discount)
+                    action_chosen, _ = self._infotaxis_n_steps(self.steps_ahead, self.discount)
                 else:
                     raise Exception("discount must be between 0 and 1")
             else:
                 raise Exception("steps_ahead has to be an integer larger than 1")
 
         elif self.policy == 1:
-            action_chosen = self._space_aware_infotaxis()
+            action_chosen, _ = self._space_aware_infotaxis()
 
         elif self.policy == 2:
-            action_chosen = self._custom_policy()
+            action_chosen, _ = self._custom_policy()
 
         elif self.policy == 5:
             action_chosen = random.randint(0, self.env.Nactions - 1)
 
         elif self.policy == 6:
-            action_chosen = self._greedy_policy()
+            action_chosen, _ = self._greedy_policy()
 
         elif self.policy == 7:
-            action_chosen = self._lower_bound_policy()
+            action_chosen, _ = self._mean_distance_policy()
 
         elif self.policy == 8:
-            action_chosen = self._voting_policy()
+            action_chosen, _ = self._voting_policy()
 
         elif self.policy == 9:
-            action_chosen = self._most_likely_state_policy()
+            action_chosen, _ = self._most_likely_state_policy()
 
         else:
             raise Exception("The policy " + str(self.policy) + " does not exist (yet)!")
@@ -188,7 +189,7 @@ class HeuristicPolicies:
 
         action_chosen = np.argwhere(np.abs(delta_entropy - np.min(delta_entropy)) < EPSILON_CHOICE).flatten()[0]
 
-        return action_chosen
+        return action_chosen, -delta_entropy
 
     def _infotaxis_n_steps(self, steps_ahead, discount):
         """Infotaxis policy, n-steps ahead"""
@@ -287,7 +288,7 @@ class HeuristicPolicies:
                                                          axis=cum_gain_reduced_over_obs.ndim - 1)
                 break
 
-        return action_chosen
+        return action_chosen, self.env.entropy + cum_gain_reduced_over_obs
 
     def _infotaxis_n_steps_no_discount(self, steps_ahead):
         """INFOTAXIS n-steps ahead, without any discounting"""
@@ -382,7 +383,7 @@ class HeuristicPolicies:
 
                 break
 
-        return action_chosen
+        return action_chosen, self.env.entropy - expected_S
 
     def _init_space_aware_infotaxis(self, ):
         size = 1 + 2 * self.env.N
@@ -440,7 +441,7 @@ class HeuristicPolicies:
 
         action_chosen = np.argwhere(np.abs(to_minimize - np.min(to_minimize)) < EPSILON_CHOICE).flatten()[0]
 
-        return action_chosen
+        return action_chosen, to_minimize
 
     def _greedy_policy(self):
         p = np.ones(self.env.Nactions) * float("inf")
@@ -449,18 +450,18 @@ class HeuristicPolicies:
             if move_possible:
                 p[a] = 1.0 - self.env.p_source[tuple(agent_)]
         action_chosen = np.argwhere(np.abs(p - np.min(p)) < EPSILON_CHOICE).flatten()[0]
-        return action_chosen
+        return action_chosen, p
 
-    def _init_lower_bound_policy(self, ):
+    def _init_mean_distance_policy(self, ):
         size = 1 + 2 * self.env.N
         origin = [self.env.N] * self.env.Ndim
         self.distance_array = self.env._distance(N=size, origin=origin, norm="Manhattan")
 
-    def _lower_bound_policy(self, ):
-        """Policy that minimizes the lower bound of the expected time to find the source (=mean Manhattan distance)"""
+    def _mean_distance_policy(self, ):
+        """Policy that minimizes the expected distance to the source"""
 
         if not hasattr(self, 'distance_array'):
-            self._init_lower_bound_policy()
+            self._init_mean_distance_policy()
 
         to_minimize = np.ones(self.env.Nactions) * float("inf")
         for a in range(self.env.Nactions):
@@ -498,7 +499,7 @@ class HeuristicPolicies:
 
         action_chosen = np.argwhere(np.abs(to_minimize - np.min(to_minimize)) < EPSILON_CHOICE).flatten()[0]
 
-        return action_chosen
+        return action_chosen, to_minimize
 
     def _voting_policy(self, ):
         """Policy that chooses the action which is the most likely to be optimal,
@@ -526,7 +527,7 @@ class HeuristicPolicies:
 
         action_chosen = np.argwhere(np.abs(to_maximize - np.max(to_maximize)) < EPSILON_CHOICE).flatten()[0]
 
-        return action_chosen
+        return action_chosen, to_maximize
 
     def _most_likely_state_policy(self, ):
         """Policy that performs the action that is optimal for the most likely source location,
@@ -544,10 +545,12 @@ class HeuristicPolicies:
 
         action_chosen = np.argwhere(np.abs(to_minimize - np.min(to_minimize)) < EPSILON_CHOICE).flatten()[0]
 
-        return action_chosen
+        return action_chosen, to_minimize
 
     def _custom_policy(self, ):
         """Implement your custom policy"""
-        raise Exception("Custom policy is not implemented!")
-        action_chosen = 0
-        return action_chosen
+        # implement your policy here
+        # ....
+        to_minimize = np.ones(self.env.Nactions)
+        action_chosen = np.argwhere(np.abs(to_minimize - np.min(to_minimize)) < EPSILON_CHOICE).flatten()[0]
+        return action_chosen, to_minimize
