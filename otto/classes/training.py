@@ -1,6 +1,6 @@
 #!/usr/bin/self python3
 # -*- coding: utf-8 -*-
-
+"""Functions and classes required to train a value model on the source-tracking POMDP."""
 import os
 import numpy as np
 from copy import deepcopy
@@ -10,23 +10,23 @@ from tensorflow.keras import Model
 from tensorflow.keras import regularizers
 from .sourcetracking import SourceTracking
 
-
 # _____________________  parameters  _____________________
 EPSILON = 1e-10
 # ________________________________________________________
 
+
 class State:
     """
-    Defines a belief state, used to store transitions (s, s').
+    Defines a belief state. This is the class used to store transitions (s, s').
 
     Attributes:
         p_source (ndarray):
             probability distribution of the source
-        agent (list of ints):
+        agent (list(int)):
             location of the agent
-        prob (0 <= float <= 1):
-            if current state s, then prob=1;
-            if next state s', then probability to transit from s to this state
+        prob (float):
+            - if current state s, then prob=1.0;
+            - if next state s', then probability to transit from s to this state
     """
 
     def __init__(
@@ -35,77 +35,48 @@ class State:
     agent,
     prob=1.0,
     ):
-        """Constructor.
 
-        Args:
-            p_source (ndarray):
-                probability distribution of the source
-            agent (list of ints):
-                location of the agent
-            prob (0 <= float <= 1, optional):
-                if current state s, then prob = 1 (default);
-                if next state s', then prob = probability to transit to this state
-        """
         self.p_source = np.asarray(p_source, dtype=np.float32)
         self.agent = agent
         self.prob = prob
 
+
 class TrainingEnv(SourceTracking):
-    """Environment for using RL to solve the source tracking POMDP."""
+    """Add functions useful for training to the SourceTracking class"""
 
     def __init__(
             self,
             *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-    def choose_action_from_statep(self, model, sym_avg=False, statep=None):  # statep: (Nactions, Nhits)
-        """Choose an action according to the current model, depending on the reachable possible beliefs at next step.
+    def choose_action_from_statep(self, model, statep=None, sym_avg=False):  # statep: (Nactions, Nhits)
+        """Choose an action according to the current value model and successor states statep.
+        Has the same effect as choose_action from the RLPolicy class, but is faster if statep is provided.
 
         Args:
             model (ValueModel):
                 value model to be used
             statep (ndarray or None, optional):
-                array of all possible next states reachable from current state (output from nextstates function); if
-                None then will be computed within this function (default=None)
+                array of all possible next states reachable from current state, as computed using :func:`transitions`;
+                if None then will be computed within this function (default=None)
             sym_avg (bool, optional):
-                whether to average the value of symmetric equivalent states (default=False)
+                whether to average the value over symmetric-equivalent states (default=False)
 
         Returns:
-            int: action chosen according to the policy
+            action_chosen (int): action chosen according to the policy
         """
         if statep is None:
-            _, statep = self.nextstates()
-        assert statep.shape == (self.Nactions, self.Nhits)
+            _, statep = self.transitions()
+        action_chosen, _ = self._value_policy_from_statep(model=model, statep=statep, sym_avg=sym_avg)
 
-        ishape = self._inputshape()
-
-        inputp, probp = self.states2inputs(statep, dims=2)  # (1, Nactions, Nhits, inputshape), (1, Nactions, Nhits)
-        assert inputp.shape == tuple([1] + [self.Nactions] + [self.Nhits] + list(ishape))
-        assert probp.shape == tuple([1] + [self.Nactions] + [self.Nhits])
-
-        inputpshape = inputp.shape
-        inputp = tf.reshape(inputp, shape=tuple([inputpshape[0] * inputpshape[1] * inputpshape[2]] + list(inputpshape[3:])))  # (1 * Nactions * Nhits, inputshape)
-        assert inputp.shape == tuple([1 * self.Nactions * self.Nhits] + list(ishape))
-
-        values_next = model(inputp, sym_avg=sym_avg)  # (1 * Nactions*Nhits, 1)
-        assert values_next.shape == tuple([1 * self.Nactions * self.Nhits] + [1])
-
-        values_next = tf.reshape(values_next, shape=(inputpshape[0], inputpshape[1], inputpshape[2],))  # (1, Nactions, Nhits)
-        assert values_next.shape == tuple([1] + [self.Nactions] + [self.Nhits])
-        assert values_next.shape == probp.shape
-
-        expected_value = 1.0 + tf.math.reduce_sum(probp * values_next, axis=2)  # sum over hits: (1, Nactions)
-        assert expected_value.shape == tuple([1] + [self.Nactions])
-
-        action_chosen = np.argmin(expected_value.numpy().squeeze())
         return action_chosen
 
     def transitions(self):
-        """ Compute all possible s' at t+1 that can be reached from state s at t
+        """ Compute all possible successors s' that can be reached from state s
 
         Returns:
-            state (ndarray): current state
-            statep (ndarray): array of all states reached for all possible actions and hit values
+            state (State): current state
+            statep (ndarray of State): array of all states reached for all possible actions and hit values
         """
         statep = [0] * self.Nactions
 
@@ -296,10 +267,10 @@ class TrainingEnv(SourceTracking):
 
     def apply_sym_transformation(self, sym):
         """
-        Apply a symmetry transformation (rotation, mirror, flip, etc) to p_source, agent, hit_map, ...
+        Apply a symmetry transformation (rotation, mirror, flip, etc.) to p_source, agent, hit_map, ...
 
         Args:
-            sym: which symmetry transformation to apply (0 for none)
+            sym (int): which symmetry transformation to apply (0 for none)
 
         """
         self.p_source = self._sym_transformation_array(self.p_source, sym=sym)
@@ -311,6 +282,31 @@ class TrainingEnv(SourceTracking):
             self.source = self._sym_transformation_coords(self.source, sym=sym)
 
     # __ INTERNAL FUNCTIONS  _________________________________________
+    def _value_policy_from_statep(self, model, statep, sym_avg=False):  # statep: (Nactions, Nhits)
+        assert statep.shape == (self.Nactions, self.Nhits)
+
+        ishape = self._inputshape()
+
+        inputp, probp = self.states2inputs(statep, dims=2)  # (1, Nactions, Nhits, inputshape), (1, Nactions, Nhits)
+        assert inputp.shape == tuple([1] + [self.Nactions] + [self.Nhits] + list(ishape))
+        assert probp.shape == tuple([1] + [self.Nactions] + [self.Nhits])
+
+        inputpshape = inputp.shape
+        inputp = tf.reshape(inputp, shape=tuple([inputpshape[0] * inputpshape[1] * inputpshape[2]] + list(inputpshape[3:])))  # (1 * Nactions * Nhits, inputshape)
+        assert inputp.shape == tuple([1 * self.Nactions * self.Nhits] + list(ishape))
+
+        values_next = model(inputp, sym_avg=sym_avg)  # (1 * Nactions*Nhits, 1)
+        assert values_next.shape == tuple([1 * self.Nactions * self.Nhits] + [1])
+
+        values_next = tf.reshape(values_next, shape=(inputpshape[0], inputpshape[1], inputpshape[2],))  # (1, Nactions, Nhits)
+        assert values_next.shape == tuple([1] + [self.Nactions] + [self.Nhits])
+        assert values_next.shape == probp.shape
+
+        expected_value = 1.0 + tf.math.reduce_sum(probp * values_next, axis=2)  # sum over hits: (1, Nactions)
+        assert expected_value.shape == tuple([1] + [self.Nactions])
+
+        action_chosen = np.argmin(expected_value.numpy().squeeze())
+        return action_chosen, expected_value.numpy().squeeze()
 
     def _state2input(self, state):
         p_source = self._centeragent(state.p_source, state.agent)

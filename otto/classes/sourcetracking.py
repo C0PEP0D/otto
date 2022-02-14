@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+"""Provides the SourceTracking class, to simulate the source-tracking POMDP."""
 
 import numpy as np
 import warnings
@@ -15,32 +16,65 @@ EPSILON = 1e-10
 
 
 class SourceTracking:
-    """Environment used to simulate the source tracking POMDP.
+    """Environment used to simulate the source-tracking POMDP.
+
+    Args:
+        Ndim (int):
+            number of space dimensions (1D, 2D...)
+        lambda_over_dx (float):
+            dimensionless problem size (odor dispersion lengthscale divided by agent step size)
+        R_dt (float):
+            dimensionless source intensity (source rate of emission multiplied by the agent time step)
+        norm_Poisson ('Euclidean', 'Manhattan' or 'Chebyshev', optional):
+            norm used for hit detections (default='Euclidean')
+        Ngrid (int or None, optional):
+            linear size of the domain, set automatically if None (default=None)
+        Nhits (int or None, optional):
+            number of possible hit values, set automatically if None (default=None)
+        draw_source (bool, optional):
+            whether to actually draw the source location (otherwise uses Bayesian framework) (default=False)
+        initial_hit (int or None, optional):
+                value of the initial hit, if None drawn randomly according to relevant probability distribution (default=None)
+        dummy (bool, optional):
+                set automatic parameters (e.g., Ngrid) but does not initialize the POMDP (default=False)
 
     Attributes:
-        Ndim (int): number of dimension of space (1D, 2D...)
-        lambda_over_dx (float): dimensionless problem size (odor dispersion lengthscale divided by agent's step size)
-        R_dt (float): dimensionless source intensity (source rate of emission multiplied by the agent's time step)
-        mu0_Poisson (float): mean number of hits at a distance lambda_over_dx from the source
-        norm_Poisson ('Euclidean', 'Manhattan' or 'Chebyshev'): norm used for hit detections
-        Ngrid (int): linear size of the box
-        Nhits (int): number of values of hit possible
-        draw_source (bool): whether to actually draw the source location (otherwise uses Bayesian framework)
-        initial_hit (int): value of the initial hit
-        Nactions (int = 2 * Ndim): number of possible actions
+        Ndim (int):
+            number of dimension of space (1D, 2D...)
+        lambda_over_dx (float):
+            dimensionless problem size (odor dispersion lengthscale divided by agent step size)
+        R_dt (float):
+            dimensionless source intensity (source rate of emission multiplied by the agent time step)
+        norm_Poisson (str):
+            norm used for hit detections: 'Euclidean', 'Manhattan' or 'Chebyshev'
+        Ngrid (int):
+            linear size of the domain
+        Nhits (int):
+            number of possible hit values
+        draw_source (bool):
+            whether a source location is actually drawn  (otherwise uses Bayesian framework)
+        initial_hit (int):
+            value of the initial hit
+        Nactions (int):
+            number of possible actions
+        mu0_Poisson (float):
+            mean number of hits at a distance lambda_over_dx from the source
+        agent (list(int)):
+            current agent location
+        p_source (ndarray):
+            current probability distribution of the source location)
+        obs (dict):
+            current observation ("hit" and "done")
+        hit_map (ndarray):
+            number of hits received for each location (-1 for cells not visited ye
+        cumulative_hits (int):
+            cumulated sum of hits received (ignoring initial hit)
+        agent_near_boundaries (bool):
+            whether the agent is currently near a boundary
+        agent_stuck (bool):
+            whether the agent is currently stuck in an "infinite" loop
 
-        agent (list of int): agent's location
-        p_source (array): probability distribution of the source location
-        hit_map (array): number of hits received for each location (-1 for cells not visited yet)
 
-        obs (dict): last observation ("hit" and "done")
-        cumulative_hits (int): cumulated sum of hits received (ignoring initial hit)
-        agent_near_boundaries (bool): whether the agent is currently near a boundary
-        agent_stuck (bool): whether the agent is currently stuck in an "infinite" loop
-
-    Methods:
-        step(action): make a step in the environment
-        restart(initial_hit=None): restart the search
 
     """
 
@@ -56,31 +90,6 @@ class SourceTracking:
         initial_hit=None,
         dummy=False,
     ):
-        """Constructor.
-
-        Args:
-            Ndim (int):
-                number of dimension of space (1D, 2D, ...)
-            lambda_over_dx (float):
-                sets the dimensionless problem size (odor dispersion lengthscale divided by agent's step size)
-            R_dt (float):
-                sets the dimensionless source intensity (source rate of emission multiplied by the agent's time step)
-            norm_Poisson ('Euclidean', 'Manhattan' or 'Chebyshev', optional):
-                norm used for hit detections (default='Euclidean')
-            Ngrid (int >= 3 or None, optional):
-                linear size of the box, set automatically if None (default=None)
-            Nhits (int >= 2 or None, optional):
-                number of values of hit possible, set automatically if None (default=None)
-            draw_source (bool, optional):
-                whether to actually draw the source location (otherwise uses Bayesian framework)
-            initial_hit (int > 0 or None, optional):
-                initial hit, if None then random (default=None)
-            dummy (bool, optional):
-                set parameters but does not initialize the problem (default=False)
-
-        Raises
-            Exception: invalid values
-        """
 
         self.Ndim = int(Ndim)
         if self.Ndim < 1:
@@ -126,7 +135,7 @@ class SourceTracking:
         """Restart the search.
 
         Args:
-            initial_hit (int > 0 or None): initial hit, if None then random
+            initial_hit (int or None): initial hit, if None then random
         """
         if initial_hit is None:
             self.initial_hit = self._initial_hit()
@@ -151,10 +160,10 @@ class SourceTracking:
         self._repeated_visits = 0  # to detect back and forth motion
 
     def step(self, action, hit=None, quiet=False):
-        """Time stepping the algorithm.
-         - The agent moves to its new position according to `action`
-         - The agent receives observations (hits)
-         - The belief (p_source) and the hit map are updated
+        """Make a step in the source-tracking environment:
+         - The agent moves to its new position according to `action`,
+         - The agent receives an observation (hit),
+         - The belief (self.p_source) and the hit map (self.hit_map) are updated.
 
         Args:
             action (int): action of the agent
@@ -164,8 +173,8 @@ class SourceTracking:
 
         Returns:
             hit (int): number of hits received
-            p_end (float): probability of having found the source (if not unique source)
-            done (bool): whether the source has been found (if unique source)
+            p_end (float): probability of having found the source (relevant only if not draw_source)
+            done (bool): whether the source has been found (relevant only if draw_source)
 
         """
         hit, p_end, done = self._execute_action(action, hit, quiet)

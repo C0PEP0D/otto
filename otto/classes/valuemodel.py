@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+"""Provides the ValueModel class, for defining a neural network model of the value function."""
 
 import os
 import pickle
@@ -23,7 +24,24 @@ def reload_model(model_dir, inputshape):
 
 class ValueModel(Model):
     """Neural network model used to predict the value of the belief state
-    (i.e. the expected remaining time to find the source)
+    (i.e. the expected remaining time to find the source).
+
+    Args:
+        Ndim (int):
+            number of space dimensions (1D, 2D, ...) for the search problem
+        FC_layers (int):
+            number of hidden layers
+        FC_units (int or tuple(int)):
+            units per layer
+        regularization_factor (float, optional):
+            factor for regularization losses (default=0.0)
+        loss_function (str, optional):
+            either 'mean_absolute_error', 'mean_absolute_percentage_error' or 'mean_squared_error' (default)
+
+    Attributes:
+        config (dict):
+            saves the args in a dictionary, can be used to recreate the model
+
     """
 
     def __init__(self,
@@ -35,20 +53,7 @@ class ValueModel(Model):
                  ):
         """Constructor.
 
-        Args:
-            Ndim (int):
-                number of dimension of space (1D, 2D, ...) for the search problem
-            FC_layers (int):
-                number of hidden layers
-            FC_units (int or tuple):
-                units per layer
-            regularization_factor (float >= 0.0, optional):
-                factor for regularization losses (default=0.0)
-            loss_function (str, optional):
-                either 'mean_absolute_error', 'mean_absolute_percentage_error' or 'mean_squared_error' (default)
 
-        Raises:
-            Exception: if Ndim or loss_function are not implemented, or if FC_units is not consistent with FC_layers.
         """
         super(ValueModel, self).__init__()
         self.config = {"Ndim": Ndim,

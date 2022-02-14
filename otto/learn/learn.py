@@ -125,7 +125,8 @@ from copy import deepcopy
 from itertools import repeat
 from classes.training import TrainingEnv as env
 from classes.valuemodel import ValueModel, reload_model
-from classes.heuristicpolicies import HeuristicPolicies, policy_name
+from classes.heuristicpolicy import HeuristicPolicy
+from classes.policy import policy_name
 
 # import default globals
 from parameters.__defaults import *
@@ -704,7 +705,7 @@ def _Worker(episode, policy, eps, memorize):
     myenv = deepcopy(MYENV)
     myenv.restart()
     if policy != -1:
-        mypol = HeuristicPolicies(env=myenv, policy=policy)
+        mypol = HeuristicPolicy(env=myenv, policy=policy)
 
     # Initialization parameters
     p_not_found_yet = 1  # probability of not having found the source
@@ -733,7 +734,11 @@ def _Worker(episode, policy, eps, memorize):
             action = random.randint(0, myenv.Nactions - 1)
         else:
             if policy == -1:
-                action = myenv.choose_action_from_statep(MYMODEL, sym_avg=((not memorize) and SYM_EVAL_ENSEMBLE_AVG), statep=statep)
+                action = myenv.choose_action_from_statep(
+                    model=MYMODEL,
+                    statep=statep,
+                    sym_avg=((not memorize) and SYM_EVAL_ENSEMBLE_AVG)
+                )
             else:
                 action = mypol.choose_action()
 

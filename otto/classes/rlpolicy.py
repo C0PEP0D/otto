@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+"""Definition of the RL policy (policy based on a value model)."""
 
 import os
 import numpy as np
 from copy import deepcopy
 import tensorflow as tf
+from .policy import Policy
 
 # _____________________  parameters  _____________________
 EPSILON = 1e-10
@@ -12,20 +14,57 @@ EPSILON_CHOICE = EPSILON
 # ________________________________________________________
 
 
-class RLPolicies:
+class RLPolicy(Policy):
+    """
+        An RL policy, that is, a policy based on a value model.
+
+        Args:
+            env (SourceTracking):
+                an instance of the source-tracking POMDP
+            model (ValueModel):
+                an instance of the neural network model
+            sym_avg (bool, optional):
+                whether to average the value over symmetric duplicates
+
+
+        Attributes:
+            env (SourceTracking):
+                source-tracking POMDP
+            model (ValueModel):
+                neural network model
+            policy_index (int):
+                policy index, set to -1
+            policy_name (str):
+                name of the policy
+
+
+
+    """
     def __init__(
             self,
             env,
             model,
-            sym_avg,
+            sym_avg=True,
     ):
+        super().__init__(policy=-1)  # sets policy_index and policy_name
+
         self.env = env
         self.model = model
         self.sym_avg = sym_avg
-        self.policy = -1
-        self.policy_name = "RL"
 
-    def choose_action(self, ):
+    def _choose_action(self, ):
+
+        if self.policy_index == -1:
+            action_chosen, _ = self._value_policy()
+        else:
+            raise Exception("The policy " + str(self.policy) + " does not exist (yet)!")
+
+        return action_chosen
+
+    # __ POLICY DEFINITIONS _______________________________________
+
+    def _value_policy(self):
+        """Chooses the action which minimizes the expected value at the next step."""
 
         inputs = [0] * self.env.Nactions
         probs = [0] * self.env.Nactions
@@ -75,7 +114,4 @@ class RLPolicies:
         # action_chosen = np.argmin(expected_value.numpy().squeeze())
 
         action_chosen = np.argwhere(np.abs(expected_value - np.min(expected_value)) < EPSILON_CHOICE).flatten()[0]
-        return action_chosen
-
-
-
+        return action_chosen, expected_value

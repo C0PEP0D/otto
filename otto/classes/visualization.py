@@ -1,6 +1,6 @@
 #!/usr/bin/self python3
 # -*- coding: utf-8 -*-
-
+"""Provides the Visualization class, for rendering episodes."""
 import os
 import shutil
 import numpy as np
@@ -14,9 +14,18 @@ from mpl_toolkits.axes_grid1 import make_axes_locatable
 class Visualization:
     """ A class for visualizing the search in 1D, 2D or 3D
 
-    Methods:
-        make_video(frame_rate=5, save_frames=False): to call after done recording, to create a video from the frames
-        record_snapshot(num, toptext=''): create a frame, that is, plot and save current state of the search
+    Args:
+        env (SourceTracking):
+            an instance of the SourceTracking class
+        live (bool, optional):
+            whether to show live preview (faster if False) (default=False)
+        filename (str, optional):
+            file name for the video (default='test')
+        log_prob (bool, optional):
+            whether to show log(prob) instead of prob (default=False)
+        marginal_prob_3d (bool, optional):
+            in 3D, whether to show marginal pdfs on each plane, instead of the pdf in the planes that the
+            agent crosses (default=False)
     """
     
     def __init__(self,
@@ -26,23 +35,6 @@ class Visualization:
                  log_prob=False,
                  marginal_prob_3d=False,
                  ):
-        """Constructor
-
-        Args
-            env (SourceTracking):
-                an instance of the SourceTracking class
-            live (bool, optional):
-                whether to show live preview (faster if False) (default=False)
-            filename (str, optional):
-                file name for the video (default='test')
-            log_prob (bool, optional):
-                whether to show log(p) instead of p (default=False)
-            marginal_prob_3d (bool, optional):
-                in 3D, whether to show marginal pdfs on each plane, instead of the pdf in the planes that the
-                agent crosses (default=False)
-        Raises
-            Exception: if not 1D, 2D or 3D
-        """
         self.env = env
         if self.env.Ndim > 3 or self.env.Ndim < 1 or not isinstance(env.Ndim, int):
             raise Exception("Problem with Ndim: visualization is not possible")
@@ -58,14 +50,16 @@ class Visualization:
 
     def make_video(self, frame_rate=5, keep_frames=False):
         """
-        Make a video and clean up frames
+        Make a video from recorded frames and clean up frames.
 
         Args:
-            frame_rate: number of frames per second
-            keep_frames: whether to keep the frames (images)
+            frame_rate (int): number of frames per second (default=5)
+            keep_frames (bool): whether to keep the frames as images (default=False)
 
         Returns:
-
+            exit_code (int):
+                nonzero if something went wrong while making the video, in that case frames will be
+                saved even if keep_frames = False
         """
         if self.video_live:
             plt.close("all")

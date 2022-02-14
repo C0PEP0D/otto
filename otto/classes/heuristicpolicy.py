@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+"""Definition of heuristic policies such as infotaxis."""
 
 import numpy as np
 import random
 from copy import deepcopy
+from .policy import Policy
 
 # _____________________  parameters  _____________________
 EPSILON = 1e-10
@@ -11,43 +13,39 @@ EPSILON_CHOICE = EPSILON
 # ________________________________________________________
 
 
-def policy_name(policy):
-    """Returns the name (str) of the policy (int)."""
-    if policy == 0:
-        name = "infotaxis"
-    elif policy == 1:
-        name = "space-aware infotaxis"
-    elif policy == 2:
-        name = "custom policy"
-    elif policy == 5:
-        name = "random"
-    elif policy == 6:
-        name = "greedy"
-    elif policy == 7:
-        name = "mean distance"
-    elif policy == 8:
-        name = "voting"
-    elif policy == 9:
-        name = "most likely state"
-    else:
-        raise Exception("The policy " + str(policy) + " does not exist (yet)!")
-    return name
-
-
-class HeuristicPolicies:
+class HeuristicPolicy(Policy):
     """
-        Class that defines the behavior of heuristic policies (such as infotaxis)
-        
+        A heuristic policy.
+
+        Args:
+            env (SourceTracking):
+                an instance of the source-tracking POMDP
+            policy (int):
+                    - 0: infotaxis (Vergassola, Villermaux and Shraiman, Nature 2007)
+                    - 1: space-aware infotaxis
+                    - 2: custom policy (to be implemented by the user)
+                    - 5: random walk
+                    - 6: greedy policy
+                    - 7: mean distance policy
+                    - 8: voting policy (Cassandra, Kaelbling & Kurien, IEEE 1996)
+                    - 9: most likely state policy (Cassandra, Kaelbling & Kurien, IEEE 1996)
+            steps_ahead (int, optional):
+                number of anticipated future moves (default=1), > 1 only for infotaxis
+            discount (float or None, optional):
+                discount factor to use when steps_ahead> 1, automatically set if None (default=None)
+
         Attributes:
-            env (SourceTracking): an instance of the source-tracking POMDP
-            policy (int): policy index
-            policy_name (str): name of the policy
-            steps_ahead (int or None): number of anticipated future moves, for infotaxis only
-            discount (float or None): discount factor, for infotaxis only when steps_ahead > 1
-            
-        Methods
-        choose_action_with_heuristic_policy(policy=0, steps_ahead=1, discount=0.999):
-            determine the action according to a heuristic policy, for example infotaxis, space-aware infotaxis, ...
+            env (SourceTracking):
+                source-tracking POMDP
+            policy_index (int):
+                policy index
+            policy_name (str):
+                name of the policy
+            steps_ahead (int):
+                number of anticipated future moves, for infotaxis only
+            discount (float or None):
+                discount factor used for steps_ahead > 1, or None if steps_ahead = 1
+
     """
 
     def __init__(
@@ -56,30 +54,12 @@ class HeuristicPolicies:
             policy,
             steps_ahead=1,
             discount=None,
-
     ):
-        """
-        Args:
-            env (SourceTracking): an instance of the source-tracking POMDP
-            policy (int): policy index, with
-                0 infotaxis (default)
-                1 space-aware infotaxis
-                2 custom policy (to be implemented by the user)
-                5 random policy
-                6 greedy policy
-                7 mean distance policy
-                8 voting policy (Cassandra, Kaelbling & Kurien, IEEE 1996)
-                9 most likely state policy (Cassandra, Kaelbling & Kurien, IEEE 1996)
-            policy_name (str): name of the policy
-            steps_ahead (int or None): number of anticipated future moves, for infotaxis only (default=None)
-            discount (float or None, optional): discount factor used, for infotaxis only when steps_ahead > 1 (default=None)
-        """
+        super().__init__(policy=policy)  # sets policy_index and policy_name
 
         self.env = env
-        self.policy = policy
-        self.policy_name = policy_name(self.policy)
         
-        if self.policy == 0:
+        if self.policy_index == 0:
             if discount is None:
                 discount = 0.999
         else:
@@ -91,62 +71,45 @@ class HeuristicPolicies:
         self.steps_ahead = int(steps_ahead)
         self.discount = discount
 
-    def choose_action(self, ):
-        """Choose an action according to a heuristic policy, based on the current belief (p_source, agent).
-
-        Args:
-            policy (int, optional):
-                0 infotaxis (default)
-                1 space-aware infotaxis
-                5 random policy
-                6 greedy policy
-                7 mean distance policy
-                8 voting policy (Cassandra, Kaelbling & Kurien, IEEE 1996)
-                9 most likely state policy (Cassandra, Kaelbling & Kurien, IEEE 1996)
-
-        Returns:
-            int: action chosen according to the policy
-
-        Raises:
-            Exception: invalid values
-        """
-
-        if self.policy == 0:
+    def _choose_action(self, ):
+        if self.policy_index == 0:
             if self.steps_ahead == 1:
                 action_chosen, _ = self._infotaxis()
             elif self.steps_ahead > 1:
-                if self.discount == 1.0:
+                if self.discount == 0.0:
+                    action_chosen, _ = self._infotaxis()
+                elif self.discount == 1.0:
                     action_chosen, _ = self._infotaxis_n_steps_no_discount(self.steps_ahead)
-                elif 0 <= self.discount < 1:
+                elif 0 < self.discount < 1:
                     action_chosen, _ = self._infotaxis_n_steps(self.steps_ahead, self.discount)
                 else:
                     raise Exception("discount must be between 0 and 1")
             else:
                 raise Exception("steps_ahead has to be an integer larger than 1")
 
-        elif self.policy == 1:
+        elif self.policy_index == 1:
             action_chosen, _ = self._space_aware_infotaxis()
 
-        elif self.policy == 2:
+        elif self.policy_index == 2:
             action_chosen, _ = self._custom_policy()
 
-        elif self.policy == 5:
+        elif self.policy_index == 5:
             action_chosen = random.randint(0, self.env.Nactions - 1)
 
-        elif self.policy == 6:
+        elif self.policy_index == 6:
             action_chosen, _ = self._greedy_policy()
 
-        elif self.policy == 7:
+        elif self.policy_index == 7:
             action_chosen, _ = self._mean_distance_policy()
 
-        elif self.policy == 8:
+        elif self.policy_index == 8:
             action_chosen, _ = self._voting_policy()
 
-        elif self.policy == 9:
+        elif self.policy_index == 9:
             action_chosen, _ = self._most_likely_state_policy()
 
         else:
-            raise Exception("The policy " + str(self.policy) + " does not exist (yet)!")
+            raise Exception("The policy " + str(self.policy_index) + " does not exist (yet)!")
 
         return action_chosen
 
@@ -291,7 +254,7 @@ class HeuristicPolicies:
         return action_chosen, self.env.entropy + cum_gain_reduced_over_obs
 
     def _infotaxis_n_steps_no_discount(self, steps_ahead):
-        """INFOTAXIS n-steps ahead, without any discounting"""
+        """Infotaxis policy, n-steps ahead, without any discounting"""
 
         # initialization of the info using the current position
         p_source = [self.env.p_source]
@@ -391,10 +354,10 @@ class HeuristicPolicies:
         self.distance_array = self.env._distance(N=size, origin=origin, norm="Manhattan")
 
     def _space_aware_infotaxis(self, ):
-        """Policy that minimizes an empirical proxi of the value function based on the entropy and the mean distance.
-        Note: assumes Manhattan norm for distances, this can be changed in _init_space_aware_infotaxis()"""
+        """Policy that minimizes an empirical proxi of the value function based on the entropy and the mean distance."""
 
         if not hasattr(self, 'distance_array'):
+            # assumes Manhattan norm for distances, this can be changed in _init_space_aware_infotaxis()
             self._init_space_aware_infotaxis()
 
         to_minimize = np.ones(self.env.Nactions) * float("inf")
@@ -444,6 +407,7 @@ class HeuristicPolicies:
         return action_chosen, to_minimize
 
     def _greedy_policy(self):
+        """Usual greedy policy"""
         p = np.ones(self.env.Nactions) * float("inf")
         for a in range(self.env.Nactions):
             agent_, move_possible = self.env._move(a, self.env.agent)
@@ -458,7 +422,7 @@ class HeuristicPolicies:
         self.distance_array = self.env._distance(N=size, origin=origin, norm="Manhattan")
 
     def _mean_distance_policy(self, ):
-        """Policy that minimizes the expected distance to the source"""
+        """Policy that chooses the action that minimizes the expected distance to the source at the next step"""
 
         if not hasattr(self, 'distance_array'):
             self._init_mean_distance_policy()

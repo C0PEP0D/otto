@@ -81,12 +81,12 @@ del parser, args
 
 # other globals
 if POLICY == -1:
-    from classes.rlpolicies import RLPolicies
+    from classes.rlpolicy import RLPolicy
     from classes.valuemodel import reload_model
     if MODEL_PATH is None:
         raise Exception("MODEL_PATH cannot be None with an RL policy!")
 else:
-    from classes.heuristicpolicies import HeuristicPolicies
+    from classes.heuristicpolicy import HeuristicPolicy
 
 EPSILON = 1e-10
 
@@ -120,15 +120,14 @@ def run():
 
     if POLICY == -1:
         mymodel = reload_model(MODEL_PATH, inputshape=myenv._inputshape())
-        mypol = RLPolicies(
+        mypol = RLPolicy(
             env=myenv,
             model=mymodel,
-            sym_avg=True,
         )
         print("POLICY = -1 (" + mypol.policy_name + ")")
         print("MODEL =", mymodel.config)
     else:
-        mypol = HeuristicPolicies(
+        mypol = HeuristicPolicy(
             env=myenv,
             policy=POLICY,
             steps_ahead=STEPS_AHEAD,
