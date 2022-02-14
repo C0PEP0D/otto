@@ -17,10 +17,10 @@ def main():
         author="A. Loisy, C. Eloy",
         author_email="aurore.loisy@gmail.com, eloy@irphe.univ-mrs.fr",
         description="OTTO (Odor-based Target Tracking Optimization): "
-                    "a python package to simulate and solve the source-tracking POMDP",
+                    "a Python package to simulate, solve and visualize the source-tracking POMDP",
         long_description=my_long_description,
         long_description_content_type="text/markdown",
-        url='', #'"https://gitlab.com/celoy/infotaxis",
+        url='https://github.com/C0PEP0D/otto',
         license=my_license,
         packages=find_packages(),
         classifiers=[
