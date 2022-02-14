@@ -1,99 +1,118 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Program used to visualize a search in 1D, 2D or 3D. Outputs are saved in the 'outputs/videos' directory.
-# ??? Frame generation and live preview work on all platforms, but video recording is Linux-only.
+Script used to visualize a search in 1D, 2D or 3D.
+Frame generation and live preview work on all platforms, but video recording is Linux-only and requires ffmpeg.
 
-Default parameters are set by '__default.py' in the 'parameters' directory.
 
-Source-tracking POMDP:
+
+Usage: execute the script from a terminal using
+
+`python visualize.py -i custom.py`
+
+where `custom.py` is a user-defined Python script that sets the custom parameters.
+
+The list of all parameters is given below.
+Default parameters are set by '__default.py' in the local 'parameters' directory.
+
+Source-tracking POMDP
     - N_DIMS (int > 0)
-    number of dimension (1D, 2D, ...)
+        number of dimension (1D, 2D, ...)
     - LAMBDA_OVER_DX (float >= 1)
-    sets the dimensionless problem size (odor dispersion lengthscale divided by agent's step size)
+        sets the dimensionless problem size (odor dispersion lengthscale divided by agent's step size)
     - R_DT (float > 0)
-    sets the dimensionless source intensity (source rate of emission multiplied by the agent's time step)
+        sets the dimensionless source intensity (source rate of emission multiplied by the agent's time step)
     - NORM_POISSON ('Euclidean', 'Manhattan' or 'Chebyshev')
-    norm used for hit detections
+        norm used for hit detections
     - N_HITS (int >= 2 or None)
-    number of values of hit possible, set automatically if None
+        number of values of hit possible, set automatically if None
     - N_GRID (int >=3 or None)
-    linear size of the box, set automatically if None
+        linear size of the domain, set automatically if None
 
 Policy
     - POLICY (int)
-    O: infotaxis, 1: space-aware infotaxis, 5: random, 6: greedy, 7: mean distance, 8: voting, 9: most likely state
+        - -1: reinforcement learning
+        - 0: infotaxis (Vergassola, Villermaux and Shraiman, Nature 2007)
+        - 1: space-aware infotaxis
+        - 2: custom policy (to be implemented by the user)
+        - 5: random walk
+        - 6: greedy policy
+        - 7: mean distance policy
+        - 8: voting policy (Cassandra, Kaelbling & Kurien, IEEE 1996)
+        - 9: most likely state policy (Cassandra, Kaelbling & Kurien, IEEE 1996)
     - STEPS_AHEAD (int>=1)
-    number of anticipated future moves, only for POLICY=0
+        number of anticipated future moves, only for POLICY=0
 
-Setup:
+Setup
     - DRAW_SOURCE (bool)
-    whether to actually draw the source location (otherwise uses Bayesian framework)
+        whether to actually draw the source location (otherwise uses Bayesian framework)
     - ZERO_HIT (bool)
-    whether to force a series of zero hits
+        whether to force a series of zero hits
 
 Visualization
     - VISU_MODE (int={0,1,2})
-    0: run without video, 1: make video in the background, 2: make video with live preview (slower)
+        - 0: run without video
+        - 1: make video in the background
+        - 2: make video with live preview (slower)
     - FRAME_RATE (int)
-    number of frames per second in the video
+        number of frames per second in the video
     - KEEP_FRAMES (bool)
-    whether each frame is conserved (otherwise frames are deleted, only the video is kept)
+        whether each frame is conserved (otherwise frames are deleted, only the video is kept)
 
-Stopping criteria (only if DRAW_SOUCE is False):
+Stopping criteria (only if DRAW_SOURCE is False)
     - STOP_p (float ~ 0):
-    stops when the probability that the source is found is greater than 1 - STOP_p
+        stops when the probability that the source is found is greater than 1 - STOP_p
     - STOP_t (int)
-    max number of iterations
+        max number of iterations
 
 Saving
-    - RUN_NAME (str)
-    prefix used for all output files
+    - RUN_NAME (str or None)
+        prefix used for all output files, if None will use timestamp
 """
 import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 import sys
-sys.path.insert(1, os.path.join(sys.path[0], '..'))
-sys.path.insert(2, os.path.join(sys.path[0], '..', '..', 'zoo'))
-
+sys.path.insert(1, os.path.abspath(os.path.join(sys.path[0], '..', '..')))
+sys.path.insert(2, os.path.abspath(os.path.join(sys.path[0], '..', '..', 'zoo')))
 import time
 import argparse
 import importlib
-from classes.sourcetracking import SourceTracking as env
-from classes.visualization import Visualization
+from otto.classes.sourcetracking import SourceTracking as env
+from otto.classes.visualization import Visualization
 
 # import default globals
-from parameters.__defaults import *
+from otto.visualize.parameters.__defaults import *
 
-# import global from user defined parameter file
-parser = argparse.ArgumentParser(description='Visualize an episode')
-parser.add_argument('-i', '--input',
-                    dest='inputfile',
-                    help='name of the file containing the parameters')
-args = vars(parser.parse_args())
-if args['inputfile'] is not None:
-    filename, fileextension = os.path.splitext(args['inputfile'])
-    params = importlib.import_module(name="parameters." + filename)
-    names = [x for x in params.__dict__ if not x.startswith("_")]
-    globals().update({k: getattr(params, k) for k in names})
-    del params, names
-del parser, args
+# import globals from user defined parameter file
+if os.path.basename(sys.argv[0]) not in ["sphinx-build", "build.py"]:
+    parser = argparse.ArgumentParser(description='Visualize an episode')
+    parser.add_argument('-i', '--input',
+                        dest='inputfile',
+                        help='name of the file containing the parameters')
+    args = vars(parser.parse_args())
+    if args['inputfile'] is not None:
+        filename, fileextension = os.path.splitext(args['inputfile'])
+        params = importlib.import_module(name="parameters." + filename)
+        names = [x for x in params.__dict__ if not x.startswith("_")]
+        globals().update({k: getattr(params, k) for k in names})
+        del params, names
+    del parser, args
 
 # other globals
 if POLICY == -1:
-    from classes.rlpolicy import RLPolicy
-    from classes.valuemodel import reload_model
+    from otto.classes.rlpolicy import RLPolicy
+    from otto.classes.valuemodel import reload_model
     if MODEL_PATH is None:
         raise Exception("MODEL_PATH cannot be None with an RL policy!")
 else:
-    from classes.heuristicpolicy import HeuristicPolicy
+    from otto.classes.heuristicpolicy import HeuristicPolicy
 
 EPSILON = 1e-10
 
 if RUN_NAME is None:
     RUN_NAME = time.strftime("%Y%m%d-%H%M%S")
 
-DIR_OUTPUTS = "outputs"
+DIR_OUTPUTS = os.path.abspath(os.path.join(sys.path[0], "outputs"))
 
 # _______________________________________________
 
@@ -125,14 +144,15 @@ def run():
             model=mymodel,
         )
         print("POLICY = -1 (" + mypol.policy_name + ")")
-        print("MODEL =", mymodel.config)
+        print("MODEL_PATH =", MODEL_PATH)
+        print("MODEL_CONFIG =", mymodel.config)
     else:
         mypol = HeuristicPolicy(
             env=myenv,
             policy=POLICY,
             steps_ahead=STEPS_AHEAD,
         )
-        print("POLICY = " + str(mypol.policy) + " (" + mypol.policy_name + ")")
+        print("POLICY = " + str(mypol.policy_index) + " (" + mypol.policy_name + ")")
         print("STEPS_AHEAD = " + str(mypol.steps_ahead))
 
     print("*** running...")

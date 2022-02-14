@@ -1,67 +1,74 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Program used to evaluate the performance of a given policy (such as intotaxis) on the source-tracking POMDP.
+Script used to evaluate the performance of a given policy (such as intotaxis) on the source-tracking POMDP.
 The POMDP is defined by the number of dimensions (1D, 2D, 3D and more), and by dimensionless parameters that
 control the domain size and the source intensity (other parameters are set automatically, but can be chosen manually).
-The program records many statistics and monitoring information, and plot results.
+The script records many statistics and monitoring information, and plot results.
 All outputs are saved in the 'outputs/statistics' directory.
 Computations are parallelized with multiprocessing (done automatically) or with MPI.
+
 To use MPI on N_CORES cores, run the following command line from a Linux terminal:
 mpiexec -n N_CORES python3 -m mpi4py evaluate.py
 
-Default parameters are set by '__default.py' in the 'parameters' directory.
+The list of all parameters is given below.
+Default parameters are set by '__default.py' in the local 'parameters' directory.
 
-Source-tracking POMDP:
+Source-tracking POMDP
     - N_DIMS (int > 0)
-    number of dimension (1D, 2D, ...)
+        number of dimension (1D, 2D, ...)
     - LAMBDA_OVER_DX (float >= 1)
-    sets the dimensionless problem size (odor dispersion lengthscale divided by agent's step size)
+        sets the dimensionless problem size (odor dispersion lengthscale divided by agent's step size)
     - R_DT (float > 0)
-    sets the dimensionless source intensity (source rate of emission multiplied by the agent's time step)
+        sets the dimensionless source intensity (source rate of emission multiplied by the agent's time step)
     - NORM_POISSON ('Euclidean', 'Manhattan' or 'Chebyshev')
-    norm used for hit detections
+        norm used for hit detections
     - N_HITS (int >= 2 or None)
-    number of values of hit possible, set automatically if None
+        number of values of hit possible, set automatically if None
     - N_GRID (int >=3 or None)
-    linear size of the box, set automatically if None
+        linear size of the domain, set automatically if None
 
 Policy
     - POLICY (int)
-    O: infotaxis, 1: space-aware infotaxis, 5: random, 6: greedy, 7: mean distance, 8: voting, 9: most likely state
+        - -1: reinforcement learning
+        - 0: infotaxis (Vergassola, Villermaux and Shraiman, Nature 2007)
+        - 1: space-aware infotaxis
+        - 2: custom policy (to be implemented by the user)
+        - 5: random walk
+        - 6: greedy policy
+        - 7: mean distance policy
+        - 8: voting policy (Cassandra, Kaelbling & Kurien, IEEE 1996)
+        - 9: most likely state policy (Cassandra, Kaelbling & Kurien, IEEE 1996)
     - STEPS_AHEAD (int>=1)
-    number of anticipated future moves, only for POLICY=0
+        number of anticipated future moves, only for POLICY=0
 
 Statistics computation
     - N_RUNS (int > 0 or None)
-    number of episodes used for statistics, if None then set automatically
+        number of episodes used for statistics, if None then set automatically
     - ADAPTIVE_N_RUNS (bool)
-    if true, N_RUNS is increased until the estimated error is less than REL_TOL
+        if true, N_RUNS is increased until the estimated error is less than REL_TOL
     - REL_TOL (0 < float < 1)
-    tolerance on the estimate of the relative error on the mean time (if ADAPTIVE_N_RUNS only)
+        tolerance on the estimate of the relative error on the mean time (if ADAPTIVE_N_RUNS only)
     - MAX_N_RUNS (int > 0)
-    maximum number of runs (if ADAPTIVE_N_RUNS only)
+        maximum number of runs (if ADAPTIVE_N_RUNS only)
     - STOP_p (float ~ 0)
-    stops when the probability that the source is found is greater than 1 - STOP_p
+        stops when the probability that the source is found is greater than 1 - STOP_p
 
 Saving
-    - RUN_NAME (str)
-    prefix used for all output files
+    - RUN_NAME (str or None)
+        prefix used for all output files, if None will use timestamp
 
 Parallelization
     - N_PARALLEL (int)
-    number of episodes computed in parallel when generating new experience or evaluating the RL policy (if <= 0, will
-    use all available cpus), with multiprocessing only (has no effect with MPI)
-    Known bug: for large neural networks, the code may hang if N_PARALLEL > 1, so use N_PARALLEL = 1 instead.
+        number of episodes computed in parallel when generating new experience or evaluating the RL policy
+        (if <= 0, will use all available cpus), with multiprocessing only (has no effect with MPI)
+        Known bug: for large neural networks, the code may hang if N_PARALLEL > 1, so use N_PARALLEL = 1 instead.
 """
 import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 import sys
-sys.path.insert(1, os.path.join(sys.path[0], '..'))
-sys.path.insert(2, os.path.join(sys.path[0], '..', '..', 'zoo'))
-
-import sys
-import os
+sys.path.insert(1, os.path.abspath(os.path.join(sys.path[0], '..', '..')))
+sys.path.insert(2, os.path.abspath(os.path.join(sys.path[0], '..', '..', 'zoo')))
 import time
 import argparse
 import importlib
@@ -71,7 +78,7 @@ import matplotlib.pyplot as plt
 from copy import deepcopy
 from scipy.stats import skew as Skew
 from scipy.stats import kurtosis as Kurt
-from classes.sourcetracking import SourceTracking as env
+from otto.classes.sourcetracking import SourceTracking as env
 if 'mpi4py' in sys.modules:
     WITH_MPI = True
     import mpi4py.MPI as MPI
@@ -80,39 +87,40 @@ else:
     import multiprocessing
 
 # import default globals
-from parameters.__defaults import *
+from otto.evaluate.parameters.__defaults import *
 
-# import global from user defined parameter file
-parser = argparse.ArgumentParser(description='Evaluate a policy')
-parser.add_argument('-i', '--input',
-                    dest='inputfile',
-                    help='name of the file containing the parameters')
-args = vars(parser.parse_args())
-if args['inputfile'] is not None:
-    filename, fileextension = os.path.splitext(args['inputfile'])
-    params = importlib.import_module(name="parameters." + filename)
-    names = [x for x in params.__dict__ if not x.startswith("_")]
-    globals().update({k: getattr(params, k) for k in names})
-    del params, names
-del parser, args
+# import globals from user defined parameter file
+if os.path.basename(sys.argv[0]) not in ["sphinx-build", "build.py"]:
+    parser = argparse.ArgumentParser(description='Evaluate a policy')
+    parser.add_argument('-i', '--input',
+                        dest='inputfile',
+                        help='name of the file containing the parameters')
+    args = vars(parser.parse_args())
+    if args['inputfile'] is not None:
+        filename, fileextension = os.path.splitext(args['inputfile'])
+        params = importlib.import_module(name="parameters." + filename)
+        names = [x for x in params.__dict__ if not x.startswith("_")]
+        globals().update({k: getattr(params, k) for k in names})
+        del params, names
+    del parser, args
 
 # set other globals
 if POLICY == -1:
-    from classes.rlpolicy import RLPolicy
-    from classes.valuemodel import reload_model
+    from otto.classes.rlpolicy import RLPolicy
+    from otto.classes.valuemodel import reload_model
     if MODEL_PATH is None:
         raise Exception("MODEL_PATH cannot be None with an RL policy!")
 else:
-    from classes.heuristicpolicy import HeuristicPolicy
+    from otto.classes.heuristicpolicy import HeuristicPolicy
 
 EPSILON = 1e-10
 
 if RUN_NAME is None:
     RUN_NAME = time.strftime("%Y%m%d-%H%M%S")
 
-DIR_OUTPUTS = os.path.join("outputs", RUN_NAME)
-PARENT_DIR_TMP = "tmp"
-DIR_TMP = os.path.join(PARENT_DIR_TMP, RUN_NAME)
+DIR_OUTPUTS = os.path.abspath(os.path.join(sys.path[0], "outputs", RUN_NAME))
+PARENT_DIR_TMP = os.path.abspath(os.path.join(sys.path[0], "tmp"))
+DIR_TMP = os.path.abspath(os.path.join(PARENT_DIR_TMP, RUN_NAME))
 
 
 # config
@@ -208,7 +216,7 @@ def check_envs(env, pol):
     assert not env.draw_source
     
     assert pol.env == env
-    assert pol.policy == POLICY
+    assert pol.policy_index == POLICY
     if POLICY != -1:
         assert pol.steps_ahead == STEPS_AHEAD
     

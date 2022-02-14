@@ -54,7 +54,7 @@ class Policy:
             policy,
     ):
         self.policy_index = policy
-        self.policy_name = policy_name(self.policy)
+        self.policy_name = policy_name(self.policy_index)
 
     def choose_action(self, ):
         """Choose an action based on the current belief (env.p_source, env.agent), according to the policy.

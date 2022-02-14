@@ -12,8 +12,8 @@ from tensorflow.keras import regularizers
 
 def reload_model(model_dir, inputshape):
     model_name = os.path.basename(model_dir)
-    weights_path = os.path.join(model_dir, model_name)
-    config_path = os.path.join(model_dir, model_name + ".config")
+    weights_path = os.path.abspath(os.path.join(model_dir, model_name))
+    config_path = os.path.abspath(os.path.join(model_dir, model_name + ".config"))
     with open(config_path, 'rb') as filehandle:
         config = pickle.load(filehandle)
     model = ValueModel(**config)
@@ -268,9 +268,9 @@ class ValueModel(Model):
         if not os.path.isdir(model_dir):
             os.mkdir(model_dir)
         model_name = os.path.basename(model_dir)
-        weights_path = os.path.join(model_dir, model_name)
+        weights_path = os.path.abspath(os.path.join(model_dir, model_name))
         self.save_weights(weights_path, save_format='h5')
-        config_path = os.path.join(model_dir, model_name + ".config")
+        config_path = os.path.abspath(os.path.join(model_dir, model_name + ".config"))
         with open(config_path, 'wb') as filehandle:
             pickle.dump(self.config, filehandle)
 

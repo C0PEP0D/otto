@@ -1,36 +1,37 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Program used to learn the optimal value function using a neural network approximator, for 1D and 2D searches.
+Script used to learn the optimal value function using a neural network approximator, for 1D and 2D searches.
 The learning algorithm is a value-based version of the DQN algorithm (Mnih et al., Nature 2015).
-The program periodically evaluates the performance of the RL policy derived from the current value function.
+The script periodically evaluates the performance of the RL policy derived from the current value function.
 Training can be interrupted at any time (the neural network is saved periodically, and training can restart from a
 previously saved network).
 Data and results are saved in the 'outputs/reinforcementlearning' directory.
 
-Default parameters are set by '__default.py' in the 'parameters' directory.
+The list of all parameters is given below.
+Default parameters are set by '__default.py' in the local 'parameters' directory.
 
 Source-tracking POMDP:
     - N_DIMS (1 or 2)
-    number of dimension (1D or 2D)
+        number of dimension (1D or 2D)
     - LAMBDA_OVER_DX (float >= 1)
-    sets the dimensionless problem size (odor dispersion lengthscale divided by agent's step size)
+        sets the dimensionless problem size (odor dispersion lengthscale divided by agent's step size)
     - R_DT (float > 0)
-    sets the dimensionless source intensity (source rate of emission multiplied by the agent's time step)
+        sets the dimensionless source intensity (source rate of emission multiplied by the agent's time step)
     - NORM_POISSON ('Euclidean', 'Manhattan' or 'Chebyshev')
-    norm used for hit detections
+        norm used for hit detections
     - N_HITS (int >= 2 or None)
-    number of values of hit possible, set automatically if None
+        number of values of hit possible, set automatically if None
     - N_GRID (int >=3 or None)
-    linear size of the box, set automatically if None
+        linear size of the domain, set automatically if None
 
 
 Reinforcement learning
     Neural network architecture (fully connected)
         - FC_LAYERS (int)
-        number of layers
+            number of layers
         - FC_UNITS (tuple of int, or int)
-        number of units per layers
+            number of units per layers
         
     Stochastic gradient descent
         - BATCH_SIZE (int) 
@@ -42,77 +43,74 @@ Reinforcement learning
 
     Exploration: eps is the probability of taking a random action
         - E_GREEDY_FLOOR (0 <= float <= 1)
-        floor value of eps
+            floor value of eps
         - E_GREEDY_0 (0 <= float <= 1)
-        initial value of eps
+            initial value of eps
         - E_GREEDY_DECAY (float > 0)
-        timescale (in units of algorithm iteration) for the decay of eps
+            timescale (in units of algorithm iteration) for the decay of eps
     
     Accounting for symmetries:
         - SYM_EVAL_ENSEMBLE_AVG (bool) 
-        whether to average over symmetric duplicates during evaluation
+            whether to average over symmetric duplicates during evaluation
         - SYM_TRAIN_ADD_DUPLICATES (bool) 
-        whether to augment data by including symmetric duplicates with identical targets during training step
+            whether to augment data by including symmetric duplicates with identical targets during training step
         - SYM_TRAIN_RANDOMIZE (bool) 
-        whether to apply random symmetry transformations when generating the data (no duplicates)
+            whether to apply random symmetry transformations when generating the data (no duplicates)
     
     Experience replay
         - MEMORY_SIZE (int)
-        number of transitions (s, s') to keep in memory
+            number of transitions (s, s') to keep in memory
         - REPLAY_NTIMES (int>0)
-        how many times a transition is used for training before being deleted, on average
+            how many times a transition is used for training before being deleted, on average
     
     Additional DQN algo parameters
         - ALGO_MAX_IT (int) 
-        stop training if it > ALGO_MAX_IT
+            stop training if it > ALGO_MAX_IT
         - UPDATE_FROZEN_MODEL_EVERY (int) 
-        the optimal Bellman target is computed using a frozen model, which is updated to the latest model every 
-        UPDATE_FROZEN_MODEL_EVERY iterations
+            the optimal Bellman target is computed using a frozen model, which is updated to the latest model every
+            UPDATE_FROZEN_MODEL_EVERY iterations
         - DDQN (bool) 
-        whether to use Double DQN instead of vanille DQN
+            whether to use Double DQN instead of vanille DQN
 
     Evaluation of the RL policy
         - POLICY_REF (int)
-        heuristic policy to use for comparison
+            heuristic policy to use for comparison
         - EVALUATE_PERFORMANCE_EVERY (int) 
-        evaluate the RL policy every EVALUATE_PERFORMANCE_EVERY iterations
+            evaluate the RL policy every EVALUATE_PERFORMANCE_EVERY iterations
         - N_RUNS_STATS (int) 
-        number of episodes used to compute the stats of a policy
+            number of episodes used to compute the stats of a policy
         
     Monitoring/Saving during the training
         - PRINT_INFO_EVERY (int)
-        print info on screen every PRINT_INFO_EVERY iterations
+            print info on screen every PRINT_INFO_EVERY iterations
         - SAVE_MODEL_EVERY (int)
-        save the current neural network every SAVE_MODEL_EVERY iterations 
-        (in addition, model copies will be saved every EVALUATE_PERFORMANCE_EVERY)
+            save the current neural network every SAVE_MODEL_EVERY iterations
+            (in addition, model copies will be saved every EVALUATE_PERFORMANCE_EVERY)
         
 Criteria for episode termination
     - STOP_t (int) 
-    maximum number of steps per episode
+        maximum number of steps per episode
     - STOP_p (float < 1)
-     minimal value of p (the probability that the source has not been found) before termination
+        minimal value of p (the probability that the source has not been found) before termination
 
 Parallelization
     - N_PARALLEL (int) 
-    number of episodes computed in parallel when generating new experience or evaluating the RL policy (if <= 0, will 
-    use all available cpus)
-    Known bug: for large neural networks, the code may hang if N_PARALLEL > 1, so use N_PARALLEL = 1 instead.
+        number of episodes computed in parallel when generating new experience or evaluating the RL policy
+        (if <= 0, will use all available cpus)
+        Known bug: for large neural networks, the code may hang if N_PARALLEL > 1, so use N_PARALLEL = 1 instead.
 
 Reload an existing model
     - MODEL_PATH (str or None)
-    path of the model (neural network) to reload, if None starts from scratch
+        path of the model (neural network) to reload, if None starts from scratch
 
 Saving
-    - RUN_NAME (str)
-    prefix used for all output files
+    - RUN_NAME (str or None)
+        prefix used for all output files, if None will use timestamp
 """
 import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 import sys
-sys.path.insert(1, os.path.join(sys.path[0], '..'))
-
-import os
-import sys
+sys.path.insert(1, os.path.abspath(os.path.join(sys.path[0], '..', '..')))
 import time
 import argparse
 import importlib
@@ -123,27 +121,28 @@ import matplotlib.pyplot as plt
 import tensorflow as tf
 from copy import deepcopy
 from itertools import repeat
-from classes.training import TrainingEnv as env
-from classes.valuemodel import ValueModel, reload_model
-from classes.heuristicpolicy import HeuristicPolicy
-from classes.policy import policy_name
+from otto.classes.training import TrainingEnv as env
+from otto.classes.valuemodel import ValueModel, reload_model
+from otto.classes.heuristicpolicy import HeuristicPolicy
+from otto.classes.policy import policy_name
 
 # import default globals
-from parameters.__defaults import *
+from otto.learn.parameters.__defaults import *
 
-# import global from user defined parameter file
-parser = argparse.ArgumentParser(description='Train a neural network')
-parser.add_argument('-i', '--input',
-                    dest='inputfile',
-                    help='name of the file containing the parameters')
-args = vars(parser.parse_args())
-if args['inputfile'] is not None:
-    filename, fileextension = os.path.splitext(args['inputfile'])
-    params = importlib.import_module(name="parameters." + filename)
-    names = [x for x in params.__dict__ if not x.startswith("_")]
-    globals().update({k: getattr(params, k) for k in names})
-    del params, names
-del parser, args
+# import globals from user defined parameter file
+if os.path.basename(sys.argv[0]) not in ["sphinx-build", "build.py"]:
+    parser = argparse.ArgumentParser(description='Train a neural network')
+    parser.add_argument('-i', '--input',
+                        dest='inputfile',
+                        help='name of the file containing the parameters')
+    args = vars(parser.parse_args())
+    if args['inputfile'] is not None:
+        filename, fileextension = os.path.splitext(args['inputfile'])
+        params = importlib.import_module(name="parameters." + filename)
+        names = [x for x in params.__dict__ if not x.startswith("_")]
+        globals().update({k: getattr(params, k) for k in names})
+        del params, names
+    del parser, args
 
 # other globals
 EPSILON = 1E-10
@@ -164,8 +163,8 @@ if MODEL_PATH is not None:
 if RUN_NAME is None:
     RUN_NAME = time.strftime("%Y%m%d-%H%M%S")
 
-DIR_OUTPUTS = os.path.join("outputs", RUN_NAME)
-DIR_MODELS = os.path.join("models", RUN_NAME)
+DIR_OUTPUTS = os.path.abspath(os.path.join(sys.path[0], "outputs", RUN_NAME))
+DIR_MODELS = os.path.abspath(os.path.join(sys.path[0], "models", RUN_NAME))
 
 # config
 np.set_printoptions(precision=4)
@@ -821,14 +820,14 @@ def update_buffer_memory(mem, new, max_size):
 
 
 #  Training core algo _______________________________________________________________
-def train_model_with_DVN(eps_floor, eps_0, eps_decay, max_it, ref_stats):
+def train_model(eps_floor, eps_0, eps_decay, max_it, ref_stats):
     """
-    Train the model to fit an (approximately) optimal value function using a "DVN" algorithm (deep value network,
-    the analog of DQN using the value function rather than the Q function).
+    Train the model to fit an (approximately) optimal value function using a model-based version of DQN.
     The value model is trained using simulation data generated by the RL policy with eps-exploration
     (a random action is selected with eps probability, which decreases over time).
     The loss is the norm of the optimal Bellman error (the norm used is defined within the model).
     The algorithm is as follows:
+
     while it < max_it:
         1) generate new data (transitions s -> s') by following trajectories according to RL policy with eps-exploration
         2) add this new data to buffer memory
@@ -837,6 +836,7 @@ def train_model_with_DVN(eps_floor, eps_0, eps_decay, max_it, ref_stats):
             - update model weights to minimize the loss
         4) occasionally: compute the performance of the RL policy defined by the current model
         5) occasionally: update the frozen model used to compute targets in the loss definition
+
     Training can be interrupted at any time (the model is saved periodically).
 
     Args:
@@ -991,7 +991,7 @@ def run():
 
     # Training
     print("\n*** Learning optimal value function...")
-    train_model_with_DVN(
+    train_model(
         eps_floor=E_GREEDY_FLOOR,
         eps_0=E_GREEDY_0,
         eps_decay=E_GREEDY_DECAY,

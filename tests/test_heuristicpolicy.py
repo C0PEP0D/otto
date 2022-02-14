@@ -22,7 +22,7 @@ def test_attributes():
         policy=POLICY,
     )
 
-    assert mypol.policy == POLICY
+    assert mypol.policy_index == POLICY
     assert mypol.steps_ahead == 1
     assert mypol.discount is None
 
@@ -34,7 +34,7 @@ def test_attributes():
         steps_ahead=STEPS_AHEAD,
     )
     assert mypol.env == myenv
-    assert mypol.policy == POLICY
+    assert mypol.policy_index == POLICY
     assert mypol.steps_ahead == STEPS_AHEAD
     assert mypol.discount == 0.999
 
