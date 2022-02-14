@@ -6,7 +6,7 @@ import pytest
 import numpy.testing as npt
 import numpy as np
 from classes.sourcetracking import SourceTracking as env
-from classes.heuristicpolicies import HeuristicPolicies
+from classes.heuristicpolicy import HeuristicPolicy
 
 
 def test_attributes():
@@ -17,7 +17,7 @@ def test_attributes():
     )
 
     POLICY = 6
-    mypol = HeuristicPolicies(
+    mypol = HeuristicPolicy(
         env=myenv,
         policy=POLICY,
     )
@@ -28,7 +28,7 @@ def test_attributes():
 
     POLICY = 0
     STEPS_AHEAD = 2
-    mypol = HeuristicPolicies(
+    mypol = HeuristicPolicy(
         env=myenv,
         policy=POLICY,
         steps_ahead=STEPS_AHEAD,
@@ -39,7 +39,7 @@ def test_attributes():
     assert mypol.discount == 0.999
 
     DISCOUNT = 0.9
-    mypol = HeuristicPolicies(
+    mypol = HeuristicPolicy(
         env=myenv,
         policy=POLICY,
         steps_ahead=STEPS_AHEAD,
@@ -79,7 +79,7 @@ def setup_clear():
 def test_behavior():
     myenv = setup_noisy()
     for policy in (0, 1, 6, 7, 8, 9):
-        mypol = HeuristicPolicies(
+        mypol = HeuristicPolicy(
             env=myenv,
             policy=policy,
         )
@@ -89,7 +89,7 @@ def test_behavior():
 
 def test_policies_1():
     myenv = setup_noisy()
-    mypol = HeuristicPolicies(
+    mypol = HeuristicPolicy(
         env=myenv,
         policy=0,
     )
@@ -111,7 +111,7 @@ def test_policies_1():
 
 def test_policies_2():
     myenv = setup_clear()
-    mypol = HeuristicPolicies(
+    mypol = HeuristicPolicy(
         env=myenv,
         policy=0,
     )
@@ -143,7 +143,7 @@ def test_nstep_infotaxis():
     myenv.p_source[myenv.N // 2, myenv.N // 2 + 4] += 1.0
     myenv.p_source /= np.sum(myenv.p_source)
     myenv.entropy = myenv._entropy(myenv.p_source)
-    mypol = HeuristicPolicies(
+    mypol = HeuristicPolicy(
             env=myenv,
             policy=0,
             steps_ahead=STEPS_AHEAD,

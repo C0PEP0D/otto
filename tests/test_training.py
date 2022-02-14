@@ -7,7 +7,7 @@ import pytest
 import numpy.testing as npt
 import numpy as np
 from copy import deepcopy
-from classes.heuristicpolicies import HeuristicPolicies
+from classes.heuristicpolicy import HeuristicPolicy
 from classes.training import TrainingEnv as env
 
 
@@ -99,3 +99,6 @@ def test_sym_1d():
     myenv.apply_sym_transformation(sym=1)
     assert myenv.agent == [myenv.N // 2 + 5]
     assert myenv.p_source[myenv.N // 2 + 3] == pytest.approx(0.8)
+
+
+## TODO: choose_action vs choose_action_from_statep

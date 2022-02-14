@@ -6,7 +6,7 @@ import pytest
 import numpy.testing as npt
 import numpy as np
 from classes.sourcetracking import SourceTracking as env
-from classes.heuristicpolicies import HeuristicPolicies
+from classes.heuristicpolicy import HeuristicPolicy
 
 
 def shared(params):
