@@ -387,7 +387,7 @@ These issues are resolved by setting `N_PARALLEL = 1` in the parameter file, whi
 ***TODO: not done***
 
 **OTTO** uses [Sphinx](http://www.sphinx-doc.org/en/stable/) for documentation and is made available online 
-[here](https://otto.readthedocs.io/en/latest/?badge=latest#). 
+[here](). 
 To build the html version of the docs locally, go to the `docs` directory and use:
 
 ```bash
@@ -396,7 +396,6 @@ make html
 
 
 The generated html can be viewed by opening `docs/_build/html/index.html`.
-
 
 ## How to cite OTTO?
 
