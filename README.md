@@ -423,6 +423,8 @@ Contact us by email for further information or questions about OTTO.
 
 ## Contributing
 
+***TODO***
+
 You are welcome to contribute by [opening an issue](https://github.com/C0PEP0D/otto/issues/new) 
 or suggesting pull requests.
 
