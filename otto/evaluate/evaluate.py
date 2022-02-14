@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Script used to evaluate the performance of a given policy (such as intotaxis) on the source-tracking POMDP.
-The POMDP is defined by the number of dimensions (1D, 2D, 3D and more), and by dimensionless parameters that
-control the domain size and the source intensity (other parameters are set automatically, but can be chosen manually).
+Script used to evaluate the performance of a given policy (such as intotaxis or an RL policy)
+on the source-tracking POMDP.
+
 The script records many statistics and monitoring information, and plot results.
-All outputs are saved in the 'outputs/statistics' directory.
+
 Computations are parallelized with multiprocessing (done automatically) or with MPI.
 
-To use MPI on N_CORES cores, run the following command line from a Linux terminal:
+To use MPI on N_CORES cores, run the following command line from a Linux terminal: TODO
 mpiexec -n N_CORES python3 -m mpi4py evaluate.py
 
 The list of all parameters is given below.

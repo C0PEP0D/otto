@@ -4,14 +4,6 @@
 Script used to visualize a search in 1D, 2D or 3D.
 Frame generation and live preview work on all platforms, but video recording is Linux-only and requires ffmpeg.
 
-
-
-Usage: execute the script from a terminal using
-
-`python visualize.py -i custom.py`
-
-where `custom.py` is a user-defined Python script that sets the custom parameters.
-
 The list of all parameters is given below.
 Default parameters are set by '__default.py' in the local 'parameters' directory.
 

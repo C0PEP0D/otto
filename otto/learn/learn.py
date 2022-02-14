@@ -2,11 +2,12 @@
 # -*- coding: utf-8 -*-
 """
 Script used to learn the optimal value function using a neural network approximator, for 1D and 2D searches.
+
 The learning algorithm is a value-based version of the DQN algorithm (Mnih et al., Nature 2015).
+
 The script periodically evaluates the performance of the RL policy derived from the current value function.
 Training can be interrupted at any time (the neural network is saved periodically, and training can restart from a
 previously saved network).
-Data and results are saved in the 'outputs/reinforcementlearning' directory.
 
 The list of all parameters is given below.
 Default parameters are set by '__default.py' in the local 'parameters' directory.
