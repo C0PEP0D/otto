@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 """
 Script used to visualize a search in 1D, 2D or 3D.
-Frame generation and live preview work on all platforms, but video recording is Linux-only and requires ffmpeg.
 
 The list of all parameters is given below.
 Default parameters are set by '__default.py' in the local 'parameters' directory.
@@ -11,13 +10,13 @@ Source-tracking POMDP
     - N_DIMS (int > 0)
         number of dimension (1D, 2D, ...)
     - LAMBDA_OVER_DX (float >= 1)
-        sets the dimensionless problem size (odor dispersion lengthscale divided by agent's step size)
+        dimensionless problem size
     - R_DT (float > 0)
-        sets the dimensionless source intensity (source rate of emission multiplied by the agent's time step)
+        dimensionless source intensity
     - NORM_POISSON ('Euclidean', 'Manhattan' or 'Chebyshev')
-        norm used for hit detections
+        norm used for hit detections, usually 'Euclidean'
     - N_HITS (int >= 2 or None)
-        number of values of hit possible, set automatically if None
+        number of possible hit values, set automatically if None
     - N_GRID (int >=3 or None)
         linear size of the domain, set automatically if None
 
@@ -37,19 +36,21 @@ Policy
 
 Setup
     - DRAW_SOURCE (bool)
-        whether to actually draw the source location (otherwise uses Bayesian framework)
+        if False, will not draw the source location and use a Bayesian setting instead
     - ZERO_HIT (bool)
-        whether to force a series of zero hits
+        whether to enforce a series of zero hits
 
 Visualization
     - VISU_MODE (int={0,1,2})
         - 0: run without video
         - 1: make video in the background
-        - 2: make video with live preview (slower)
+        - 2: make video with live preview (slower).
+        The aspect ratio of the video may be wrong depending on your screen size or resolution,
+        if so use VISU_MODE = 1.
     - FRAME_RATE (int)
         number of frames per second in the video
     - KEEP_FRAMES (bool)
-        whether each frame is conserved (otherwise frames are deleted, only the video is kept)
+        whether individual frames should be saved (otherwise frames are deleted, only the video is kept)
 
 Stopping criteria (only if DRAW_SOURCE is False)
     - STOP_p (float ~ 0):
@@ -110,7 +111,7 @@ DIR_OUTPUTS = os.path.abspath(os.path.join(sys.path[0], "outputs"))
 
 
 def run():
-    """Main function"""
+    """Main function to run and render an episode."""
     print("*** initializing env...")
 
     myenv = env(
@@ -208,13 +209,14 @@ def run():
     print("*** complete")
     print(message)
     if not DRAW_SOURCE:
-        print("mean number of steps on this episode =", T_mean)
+        print("mean number of steps on this episode = %.3f" % T_mean)
 
     if VISU_MODE > 0:
         if DRAW_SOURCE:
             toptext = "current policy: %s, current step: %d" % (mypol.policy_name, t)
         else:
-            toptext = "current policy: %s, current step: %d, proba not found: %.3f %%" % (mypol.policy_name, t, p * 100)
+            toptext = "current policy: %s, current step: %d, proba not found: %.3f %%" \
+                      % (mypol.policy_name, t, p_not_found_yet * 100)
 
         myvisu.record_snapshot(num=t, toptext=toptext)
         exitcode = myvisu.make_video(frame_rate=FRAME_RATE, keep_frames=KEEP_FRAMES)

@@ -4,7 +4,7 @@
 
 
 def policy_name(policy_index):
-    """Returns the policy name associated to policy_index"""
+    """Returns the name of the policy associated to policy_index"""
     if policy_index == -1:
         name = "RL"
     elif policy_index == 0:

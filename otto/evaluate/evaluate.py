@@ -18,13 +18,13 @@ Source-tracking POMDP
     - N_DIMS (int > 0)
         number of dimension (1D, 2D, ...)
     - LAMBDA_OVER_DX (float >= 1)
-        sets the dimensionless problem size (odor dispersion lengthscale divided by agent's step size)
+        dimensionless problem size
     - R_DT (float > 0)
-        sets the dimensionless source intensity (source rate of emission multiplied by the agent's time step)
+        dimensionless source intensity
     - NORM_POISSON ('Euclidean', 'Manhattan' or 'Chebyshev')
-        norm used for hit detections
+        norm used for hit detections, usually 'Euclidean'
     - N_HITS (int >= 2 or None)
-        number of values of hit possible, set automatically if None
+        number of possible hit values, set automatically if None
     - N_GRID (int >=3 or None)
         linear size of the domain, set automatically if None
 
@@ -43,16 +43,17 @@ Policy
         number of anticipated future moves, only for POLICY=0
 
 Statistics computation
-    - N_RUNS (int > 0 or None)
-        number of episodes used for statistics, if None then set automatically
     - ADAPTIVE_N_RUNS (bool)
         if true, N_RUNS is increased until the estimated error is less than REL_TOL
+    - N_RUNS (int > 0 or None)
+        number of episodes used for statistics, if None then set automatically
     - REL_TOL (0 < float < 1)
-        tolerance on the estimate of the relative error on the mean time (if ADAPTIVE_N_RUNS only)
+        tolerance on the estimate of the relative error on the mean number of steps to find the source
+         (if ADAPTIVE_N_RUNS only)
     - MAX_N_RUNS (int > 0)
         maximum number of runs (if ADAPTIVE_N_RUNS only)
     - STOP_p (float ~ 0)
-        stops when the probability that the source is found is greater than 1 - STOP_p
+        episode stops when the probability that the source has been found is greater than 1 - STOP_p
 
 Saving
     - RUN_NAME (str or None)
@@ -137,6 +138,17 @@ def amiroot():
 
 
 def autoset_numerical_parameters():
+    """
+    Autoset parameters that have not been set yet.
+
+    Returns:
+        N (int): linear grid size
+        Nhits (int): max number of hits
+        stop_t (int): max search duration
+        Nruns (int): number of runs for computing stats (initial value)
+        max_Nruns (int): hard limit on the number of runs
+        mu0_Poisson (float): physical parameter derived from lambda_over_dx and R_dt
+    """
     testenv = env(
         Ndim=N_DIMS,
         lambda_over_dx=LAMBDA_OVER_DX,
@@ -156,7 +168,6 @@ def autoset_numerical_parameters():
         else:
             stop_t = int(round(5 * 10 ** N_DIMS * LAMBDA_OVER_DX))
 
-    max_Nruns = 100000
     if N_RUNS is None:
         # predefined for REL_TOL = 0.01
         if N_DIMS == 1:
@@ -170,9 +181,13 @@ def autoset_numerical_parameters():
         else:
             raise Exception("Nruns not pre-defined for N_DIMS > 4")
         Nruns = int(Nruns * (0.01 / REL_TOL) ** 2)
-        max_Nruns = 10 * Nruns
     else:
         Nruns = N_RUNS
+
+    if MAX_N_RUNS is None:
+        max_Nruns = MAX_N_RUNS
+    else:
+        max_Nruns = 10 * Nruns
 
     if ADAPTIVE_N_RUNS or WITH_MPI:
         Nruns = int(N_PARALLEL * (np.ceil(Nruns / N_PARALLEL)))  # make it multiple of N_PARALLEL
@@ -182,6 +197,13 @@ def autoset_numerical_parameters():
 
 
 def init_envs():
+    """
+    Instanciate an environment and a policy.
+
+    Returns:
+        myenv (SourceTracking): instance of the source-tracking POMDP
+        mypol (Policy): instance of the policy
+    """
     myenv = env(
         Ndim=N_DIMS,
         lambda_over_dx=LAMBDA_OVER_DX,
@@ -206,6 +228,7 @@ def init_envs():
 
 
 def check_envs(env, pol):
+    """Check the envs"""
     assert env.Ndim == N_DIMS
     assert env.lambda_over_dx == LAMBDA_OVER_DX
     assert env.R_dt == R_DT
@@ -222,6 +245,8 @@ def check_envs(env, pol):
     
 
 def stats_from_pdf(x, pdf_x):
+    """Compute statistics (mean, standard deviation, skewness, kurtosis and norm) from a pdf
+    (probability distribution function)."""
     mean = 0.0
     m2 = 0.0
     m3 = 0.0
@@ -244,6 +269,7 @@ def stats_from_pdf(x, pdf_x):
 
 
 def stats_from_cdf(x, cdf_x):
+    """Compute time to find the source with some % probability from a cdf (cumulative distribution function)."""
     percentiles = []
     for P in (0.25, 0.50, 0.75, 0.90, 0.95, 0.99):
         b = 0
@@ -261,13 +287,15 @@ def stats_from_cdf(x, cdf_x):
 
 
 def cdf_to_pdf(cdf):
+    """Compute a pdf (probability distribution function) from its cdf (cumulative distribution function)."""
     pdf = deepcopy(cdf)
     pdf[1:] -= pdf[:-1].copy()
     return pdf
 
 
 def Worker(episode):
-    """Execute one run.
+    """
+    Execute one run.
 
     1. The agent is placed in the center of the grid world
     2. The agent receives a random initial hit
@@ -275,10 +303,13 @@ def Worker(episode):
     4. The run finishes when the agent has almost certainly found the source
 
     Args:
-        episode (int): number of the run
+        episode (int): run id
 
     Returns:
-        ndarray: PDF of number of steps
+        cdf_t (ndarray): CDF (cumulative distribution function) of the number of steps to find the source
+        cdf_h (ndarray): CDF (cumulative distribution function) of the number of cumulated hits to find the source
+        T_mean (float): mean number of steps to find the source in this episode
+        failed (bool): whether the episode ended due to failure (such as infinite loop or timeout)
     """
     episode_start_time = time.monotonic()
 

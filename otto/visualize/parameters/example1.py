@@ -14,16 +14,3 @@ ZERO_HIT = False  # whether to enforce a series of zero hits
 VISU_MODE = 2  # 0: run without video, 1: create video in the background, 2: create video and show live preview (slower)
 FRAME_RATE = 5  # number of frames per second in the video
 KEEP_FRAMES = False  # whether individual frames should be saved (otherwise frames are deleted, only the video is kept)
-# ____________ ADVANCED PARAMETERS ____________________________________________________________________________________
-# Source-tracking POMDP
-NORM_POISSON = 'Euclidean'  # norm used for hit detections, usually 'Euclidean'
-N_HITS = None  # number of possible hit values, set automatically if None
-N_GRID = None  # linear size of the domain, set automatically if None
-# Stopping criteria
-STOP_p = 1E-6  # episode stops when the probability that the source has been found is greater than 1 - STOP_p
-STOP_t = 1000000  # maximum number of steps per episode, set automatically if None
-# Saving
-RUN_NAME = None  # prefix used for all output files, if None will use timestamp
-
-
-

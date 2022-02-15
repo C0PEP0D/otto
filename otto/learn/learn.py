@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Script used to learn the optimal value function using a neural network approximator, for 1D and 2D searches.
+Script used to learn the optimal value function using a neural network approximator.
 
 The learning algorithm is a value-based version of the DQN algorithm (Mnih et al., Nature 2015).
 
@@ -9,20 +9,23 @@ The script periodically evaluates the performance of the RL policy derived from 
 Training can be interrupted at any time (the neural network is saved periodically, and training can restart from a
 previously saved network).
 
+Warning: while the script works for any space dimension, it is very computationally intensive and is generally not
+usable in more than 2D.
+
 The list of all parameters is given below.
 Default parameters are set by '__default.py' in the local 'parameters' directory.
 
 Source-tracking POMDP:
-    - N_DIMS (1 or 2)
-        number of dimension (1D or 2D)
+    - N_DIMS (int > 0)
+        number of dimension (1D, 2D, ...)
     - LAMBDA_OVER_DX (float >= 1)
-        sets the dimensionless problem size (odor dispersion lengthscale divided by agent's step size)
+        dimensionless problem size
     - R_DT (float > 0)
-        sets the dimensionless source intensity (source rate of emission multiplied by the agent's time step)
+        dimensionless source intensity
     - NORM_POISSON ('Euclidean', 'Manhattan' or 'Chebyshev')
-        norm used for hit detections
+        norm used for hit detections, usually 'Euclidean'
     - N_HITS (int >= 2 or None)
-        number of values of hit possible, set automatically if None
+        number of possible hit values, set automatically if None
     - N_GRID (int >=3 or None)
         linear size of the domain, set automatically if None
 
@@ -30,17 +33,17 @@ Source-tracking POMDP:
 Reinforcement learning
     Neural network architecture (fully connected)
         - FC_LAYERS (int)
-            number of layers
-        - FC_UNITS (tuple of int, or int)
+            number of hidden layers
+        - FC_UNITS (int or tuple(int))
             number of units per layers
         
     Stochastic gradient descent
         - BATCH_SIZE (int) 
             size of the mini-batch
         - N_GD_STEPS (int) 
-            number of gradient descent steps per iteration
+            number of gradient descent steps per training iteration
         - LEARNING_RATE (float) 
-            learning rate
+            usual learning rate
 
     Exploration: eps is the probability of taking a random action
         - E_GREEDY_FLOOR (0 <= float <= 1)
@@ -48,7 +51,7 @@ Reinforcement learning
         - E_GREEDY_0 (0 <= float <= 1)
             initial value of eps
         - E_GREEDY_DECAY (float > 0)
-            timescale (in units of algorithm iteration) for the decay of eps
+            timescale for eps decay, in number of training iterations
     
     Accounting for symmetries:
         - SYM_EVAL_ENSEMBLE_AVG (bool) 
@@ -66,38 +69,39 @@ Reinforcement learning
     
     Additional DQN algo parameters
         - ALGO_MAX_IT (int) 
-            stop training if it > ALGO_MAX_IT
+            max number of training iterations
         - UPDATE_FROZEN_MODEL_EVERY (int) 
             the optimal Bellman target is computed using a frozen model, which is updated to the latest model every
             UPDATE_FROZEN_MODEL_EVERY iterations
         - DDQN (bool) 
-            whether to use Double DQN instead of vanille DQN
+            whether to use Double DQN instead of original DQN
 
     Evaluation of the RL policy
         - POLICY_REF (int)
             heuristic policy to use for comparison
         - EVALUATE_PERFORMANCE_EVERY (int) 
-            evaluate the RL policy every EVALUATE_PERFORMANCE_EVERY iterations
-        - N_RUNS_STATS (int) 
-            number of episodes used to compute the stats of a policy
+            how often is the RL policy evaluated, in number of training iterations
+        - N_RUNS_STATS (int or None)
+            number of episodes used to compute the stats of a policy, set automatically if None
         
     Monitoring/Saving during the training
         - PRINT_INFO_EVERY (int)
-            print info on screen every PRINT_INFO_EVERY iterations
+            how often to print info on screen, in number of training iterations
         - SAVE_MODEL_EVERY (int)
-            save the current neural network every SAVE_MODEL_EVERY iterations
+            how often to save the current model, in number of training iterations
             (in addition, model copies will be saved every EVALUATE_PERFORMANCE_EVERY)
         
 Criteria for episode termination
-    - STOP_t (int) 
-        maximum number of steps per episode
-    - STOP_p (float < 1)
-        minimal value of p (the probability that the source has not been found) before termination
+    - STOP_t (int or None)
+        maximum number of steps per episode, set automatically if None
+    - STOP_p (float ~ 0)
+        episode stops when the probability that the source has been found is greater than 1 - STOP_p
 
 Parallelization
     - N_PARALLEL (int) 
         number of episodes computed in parallel when generating new experience or evaluating the RL policy
         (if <= 0, will use all available cpus)
+
         Known bug: for large neural networks, the code may hang if N_PARALLEL > 1, so use N_PARALLEL = 1 instead.
 
 Reload an existing model
@@ -170,6 +174,7 @@ DIR_MODELS = os.path.abspath(os.path.join(sys.path[0], "models", RUN_NAME))
 # config
 np.set_printoptions(precision=4)
 
+
 # Build and compile model ________________________________________________________________
 def build_new_model(
         Ndim,
@@ -177,13 +182,17 @@ def build_new_model(
         FC_units,
         learning_rate,
 ):
-    """Creates and compiles the model.
+    """
+    Creates and compiles the model.
 
     Args:
         Ndim (int): number of dimension of space (1D, 2D, ...) for the search problem
         FC_layers (int): number of hidden layers
         FC_units (int or tuple): units per layer
         learning_rate: usual learning rate
+
+    Returns:
+        model (ValueModel): instance of the neural network model
     """
 
     # Instantiate a new model
@@ -203,7 +212,7 @@ def build_new_model(
 
 # Parameters printing utils ________________________________________________________________
 def save_parameters(env, model):
-    """Saving parameters in a file and printing them on screen"""
+    """Saving parameters in a file and printing them on screen."""
     param_file = os.path.join(DIR_OUTPUTS, str(RUN_NAME + "_parameters" + ".txt"))
     pfile = open(param_file, "a")
     for out in (None, pfile):
@@ -277,7 +286,7 @@ def save_parameters(env, model):
 
 
 def param2subtitle(env, model):
-    """Create of string summarizing all parameters (useful as a subtitle in plots)"""
+    """Create of string summarizing all parameters (useful as a subtitle in plots)."""
     Nweights = np.sum([np.prod(w.shape) for w in model.get_weights()])
 
     arch = ("FC_LAYERS="
@@ -384,7 +393,8 @@ def param2subtitle(env, model):
 
 # Init env ________________________________________________________________
 def autoset_numerical_parameters():
-    """Autosets parameters that have not been set yet.
+    """
+    Autoset parameters that have not been set yet.
 
     Returns:
         N (int): linear grid size
@@ -429,7 +439,8 @@ def autoset_numerical_parameters():
 
 
 def init_env():
-    """Creating a new environment
+    """
+    Instanciate an environment.
 
     Returns:
         env (SourceTracking): instance of the source-tracking POMDP
@@ -449,7 +460,8 @@ def init_env():
 
 # Compute, print and plot stats ________________________________________________________________
 def compute_stats(Nepisodes, policy, parallel=True):
-    """Launches the parallel runs and save statistics in a dict.
+    """
+    Launches the parallel runs and save statistics in a dict.
 
     Args:
         Nepisodes (int):
@@ -457,7 +469,7 @@ def compute_stats(Nepisodes, policy, parallel=True):
         policy (int):
             policy to evaluate
         parallel (bool, optional):
-            whether to run the episodes in parallel (warning: code may hang for large value models) (default=True)
+            whether to run the episodes in parallel (warning: code may hang for large models) (default=True)
 
     Returns:
         stats (dict): contains 'p_not_found', 'mean', 'std', ...
@@ -515,11 +527,12 @@ def compute_stats(Nepisodes, policy, parallel=True):
 
 
 def print_stats(stats1, stats2=None):
-    """Print stats on screen.
+    """
+    Print stats on screen.
 
     Args:
         stats1 (dict): stats of the policy
-        stats2 (dict or None): stats of another policy, used for reference (default=None)
+        stats2 (dict or None, optional): stats of another policy, used for reference (default=None)
     """
 
     vars = ['p_not_found', 'mean', 'std', 'p50', 'p99']
@@ -531,7 +544,8 @@ def print_stats(stats1, stats2=None):
 
 
 def plot_stats(statsRL, statsref=None, title='', file_suffix='0'):
-    """Plot stats in a figure and save it.
+    """
+    Plot performance stats of the RL policy in a figure and save it.
 
     Args:
         statsRL (dict): stats of the RL policy
@@ -595,6 +609,24 @@ def plot_stats(statsRL, statsref=None, title='', file_suffix='0'):
 
 
 def plot_stats_evolution(data, ref_stats=None, title=''):
+    """
+    Plot performance vs training time.
+
+    Args:
+        data (ndarray): contains the stats of the learned policy. Each row corresponds to a training iteration, and
+        the columns contain
+            - col 0: training iteration
+            - col 1: number of transitions seen
+            - col 2: number of transitions generated
+            - col 3: epsilon from epsilon-greedy exploration
+            - col 4: probability that the source is never found
+            - col 5: mean number of steps to find the source, provided that the source is ultimately found
+            - col 6: error on the mean
+            - col 7: number of steps to find the source with 50 % probability
+            - col 8: number of steps to find the source with 99 % probability
+        ref_stats (dict, optional): stats of the reference policy, for comparison
+        title (str, optional): a title for the plot
+    """
     # data columns: 0=it, 1=Ntrans_seen, 2=N_trans_gen, 3=eps, 4=p_not_found, 5=mean, 6=mean_err, 7=p50, 8=p99
     index_list = [3, 4, 5, 5, 7, 8]
     names_list = ("eps", "p_not_found", "mean", "rel_mean", "p50", "p99")
@@ -614,11 +646,11 @@ def plot_stats_evolution(data, ref_stats=None, title=''):
     for r in range(2):
         if r == 0:
             xvar = data[:, 0]
-            xlab = "DVN iterations"
+            xlab = "training iterations"
             xmax = data[-1, 0]
         elif r == 1:
             xvar = data[:, 1]
-            xlab = "Number of transitions seen"
+            xlab = "number of transitions seen"
             xmax = data[-1, 1]
 
         for i in range(ncols):
@@ -675,10 +707,12 @@ def plot_stats_evolution(data, ref_stats=None, title=''):
 
 # Worker (compute trajectories) _______________________________________________________________
 def WorkerStats(episode, policy):
+    """Wrapper of Worker for computing stats of a policy."""
     pdf_t, _, _ = _Worker(episode=episode, policy=policy, eps=0.0, memorize=False)
     return pdf_t, _, _
 
 def WorkerExp(episode, policy, eps):
+    """Wrapper of Worker for generating new experience."""
     pdf_t, memory_s, memory_sp = _Worker(episode=episode, policy=policy, eps=eps, memorize=True)
     return pdf_t, memory_s, memory_sp
 
@@ -697,7 +731,7 @@ def _Worker(episode, policy, eps, memorize):
         memorize: whether to memorize states s and s' along the search
 
     Returns:
-        pdf_t (numpy array): PDF of arrival times
+        pdf_t (numpy array): distribution of the number of steps to find the source
         memory_s (numpy array or empty): memory of t-states (s), if memorize = True
         memory_sp (numpy array or empty): memory of (t+1)-states (s'), if memorize = True
     """
@@ -774,9 +808,20 @@ def _Worker(episode, policy, eps, memorize):
     return pdf_t, memory_s, memory_sp
 
 
-# DVN utils _______________________________________________________________
+# DQN utils _______________________________________________________________
 def new_experience(Nepisodes, policy, eps, parallel):
-    """Generate trajectories according to policy with eps-exploration
+    """
+    Generate trajectories according to policy with eps-exploration
+
+    Args:
+        Nepisodes (int): number of episodes to simulate
+        policy (int): policy used by the agent in the episodes
+        eps (float): a random action is chosen with probability eps
+        parallel (bool): whether episodes are computed in parallel
+
+    Returns:
+        states (ndarray): array of states s
+        statesp (ndarray): array of corresponding successor states s'
     """
     # Running the episodes
     if parallel:  # parallel, but may hang for large NN
@@ -805,6 +850,17 @@ def new_experience(Nepisodes, policy, eps, parallel):
 
 
 def update_buffer_memory(mem, new, max_size):
+    """
+    Add new transitions to the memory buffer.
+
+    Args:
+        mem (ndarray): current memory buffer
+        new (ndarray): array of new transitions
+        max_size (int): max number of transitions in memory
+
+    Returns:
+        mem (ndarray): updated memory
+    """
     mem_size = mem.shape[0]
     new_size = new.shape[0]
     if new_size > max_size:
@@ -826,7 +882,7 @@ def train_model(eps_floor, eps_0, eps_decay, max_it, ref_stats):
     Train the model to fit an (approximately) optimal value function using a model-based version of DQN.
     The value model is trained using simulation data generated by the RL policy with eps-exploration
     (a random action is selected with eps probability, which decreases over time).
-    The loss is the norm of the optimal Bellman error (the norm used is defined within the model).
+    The loss is the norm of the Bellman optimality error (the norm used is defined within the model).
     The algorithm is as follows:
 
     while it < max_it:
@@ -841,10 +897,10 @@ def train_model(eps_floor, eps_0, eps_decay, max_it, ref_stats):
     Training can be interrupted at any time (the model is saved periodically).
 
     Args:
-        eps_floor (0 <= float <= 1): floor value of the exploration parameter eps
-        eps_0 (0 <= float <= 1): initial value of the exploration parameter eps
-        eps_decay (None or float > 0): decay timescale of the exploration parameter eps
-        max_it (int): iterative algo stops if it > max_it
+        eps_floor (float): floor value of the exploration parameter eps
+        eps_0 (float): initial value of the exploration parameter eps
+        eps_decay (int): decay timescale of the exploration parameter eps (in number of training iterations)
+        max_it (int): iterative algo stops if training iteration > max_it
         ref_stats (dict or None): stats of a reference policy (used in plots for comparison only)
     """
     def eps_exploration(iteration, e_floor, e_0, e_decay):
@@ -906,14 +962,14 @@ def train_model(eps_floor, eps_0, eps_decay, max_it, ref_stats):
             print("evaluating performance of the current model-based policy")
             stats = compute_stats(Nepisodes=N_RUNS_STATS, policy=-1, parallel=N_RUNS_STATS >= N_PARALLEL > 1)
             print_stats(stats, ref_stats)
-            titlestr = "evaluation of learned value function, it # " + str(it) + ", Ntransitions=" + "{:.2e}".format(N_transitions_seen)
+            titlestr = "evaluation of learned value function, it # " + str(it) + ", transitions seen =" + "{:.2e}".format(N_transitions_seen)
             plot_stats(statsRL=stats, statsref=ref_stats, title=titlestr, file_suffix=str(it // EVALUATE_PERFORMANCE_EVERY))
             add_stats = np.array([it, N_transitions_seen, N_transitions_generated, eps, stats["p_not_found"], stats["mean"], stats["mean_err"], stats["p50"], stats["p99"]])
             stats_history = np.vstack((stats_history, add_stats))
             stats_history_file = os.path.join(DIR_OUTPUTS, str(RUN_NAME + "_table_stats" + ".npy"))
             np.save(stats_history_file, stats_history)
             print(">>> Stats saved in: " + stats_history_file)
-            titlestr = "value learning, it # " + str(it) + ", Ntransitions=" + "{:.2e}".format(N_transitions_seen)
+            titlestr = "value learning, it # " + str(it) + ", transitions seen =" + "{:.2e}".format(N_transitions_seen)
             plot_stats_evolution(data=stats_history, ref_stats=ref_stats, title=titlestr)
 
         ###################### GENERATE EXP
@@ -961,9 +1017,9 @@ def train_model(eps_floor, eps_0, eps_decay, max_it, ref_stats):
         if it % PRINT_INFO_EVERY == 0:
 
             print(
-                "  >> it:", it,
+                "  >> training iteration:", it,
                 "  |  eps:", eps,
-                "  |  Nepisodes added:", Nepisodes,
+                "  |  episodes added:", Nepisodes,
                 "  |  fraction memory renewed:", renewed_mem,
                 "  |  transitions seen:", N_transitions_seen,
                 "  |  loss:", float(mean_loss),

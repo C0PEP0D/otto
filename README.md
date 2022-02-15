@@ -114,10 +114,7 @@ Dependencies are listed in [requirements.txt](https://github.com/C0PEP0D/otto/re
 missing dependencies will be automatically installed.
 
 Optional: OTTO requires `ffmpeg` to make videos.
-If `ffmpeg` is not installed, OTTO will save video frames as images instead. 
-
-Note: while most of OTTO is platform-independent, OTTO has been developed for Unix-based systems
-and some features are not available on Windows.
+If `ffmpeg` is not installed, OTTO will save video frames as images instead.
 
 ### Conda users
 
@@ -132,7 +129,7 @@ conda activate ottoenv
 First download the package or clone the git repository with
 
 ``` bash
-git clone git@github.com:C0PEP0D/otto.git
+git clone https://github.com/C0PEP0D/otto.git
 ```
 
 Then go to the `otto` directory and install OTTO using
@@ -219,12 +216,13 @@ python visualize.py -i myparam
 ```
 will have the same effect.
 
-Each `parameters` directory contains a sample parameter file called `example.py`. 
-It shows the parameters you can play with, for example:
+Each `parameters` directory contain sample parameter files called `example*.py`. 
+They show the parameters you can play with, for example:
 
 - `N_DIMS` sets the dimensionality of the search (1D, 2D, 3D), default is `N_DIMS = 1`
 - `LAMBDA_OVER_DX` controls the size the domain, default is `LAMBDA_OVER_DX = 2.0`
 - `R_DT` controls the source intensity, default is `R_DT = 2.0`
+- `POLICY` defines the policy to use, default is `POLICY = 0` (infotaxis)
 
 Note: for advanced users, you can access the list of *all* parameters and their default values by examining
 the contents of `__defaults.py`.
@@ -301,7 +299,7 @@ To train a model, go to the `learn` directory and use
 python learn.py
 ```
 
-Now go get a coffee since it will take quite some time. Logging information is displayed in the terminal while the 
+Now is the perfect time for a coffee since it will take quite a while. Logging information is displayed in the terminal while the 
 script runs (if the script seems to have frozen, see [known issues](#known-issues)).
 
 When you come back, you can look at the contents of the `learn/outputs/YYmmdd-HHMMSS` directory.
@@ -340,7 +338,7 @@ MODEL_PATH = "../learn/models/YYmmdd-HHMMSS/YYmmdd-HHMMSS_value_model_bkp_i"
 
 where `MODEL_PATH` is the path to the model you want to evaluate or visualize.
 
-Warning: parameters should be consistent. For example, if you set `N_DIMS = 2` for learning then you must also 
+Important: parameters should be consistent. For example, if you set `N_DIMS = 2` for learning then you must also 
 set `N_DIMS = 2` for evaluation and visualization.
 
 ### Pre-trained RL policies
@@ -406,7 +404,8 @@ The workaround is to set `N_PARALLEL = 1` in the parameter file, which enforces 
 
 ### Windows users
 
-While most of OTTO is platform-independent, we do not provide Windows support and several features are not available:
+While OTTO can run on all platforms, it has been developed for Unix-based systems
+and there are minor issues with Windows.
 
 1. Videos are not recorded by `visualize.py`. Frames are saved as images instead.
 2. Parallelization for `learn.py` and `evaluate.py` does not currently work, 

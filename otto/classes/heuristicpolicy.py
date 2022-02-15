@@ -5,7 +5,7 @@
 import numpy as np
 import random
 from copy import deepcopy
-from .policy import Policy
+from .policy import Policy, policy_name
 
 # _____________________  parameters  _____________________
 EPSILON = 1e-10
@@ -73,6 +73,7 @@ class HeuristicPolicy(Policy):
 
     def _choose_action(self, ):
         if self.policy_index == 0:
+            assert policy_name(self.policy_index) == "infotaxis"
             if self.steps_ahead == 1:
                 action_chosen, _ = self._infotaxis()
             elif self.steps_ahead > 1:
@@ -88,24 +89,31 @@ class HeuristicPolicy(Policy):
                 raise Exception("steps_ahead has to be an integer larger than 1")
 
         elif self.policy_index == 1:
+            assert policy_name(self.policy_index) == "space-aware infotaxis"
             action_chosen, _ = self._space_aware_infotaxis()
 
         elif self.policy_index == 2:
+            assert policy_name(self.policy_index) == "space-aware infotaxis"
             action_chosen, _ = self._custom_policy()
 
         elif self.policy_index == 5:
+            assert policy_name(self.policy_index) == "random walk"
             action_chosen = random.randint(0, self.env.Nactions - 1)
 
         elif self.policy_index == 6:
+            assert policy_name(self.policy_index) == "greedy"
             action_chosen, _ = self._greedy_policy()
 
         elif self.policy_index == 7:
+            assert policy_name(self.policy_index) == "mean distance"
             action_chosen, _ = self._mean_distance_policy()
 
         elif self.policy_index == 8:
+            assert policy_name(self.policy_index) == "voting"
             action_chosen, _ = self._voting_policy()
 
         elif self.policy_index == 9:
+            assert policy_name(self.policy_index) == "most likely state"
             action_chosen, _ = self._most_likely_state_policy()
 
         else:

@@ -6,7 +6,7 @@ import os
 import numpy as np
 from copy import deepcopy
 import tensorflow as tf
-from .policy import Policy
+from .policy import Policy, policy_name
 
 # _____________________  parameters  _____________________
 EPSILON = 1e-10
@@ -55,6 +55,7 @@ class RLPolicy(Policy):
     def _choose_action(self, ):
 
         if self.policy_index == -1:
+            assert policy_name(self.policy_index) == "RL"
             action_chosen, _ = self._value_policy()
         else:
             raise Exception("The policy " + str(self.policy) + " does not exist (yet)!")
