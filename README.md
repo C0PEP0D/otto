@@ -9,7 +9,7 @@ OTTO is part of the [C0PEP0D](https://C0PEP0D.github.io/) project and has been u
 [publication](https://arxiv.org/abs/2112.10861).
 
 ## Table of contents
-* [Description](#description)
+* [Background](#background)
     * [Motivation](#motivation)
     * [The source-tracking POMDP](#the-source-tracking-pomdp)
     * [What does OTTO do?](#what-does-otto-do)
@@ -27,12 +27,19 @@ OTTO is part of the [C0PEP0D](https://C0PEP0D.github.io/) project and has been u
     * [Evaluating a policy](#evaluating-a-policy)
     * [Learning a policy](#learning-a-policy)
     * [Visualizing and evaluating a learned policy](#visualizing-and-evaluating-a-learned-policy)
+    * [Pre-trained RL policies](#pre-trained-rl-policies)
+    * [Custom policies](#custom-policies)
     * [Cleaning up](#cleaning-up)
-    * [Known issues](#known-issues)
 * [Documentation](#documentation)
-* [How to cite OTTO?](#how-to-cite-otto)
+* [Known issues](#known-issues)
+    * [All users](#all-users)
+    * [Windows users](#windows-users)
+* [Community guidelines](#community-guidelines)
+    * [Reporting bugs](#reporting-bugs)
+    * [Contributing](#contributing)
+    * [Getting help](#getting-help)
 * [Authors](#authors)
-* [Contributing](#contributing)
+* [How to cite OTTO?](#how-to-cite-otto)
 * [License](#license)
 * [Acknowledgements](#acknowledgements)
 
@@ -102,12 +109,15 @@ The training algorithm is a model-based version of DQN (Mnih et al., Nature, 201
 
 ### Requirements
 
-OTTO requires Python 3.8 or greater (it has not been tested with earlier versions).
+OTTO requires Python 3.8 or greater.
 Dependencies are listed in [requirements.txt](https://github.com/C0PEP0D/otto/requirements.txt),
 missing dependencies will be automatically installed.
 
 Optional: OTTO requires `ffmpeg` to make videos.
-If `ffmpeg` is not installed, OTTO will still work but will save frames as images instead. 
+If `ffmpeg` is not installed, OTTO will save video frames as images instead. 
+
+Note: while most of OTTO is platform-independent, OTTO has been developed for Unix-based systems
+and some features are not available on Windows.
 
 ### Conda users
 
@@ -169,13 +179,14 @@ python visualize.py
 You should now see the rendering of a 1D search in a new window (it may be very short!).
 You can visualize another episode by using again the same command.
 
-Some logging information is also displayed in the terminal as the script runs.
-In the rendering window, the first panel is a map of hits, and the second panel is the probability distribution of the source locations.
+Some logging information is displayed in the terminal as the script runs.
+In the rendering window, the first panel is a map of hits, and the second panel is the agent's belief 
+(probability distribution over source locations).
 
 The videos have been saved as `visualize/outputs/YYmmdd-HHMMSS_video.mp4` where 'YYmmdd-HHMMSS' is a 
 timestamp (the time you started the script). 
 
-If you do not have `ffmpeg` (or if there was a problem with video making), you will find instead frames saved
+If you do not have `ffmpeg`, or if you are on Windows, or if there was a problem with video making, you will find instead frames saved
 in `visualize/outputs/YYmmdd-HHMMSS_frames`.
 
 
@@ -243,7 +254,7 @@ Windows users: if a `NameError` is raised, see [known issues](#known-issues).
 Once the script has completed, you can look at the results in the directory `evaluate/outputs/YYmmdd-HHMMSS` 
 where 'YYmmdd-HHMMSS' is the time you started the script.
 
-The output files are described in the ***TODO: DOCUMENTATION***.
+The output files are described in the [documentation](#documentation).
 For example:
 
 - `Ymmdd-HHMMSS_statistics_nsteps.txt` is a text file containing the mean time to find the source, its standard 
@@ -269,7 +280,7 @@ POLICY = 1
 
 This file is already present in `evaluate/parameters/` for this example. 
 
-Policies are described in the ***TODO: DOCUMENTATION***.
+Policies are described in the [documentation](#documentation).
 The main policies are
 
 - `POLICY = 0` for infotaxis (default)
@@ -301,7 +312,7 @@ In particular, it shows the evolution of 'p_not_found', the probability that the
 the mean time to find the source provided it is ever found. 
 Note that the mean is meaningless if p_not_found is larger than 1e-3, in that case it is depicted by a cross.
 
-Other outputs are explained in the ***TODO: DOCUMENTATION.***
+Other outputs are explained in the [documentation](#documentation).
 
 Completing the training may take up to roughly 5000-10000 iterations (several hours on an 
 average laptop), but progress should be clearly visible from 500-1000 iterations. 
@@ -370,32 +381,65 @@ The directories can be restored to their original state by running the `cleanall
 at the root of the package.
 Warning: all user-generated outputs and models will be deleted!
 
-### Known issues
-
-There are two known issues with `multiprocessing` used for parallelization in `learn.py` and `evaluate.py`:
- 
-- Windows users may have the error `NameError: name '*' is not defined`, this is 
-because child processes do not see global variables defined only during execution (after `if __name__ == "__main__"`).
-***TODO: would be nice to fix this***
-- When using large neural networks, the code may hang, this is a 
-[known issue](https://github.com/keras-team/keras/issues/9964)
-with `keras`.
-
-These issues are resolved by setting `N_PARALLEL = 1` in the parameter file, which enforces sequential computations.
 
 ## Documentation
-***TODO: not done***
+***TODO: documentation is currently in construction***
 
 **OTTO** uses [Sphinx](http://www.sphinx-doc.org/en/stable/) for documentation and is made available online 
-[here](). 
+[here](https://otto-c0pep0d.readthedocs.io/en/latest/?badge=latest#). 
 To build the html version of the docs locally, go to the `docs` directory and use:
 
 ```bash
 make html
 ```
 
-
 The generated html can be viewed by opening `docs/_build/html/index.html`.
+
+## Known issues
+
+### All users
+
+When using large neural networks in parallel, the code may hang. This is a 
+[known incompatibility](https://github.com/keras-team/keras/issues/9964)
+between `keras` and `multiprocessing`.
+The workaround is to set `N_PARALLEL = 1` in the parameter file, which enforces sequential computations.
+
+### Windows users
+
+While most of OTTO is platform-independent, we do not provide Windows support and several features are not available:
+
+1. Videos are not recorded by `visualize.py`. Frames are saved as images instead.
+2. Parallelization for `learn.py` and `evaluate.py` does not currently work, 
+and the error `NameError: name '*' is not defined` is raised when running these scripts.
+This is because child processes instanciated with `multiprocessing` do not see global variables defined only during execution (after `if __name__ == "__main__"`).
+The workaround is to set `N_PARALLEL = 1` in the parameter file, which enforces sequential computations 
+
+
+
+## Community guidelines
+
+### Reporting bugs
+If you discover a bug in OTTO which is not a [known issue](#known-issues), please create [new issue](https://github.com/C0PEP0D/otto/issues/new).
+
+### Contributing
+Have you designed a new policy? Would you like to add a new feature? Can you fix a [known issue](#known-issues)?
+We welcome contributions to OTTO.
+To contribute, please fork the repository and submit a pull request.
+
+### Getting help
+Are you having troubles with OTTO? Please first consult the instructions for [installing](#installation) 
+and [using](#how-to-use-otto) OTTO, check the [known issues](#known-issues), and explore the [documentation](#documentation).
+
+Can you still not find an answer?
+You can send an email with the subject "OTTO: your request" to the [authors](#authors) for further 
+information or questions about OTTO.
+
+## Authors
+
+**OTTO** is developed by 
+[Aurore Loisy](mailto:aurore.loisy@gmail.com) and 
+[Christophe Eloy](mailto:christophe.eloy@centrale-marseille.fr)
+*(Aix Marseille Univ, CNRS, Centrale Marseille, IRPHE, Marseille, France)*.
 
 ## How to cite OTTO?
 
@@ -412,21 +456,6 @@ or if you use LaTeX:
   howpublished = {\url{http://github.com/C0PEP0D/otto}}
 }
 ```
-
-## Authors
-
-**OTTO** is developed by 
-[Aurore Loisy](mailto:aurore.loisy@gmail.com) and 
-[Christophe Eloy](mailto:christophe.eloy@centrale-marseille.fr)
-*(Aix Marseille Univ, CNRS, Centrale Marseille, IRPHE, Marseille, France)*.
-Contact us by email for further information or questions about OTTO.
-
-## Contributing
-
-***TODO***
-
-You are welcome to contribute by [opening an issue](https://github.com/C0PEP0D/otto/issues/new) 
-or suggesting pull requests.
 
 ## License
 
