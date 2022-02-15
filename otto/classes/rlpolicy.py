@@ -69,7 +69,7 @@ class RLPolicy(Policy):
 
         inputs = [0] * self.env.Nactions
         probs = [0] * self.env.Nactions
-        ishape = self.env._inputshape()
+        ishape = self.env.NN_input_shape
 
         for action in range(self.env.Nactions):
             inputs[action] = []
@@ -112,7 +112,6 @@ class RLPolicy(Policy):
         assert expected_value.shape == tuple([self.env.Nactions])
 
         # TODO check shapes
-        # action_chosen = np.argmin(expected_value.numpy().squeeze())
 
         action_chosen = np.argwhere(np.abs(expected_value - np.min(expected_value)) < EPSILON_CHOICE).flatten()[0]
         return action_chosen, expected_value

@@ -1,2 +1,2 @@
-N_RUNS = 10
+N_RUNS = 48
 REL_TOL = 1

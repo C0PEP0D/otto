@@ -147,7 +147,7 @@ class TrainingEnv(SourceTracking):
         else:
             raise Exception("ndim must be 0 (for state) or 2 (for statep)")
 
-        ishape = tuple(list(states.shape) + list(self._inputshape()))
+        ishape = tuple(list(states.shape) + list(self.NN_input_shape))
         zshape = tuple(list(states.shape))
 
         states = states.ravel()
@@ -206,7 +206,7 @@ class TrainingEnv(SourceTracking):
 
         batch_size = statep.shape[0]
 
-        ishape = self._inputshape()
+        ishape = self.NN_input_shape
 
         inputp, probp = self.states2inputs(statep, dims=2)
 
@@ -285,7 +285,7 @@ class TrainingEnv(SourceTracking):
     def _value_policy_from_statep(self, model, statep, sym_avg=False):  # statep: (Nactions, Nhits)
         assert statep.shape == (self.Nactions, self.Nhits)
 
-        ishape = self._inputshape()
+        ishape = self.NN_input_shape
 
         inputp, probp = self.states2inputs(statep, dims=2)  # (1, Nactions, Nhits, inputshape), (1, Nactions, Nhits)
         assert inputp.shape == tuple([1] + [self.Nactions] + [self.Nhits] + list(ishape))
@@ -311,7 +311,7 @@ class TrainingEnv(SourceTracking):
     def _state2input(self, state):
         p_source = self._centeragent(state.p_source, state.agent)
         input = np.array(p_source, dtype=np.float32)
-        assert input.shape == self._inputshape()
+        assert input.shape == self.NN_input_shape
         return input
 
     def _sym_transformation_array(self, x, sym):

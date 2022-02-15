@@ -13,88 +13,86 @@ Warning: while the script works for any space dimension, it is very computationa
 usable in more than 2D.
 
 The list of all parameters is given below.
-Default parameters are set by '__default.py' in the local 'parameters' directory.
 
 Source-tracking POMDP:
     - N_DIMS (int > 0)
-        number of dimension (1D, 2D, ...)
-    - LAMBDA_OVER_DX (float >= 1)
+        number of space dimensions (1D, 2D, ...)
+    - LAMBDA_OVER_DX (float >= 1.0)
         dimensionless problem size
-    - R_DT (float > 0)
+    - R_DT (float > 0.0)
         dimensionless source intensity
     - NORM_POISSON ('Euclidean', 'Manhattan' or 'Chebyshev')
         norm used for hit detections, usually 'Euclidean'
     - N_HITS (int >= 2 or None)
         number of possible hit values, set automatically if None
-    - N_GRID (int >=3 or None)
+    - N_GRID (int >= 3 or None)
         linear size of the domain, set automatically if None
 
 
 Reinforcement learning
     Neural network architecture (fully connected)
-        - FC_LAYERS (int)
+        - FC_LAYERS (int > 0)
             number of hidden layers
-        - FC_UNITS (int or tuple(int))
+        - FC_UNITS (int > 0 or tuple(int > 0))
             number of units per layers
         
     Stochastic gradient descent
-        - BATCH_SIZE (int) 
+        - BATCH_SIZE (int > 0)
             size of the mini-batch
-        - N_GD_STEPS (int) 
+        - N_GD_STEPS (int > 0)
             number of gradient descent steps per training iteration
-        - LEARNING_RATE (float) 
+        - LEARNING_RATE (0.0 < float < 1.0)
             usual learning rate
 
     Exploration: eps is the probability of taking a random action
-        - E_GREEDY_FLOOR (0 <= float <= 1)
+        - E_GREEDY_FLOOR (0.0 <= float <= 1.0)
             floor value of eps
-        - E_GREEDY_0 (0 <= float <= 1)
+        - E_GREEDY_0 (0.0 <= float <= 1.0)
             initial value of eps
-        - E_GREEDY_DECAY (float > 0)
+        - E_GREEDY_DECAY (float > 0.0)
             timescale for eps decay, in number of training iterations
     
     Accounting for symmetries:
         - SYM_EVAL_ENSEMBLE_AVG (bool) 
-            whether to average over symmetric duplicates during evaluation
+            whether to average value over symmetric duplicates during evaluation
         - SYM_TRAIN_ADD_DUPLICATES (bool) 
             whether to augment data by including symmetric duplicates with identical targets during training step
         - SYM_TRAIN_RANDOMIZE (bool) 
             whether to apply random symmetry transformations when generating the data (no duplicates)
     
     Experience replay
-        - MEMORY_SIZE (int)
+        - MEMORY_SIZE (int > 0)
             number of transitions (s, s') to keep in memory
-        - REPLAY_NTIMES (int>0)
+        - REPLAY_NTIMES (int > 0)
             how many times a transition is used for training before being deleted, on average
     
     Additional DQN algo parameters
-        - ALGO_MAX_IT (int) 
+        - ALGO_MAX_IT (int > 0)
             max number of training iterations
-        - UPDATE_FROZEN_MODEL_EVERY (int) 
-            the optimal Bellman target is computed using a frozen model, which is updated to the latest model every
-            UPDATE_FROZEN_MODEL_EVERY iterations
+        - UPDATE_FROZEN_MODEL_EVERY (int > 0)
+            how often is the target network updated, in number of training iterations
         - DDQN (bool) 
             whether to use Double DQN instead of original DQN
 
     Evaluation of the RL policy
         - POLICY_REF (int)
             heuristic policy to use for comparison
-        - EVALUATE_PERFORMANCE_EVERY (int) 
+        - EVALUATE_PERFORMANCE_EVERY (int > 0)
             how often is the RL policy evaluated, in number of training iterations
-        - N_RUNS_STATS (int or None)
+        - N_RUNS_STATS (int > 0 or None)
             number of episodes used to compute the stats of a policy, set automatically if None
         
     Monitoring/Saving during the training
-        - PRINT_INFO_EVERY (int)
+        - PRINT_INFO_EVERY (int > 0)
             how often to print info on screen, in number of training iterations
-        - SAVE_MODEL_EVERY (int)
+        - SAVE_MODEL_EVERY (int > 0)
             how often to save the current model, in number of training iterations
             (in addition, model copies will be saved every EVALUATE_PERFORMANCE_EVERY)
         
 Criteria for episode termination
-    - STOP_t (int or None)
+    - STOP_t (int > 0 or None)
         maximum number of steps per episode, set automatically if None
-    - STOP_p (float ~ 0)
+    - STOP_p (float ~ 0.0)
         episode stops when the probability that the source has been found is greater than 1 - STOP_p
 
 Parallelization
@@ -110,7 +108,7 @@ Reload an existing model
 
 Saving
     - RUN_NAME (str or None)
-        prefix used for all output files, if None will use timestamp
+        prefix used for all output files, if None will use a timestamp
 """
 import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
@@ -186,7 +184,7 @@ def build_new_model(
     Creates and compiles the model.
 
     Args:
-        Ndim (int): number of dimension of space (1D, 2D, ...) for the search problem
+        Ndim (int): number of space dimensions for the search problem
         FC_layers (int): number of hidden layers
         FC_units (int or tuple): units per layer
         learning_rate: usual learning rate
@@ -203,7 +201,7 @@ def build_new_model(
     )
 
     # Compile and build the model
-    model.build_graph(input_shape_nobatch=MYENV._inputshape())
+    model.build_graph(input_shape_nobatch=MYENV.NN_input_shape)
     optimizer = tf.keras.optimizers.Adam(learning_rate=learning_rate)
     model.compile(optimizer=optimizer)
 
@@ -212,7 +210,7 @@ def build_new_model(
 
 # Parameters printing utils ________________________________________________________________
 def save_parameters(env, model):
-    """Saving parameters in a file and printing them on screen."""
+    """Save parameters in a file and print them on screen."""
     param_file = os.path.join(DIR_OUTPUTS, str(RUN_NAME + "_parameters" + ".txt"))
     pfile = open(param_file, "a")
     for out in (None, pfile):
@@ -263,7 +261,7 @@ def save_parameters(env, model):
         print("FC_UNITS = " + str(FC_UNITS), file=out)
         Nweights = np.sum([np.prod(w.shape) for w in model.get_weights()])
         print("Number of weights = ", Nweights, file=out)
-        print("input shape = ", env._inputshape(), file=out)
+        print("input shape = ", env.NN_input_shape, file=out)
         if out is None:
             model.summary()
         else:
@@ -296,7 +294,7 @@ def param2subtitle(env, model):
             + str(FC_UNITS)
             + "    "
             + "INPUT_SHAPE="
-            + str(env._inputshape())
+            + str(env.NN_input_shape)
             )
 
     reloaded_model = None
@@ -400,7 +398,7 @@ def autoset_numerical_parameters():
         N (int): linear grid size
         Nhits (int): max number of hits
         stop_t (int): max search duration
-        Nruns (int): number of runs for computing stats
+        Nruns (int): number of episodes for computing stats
     """
     testenv = env(
         Ndim=N_DIMS,
@@ -461,11 +459,11 @@ def init_env():
 # Compute, print and plot stats ________________________________________________________________
 def compute_stats(Nepisodes, policy, parallel=True):
     """
-    Launches the parallel runs and save statistics in a dict.
+    Launches the episodes and save statistics in a dictionary.
 
     Args:
         Nepisodes (int):
-            number of episodes run to compute the stats
+            number of episodes to compute the statistics
         policy (int):
             policy to evaluate
         parallel (bool, optional):
@@ -531,8 +529,8 @@ def print_stats(stats1, stats2=None):
     Print stats on screen.
 
     Args:
-        stats1 (dict): stats of the policy
-        stats2 (dict or None, optional): stats of another policy, used for reference (default=None)
+        stats1 (dict): stats of the policy (as computed by :func:`compute_stats`)
+        stats2 (dict or None, optional): stats of another policy (as computed by :func:`compute_stats`) for comparison
     """
 
     vars = ['p_not_found', 'mean', 'std', 'p50', 'p99']
@@ -548,10 +546,10 @@ def plot_stats(statsRL, statsref=None, title='', file_suffix='0'):
     Plot performance stats of the RL policy in a figure and save it.
 
     Args:
-        statsRL (dict): stats of the RL policy
-        statsref (dict or None): stats of reference policy (default=None)
-        title (str, optional): plot title (printed on top) (default='')
-        file_suffix (str, optional): suffix for file name, to prevent overwriting (default='0')
+        statsRL (dict): stats of the RL policy (as computed by :func:`compute_stats`)
+        statsref (dict or None, optional): stats of reference policy (as computed by :func:`compute_stats`)
+        title (str, optional): plot title (printed on top)
+        file_suffix (str, optional): suffix for file name, to prevent overwriting
     """
 
     fig_file = os.path.join(DIR_OUTPUTS, str(RUN_NAME + "_figure_stats_" + str(file_suffix) + ".png"))
@@ -613,18 +611,20 @@ def plot_stats_evolution(data, ref_stats=None, title=''):
     Plot performance vs training time.
 
     Args:
-        data (ndarray): contains the stats of the learned policy. Each row corresponds to a training iteration, and
-        the columns contain
-            - col 0: training iteration
-            - col 1: number of transitions seen
-            - col 2: number of transitions generated
-            - col 3: epsilon from epsilon-greedy exploration
-            - col 4: probability that the source is never found
-            - col 5: mean number of steps to find the source, provided that the source is ultimately found
-            - col 6: error on the mean
-            - col 7: number of steps to find the source with 50 % probability
-            - col 8: number of steps to find the source with 99 % probability
-        ref_stats (dict, optional): stats of the reference policy, for comparison
+        data (ndarray): contains the stats history of the learned policy.
+            Each row corresponds to a training iteration, and the columns contain
+
+                - col 0: training iteration
+                - col 1: number of transitions seen
+                - col 2: number of transitions generated
+                - col 3: epsilon from epsilon-greedy exploration
+                - col 4: probability that the source is never found
+                - col 5: mean number of steps to find the source, provided that the source is ultimately found
+                - col 6: error on the mean
+                - col 7: number of steps to find the source with 50 % probability
+                - col 8: number of steps to find the source with 99 % probability
+
+        ref_stats (dict, optional): stats of the reference policy (as computed by :func:`compute_stats`) for comparison
         title (str, optional): a title for the plot
     """
     # data columns: 0=it, 1=Ntrans_seen, 2=N_trans_gen, 3=eps, 4=p_not_found, 5=mean, 6=mean_err, 7=p50, 8=p99
@@ -717,15 +717,15 @@ def WorkerExp(episode, policy, eps):
     return pdf_t, memory_s, memory_sp
 
 def _Worker(episode, policy, eps, memorize):
-    """Execute one run.
+    """Execute one episode.
 
     1. The agent is placed in the center of the grid world
     2. The agent receives an initial hit
     3. The agent moves according to the model
-    4. The run finishes when the agent has almost certainly found the source
+    4. The episode terminates when the agent has almost certainly found the source
 
     Args:
-        episode (int): number of the run
+        episode (int): episode ID
         policy (int): policy to follow
         eps (0 <= float <= 1): value of eps for exploration
         memorize: whether to memorize states s and s' along the search
@@ -879,20 +879,13 @@ def update_buffer_memory(mem, new, max_size):
 #  Training core algo _______________________________________________________________
 def train_model(eps_floor, eps_0, eps_decay, max_it, ref_stats):
     """
-    Train the model to fit an (approximately) optimal value function using a model-based version of DQN.
-    The value model is trained using simulation data generated by the RL policy with eps-exploration
-    (a random action is selected with eps probability, which decreases over time).
-    The loss is the norm of the Bellman optimality error (the norm used is defined within the model).
-    The algorithm is as follows:
+    Train the model to fit an (approximately) optimal value function using a model-based version of DQN
+    (Mnih et al., Nature 2015).
 
-    while it < max_it:
-        1) generate new data (transitions s -> s') by following trajectories according to RL policy with eps-exploration
-        2) add this new data to buffer memory
-        3) perform steps of mini-batch gradient descent: for each step
-            - select a sample of transitions (mini-batch) from buffer memory
-            - update model weights to minimize the loss
-        4) occasionally: compute the performance of the RL policy defined by the current model
-        5) occasionally: update the frozen model used to compute targets in the loss definition
+    The value model is trained using simulation data generated by the RL policy with eps-greedy exploration
+    (a random action is selected with eps probability, which decreases over time).
+
+    The loss is the norm of the Bellman optimality error (the norm used is defined within the model).
 
     Training can be interrupted at any time (the model is saved periodically).
 
@@ -900,8 +893,8 @@ def train_model(eps_floor, eps_0, eps_decay, max_it, ref_stats):
         eps_floor (float): floor value of the exploration parameter eps
         eps_0 (float): initial value of the exploration parameter eps
         eps_decay (int): decay timescale of the exploration parameter eps (in number of training iterations)
-        max_it (int): iterative algo stops if training iteration > max_it
-        ref_stats (dict or None): stats of a reference policy (used in plots for comparison only)
+        max_it (int): training stops if training iteration > max_it
+        ref_stats (dict or None): stats of a reference policy (as computed by :func:`compute_stats`), for plots only
     """
     def eps_exploration(iteration, e_floor, e_0, e_decay):
         if e_decay is None:
@@ -1105,7 +1098,7 @@ if __name__ == '__main__':
 
     if CONTINUE_TRAINING:
         print("\n*** Reloading previous weights from:", MODEL_PATH)
-        oldmodel = reload_model(MODEL_PATH, inputshape=MYENV._inputshape())
+        oldmodel = reload_model(MODEL_PATH, inputshape=MYENV.NN_input_shape)
         MYMODEL.set_weights(oldmodel.get_weights())
         MYFROZENMODEL.set_weights(oldmodel.get_weights())
         del oldmodel

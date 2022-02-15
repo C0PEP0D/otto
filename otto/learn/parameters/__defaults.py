@@ -1,6 +1,6 @@
 # ____________ BASIC PARAMETERS _______________________________________________________________________________________
 # Source-tracking POMDP
-N_DIMS = 1  # number of dimension (1D, 2D, ...)
+N_DIMS = 1  # number of space dimensions (1D, 2D, ...)
 LAMBDA_OVER_DX = 2.0  # dimensionless problem size
 R_DT = 2.0  # dimensionless source intensity
 # Neural network (NN) architecture
@@ -30,7 +30,7 @@ REPLAY_NTIMES = 4  # how many times a transition is used for training before bei
 E_GREEDY_FLOOR = 0.1  # floor value of eps (cannot be smaller than that)
 E_GREEDY_0 = 1.0  # initial value of eps
 # Accounting for symmetries
-SYM_EVAL_ENSEMBLE_AVG = True  # whether to average over symmetric duplicates during evaluation
+SYM_EVAL_ENSEMBLE_AVG = True  # whether to average value over symmetric duplicates during evaluation
 SYM_TRAIN_ADD_DUPLICATES = False  # whether to augment data by including symmetric duplicates during training step
 SYM_TRAIN_RANDOMIZE = True  # whether to apply random symmetry transformations when generating the data (no duplicates)
 # Additional DQN algo parameters

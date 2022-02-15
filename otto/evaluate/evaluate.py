@@ -6,26 +6,26 @@ on the source-tracking POMDP.
 
 The script records many statistics and monitoring information, and plot results.
 
-Computations are parallelized with multiprocessing (done automatically) or with MPI.
+Computations are parallelized with ``multiprocessing`` (default) or with MPI (requires the ``mpi4py`` module).
 
-To use MPI on N_CORES cores, run the following command line from a Linux terminal: TODO
-mpiexec -n N_CORES python3 -m mpi4py evaluate.py
+To use MPI on n_cpus processors, run the following command line from a Linux terminal:
+
+``mpiexec -n n_cpus python3 -m mpi4py evaluate.py -i custom_params.py``
 
 The list of all parameters is given below.
-Default parameters are set by '__default.py' in the local 'parameters' directory.
 
 Source-tracking POMDP
     - N_DIMS (int > 0)
-        number of dimension (1D, 2D, ...)
-    - LAMBDA_OVER_DX (float >= 1)
+        number of space dimensions (1D, 2D, ...)
+    - LAMBDA_OVER_DX (float >= 1.0)
         dimensionless problem size
-    - R_DT (float > 0)
+    - R_DT (float > 0.0)
         dimensionless source intensity
     - NORM_POISSON ('Euclidean', 'Manhattan' or 'Chebyshev')
         norm used for hit detections, usually 'Euclidean'
     - N_HITS (int >= 2 or None)
         number of possible hit values, set automatically if None
-    - N_GRID (int >=3 or None)
+    - N_GRID (int >= 3 or None)
         linear size of the domain, set automatically if None
 
 Policy
@@ -39,30 +39,31 @@ Policy
         - 7: mean distance policy
         - 8: voting policy (Cassandra, Kaelbling & Kurien, IEEE 1996)
         - 9: most likely state policy (Cassandra, Kaelbling & Kurien, IEEE 1996)
-    - STEPS_AHEAD (int>=1)
-        number of anticipated future moves, only for POLICY=0
+    - STEPS_AHEAD (int >= 1)
+        number of anticipated moves, can be > 1 only for POLICY=0
 
 Statistics computation
     - ADAPTIVE_N_RUNS (bool)
-        if true, N_RUNS is increased until the estimated error is less than REL_TOL
+        if True, more episodes will be simulated until the estimated error is less than REL_TOL
+    - REL_TOL (0.0 < float < 1.0)
+        if ADAPTIVE_N_RUNS: tolerance on the relative error on the mean number of steps to find the source
+    - MAX_N_RUNS (int > 0 or None)
+        if ADAPTIVE_N_RUNS: maximum number of runs, set automatically if None
     - N_RUNS (int > 0 or None)
-        number of episodes used for statistics, if None then set automatically
-    - REL_TOL (0 < float < 1)
-        tolerance on the estimate of the relative error on the mean number of steps to find the source
-         (if ADAPTIVE_N_RUNS only)
-    - MAX_N_RUNS (int > 0)
-        maximum number of runs (if ADAPTIVE_N_RUNS only)
-    - STOP_p (float ~ 0)
+        if not ADAPTIVE_N_RUNS: number of episodes to simulate, set automatically if None
+    - STOP_p (float ~ 0.0)
         episode stops when the probability that the source has been found is greater than 1 - STOP_p
 
 Saving
     - RUN_NAME (str or None)
-        prefix used for all output files, if None will use timestamp
+        prefix used for all output files, if None will use a timestamp
 
 Parallelization
     - N_PARALLEL (int)
-        number of episodes computed in parallel when generating new experience or evaluating the RL policy
-        (if <= 0, will use all available cpus), with multiprocessing only (has no effect with MPI)
+        number of episodes computed in parallel (if <= 0, will use all available cpus)
+
+        This is only when using multiprocessing for parallelization (it has no effect with MPI).
+
         Known bug: for large neural networks, the code may hang if N_PARALLEL > 1, so use N_PARALLEL = 1 instead.
 """
 import os
@@ -129,7 +130,7 @@ matplotlib.use('Agg')
 
 # _______________________________________________
 
-def amiroot():
+def am_i_root():
     """Returns true if master process, false otherwise"""
     if WITH_MPI:
         return not ME
@@ -145,8 +146,8 @@ def autoset_numerical_parameters():
         N (int): linear grid size
         Nhits (int): max number of hits
         stop_t (int): max search duration
-        Nruns (int): number of runs for computing stats (initial value)
-        max_Nruns (int): hard limit on the number of runs
+        Nruns (int): number of episodes for computing stats (initial value)
+        max_Nruns (int): hard limit on the number of episodes
         mu0_Poisson (float): physical parameter derived from lambda_over_dx and R_dt
     """
     testenv = env(
@@ -213,7 +214,7 @@ def init_envs():
         Nhits=N_HITS,
     )
     if POLICY == -1:
-        mymodel = reload_model(MODEL_PATH, inputshape=myenv._inputshape())
+        mymodel = reload_model(MODEL_PATH, inputshape=myenv.NN_input_shape)
         mypol = RLPolicy(
             env=myenv,
             model=mymodel,
@@ -228,7 +229,7 @@ def init_envs():
 
 
 def check_envs(env, pol):
-    """Check the envs"""
+    """Check that the attributes of env and pol match the required parameters."""
     assert env.Ndim == N_DIMS
     assert env.lambda_over_dx == LAMBDA_OVER_DX
     assert env.R_dt == R_DT
@@ -245,7 +246,7 @@ def check_envs(env, pol):
     
 
 def stats_from_pdf(x, pdf_x):
-    """Compute statistics (mean, standard deviation, skewness, kurtosis and norm) from a pdf
+    """Compute mean, standard deviation, skewness, kurtosis and norm from a pdf
     (probability distribution function)."""
     mean = 0.0
     m2 = 0.0
@@ -295,15 +296,15 @@ def cdf_to_pdf(cdf):
 
 def Worker(episode):
     """
-    Execute one run.
+    Execute one episode.
 
     1. The agent is placed in the center of the grid world
     2. The agent receives a random initial hit
     3. The agent moves according to the policy
-    4. The run finishes when the agent has almost certainly found the source
+    4. The episode terminates when the agent has almost certainly found the source
 
     Args:
-        episode (int): run id
+        episode (int): episode ID
 
     Returns:
         cdf_t (ndarray): CDF (cumulative distribution function) of the number of steps to find the source
@@ -400,9 +401,9 @@ def Worker(episode):
 
 
 def run():
-    """Main program that launches the parallel runs and save statistics.
+    """Main program that runs the episodes and computes the statistics.
     """
-    if amiroot():
+    if am_i_root():
 
         # Print parameters
         print("N_DIMS = " + str(N_DIMS))
@@ -432,7 +433,7 @@ def run():
     N_runs = N_RUNS
     if ADAPTIVE_N_RUNS or WITH_MPI:
         N_runs = int(N_PARALLEL * (np.ceil(N_runs / N_PARALLEL)))  # make it multiple of N_PARALLEL
-        if amiroot():
+        if am_i_root():
             print("N_RUNS(current) = " + str(N_runs))
             sys.stdout.flush()
 
@@ -519,7 +520,7 @@ def run():
                 N_runs = int(np.ceil(1.05 * (sigma_ep / mean_ep / REL_TOL) ** 2))
                 N_runs = min(N_runs, MAX_N_RUNS)
                 N_runs = int(N_PARALLEL * (np.ceil(N_runs / N_PARALLEL)))  # make it multiple of N_PARALLEL
-                if amiroot():
+                if am_i_root():
                     print("N_RUNS(current) = " + str(N_runs))
                     sys.stdout.flush()
 
@@ -542,7 +543,7 @@ def run():
         failed_episodes = failed_episodes[:N_runs]
 
     # Further post processing, save and plot
-    if amiroot():
+    if am_i_root():
         print("N_RUNS(performed) = " + str(N_runs))
         sys.stdout.flush()
 
@@ -860,7 +861,7 @@ if __name__ == "__main__":
         MASTER_PID = os.getpid()
 
     # check and create directories
-    if amiroot():
+    if am_i_root():
         if not os.path.isdir(DIR_TMP):
             os.makedirs(DIR_TMP)
         elif len(os.listdir(DIR_TMP)) != 0:
@@ -901,5 +902,5 @@ if __name__ == "__main__":
     if WITH_MPI:
         COMM.Barrier()
 
-    if amiroot():
+    if am_i_root():
         print("Completed. Time elapsed (in seconds):", time.monotonic() - start_time_0)

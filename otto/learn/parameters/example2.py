@@ -1,6 +1,6 @@
 # ____________ BASIC PARAMETERS _______________________________________________________________________________________
 # Source-tracking POMDP
-N_DIMS = 2  # number of dimension (1D, 2D, ...)
+N_DIMS = 2  # number of space dimensions (1D, 2D, ...)
 LAMBDA_OVER_DX = 1.0  # dimensionless problem size
 R_DT = 2.0  # dimensionless source intensity
 # Neural network (NN) architecture

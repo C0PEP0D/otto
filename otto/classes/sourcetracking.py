@@ -57,6 +57,8 @@ class SourceTracking:
             value of the initial hit
         Nactions (int):
             number of possible actions
+        NN_input_shape (tuple(int)):
+            shape of the input array for neural network models
         mu0_Poisson (float):
             mean number of hits at a distance lambda_over_dx from the source
         agent (list(int)):
@@ -127,6 +129,8 @@ class SourceTracking:
             raise Exception("draw_source must be a bool")
 
         self.Nactions = 2 * self.Ndim
+
+        self.NN_input_shape = tuple([2 * self.N - 1] * self.Ndim)
 
         if not dummy:
             self.restart(initial_hit)
@@ -569,11 +573,6 @@ class SourceTracking:
         return output
 
     # __ INPUT TO VALUE FUNCTION _______________________________________
-    
-    def _inputshape(self, ):
-        shape = tuple([2 * self.N - 1] * self.Ndim)
-        return shape
-
     def _centeragent(self, p, agent):
         """Return the probability density of the source centered on the agent
 

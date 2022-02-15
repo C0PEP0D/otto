@@ -1,6 +1,9 @@
 Scripts
 =======
 
+general usage
+-------------
+
 There are three main scripts:
 
 - ``evaluate.py`` in the ``evaluate`` directory: for **evaluating the performance** of a policy
@@ -9,35 +12,33 @@ There are three main scripts:
 
 To run any of these scripts, use::
 
-    python script.py -i custom
+    python script.py -i custom_params
 
 
 where ``script.py`` is the script file,
-and ``custom.py`` is a user-defined parameter file (possibly empty) located in the local ``parameters`` directory.
+and ``custom_params.py`` is a user-defined parameter file (possibly empty)
+located in the local ``parameters`` directory.
 
-Example files, ``example*.py``, shows *interesting* parameters that can be customized.
+Examples of parameter files called ``example*.py`` are provided in the local ``parameters`` directory.
+They show *essential* parameters that can be customized for that script.
 You can access the list of *all* parameters and their default values by examining
 the contents of ``__defaults.py``.
 
 Outputs are saved in the local ``outputs`` directory.
 
 
-visualize
----------
+visualize.py
+------------
 
 .. automodule:: otto.visualize.visualize
-   :members:
 
-evaluate
----------
+evaluate.py
+-----------
 
 .. automodule:: otto.evaluate.evaluate
-   :members:
 
-learn
------
+learn.py
+--------
 
 .. automodule:: otto.learn.learn
-   :members:
-
 

@@ -4,20 +4,19 @@
 Script used to visualize a search in 1D, 2D or 3D.
 
 The list of all parameters is given below.
-Default parameters are set by '__default.py' in the local 'parameters' directory.
 
 Source-tracking POMDP
     - N_DIMS (int > 0)
-        number of dimension (1D, 2D, ...)
+        number of space dimensions (1D, 2D, ...)
     - LAMBDA_OVER_DX (float >= 1)
         dimensionless problem size
-    - R_DT (float > 0)
+    - R_DT (float > 0.0)
         dimensionless source intensity
     - NORM_POISSON ('Euclidean', 'Manhattan' or 'Chebyshev')
         norm used for hit detections, usually 'Euclidean'
     - N_HITS (int >= 2 or None)
         number of possible hit values, set automatically if None
-    - N_GRID (int >=3 or None)
+    - N_GRID (int >= 3 or None)
         linear size of the domain, set automatically if None
 
 Policy
@@ -31,12 +30,12 @@ Policy
         - 7: mean distance policy
         - 8: voting policy (Cassandra, Kaelbling & Kurien, IEEE 1996)
         - 9: most likely state policy (Cassandra, Kaelbling & Kurien, IEEE 1996)
-    - STEPS_AHEAD (int>=1)
-        number of anticipated future moves, only for POLICY=0
+    - STEPS_AHEAD (int >= 1)
+        number of anticipated moves, can be > 1 only for POLICY=0
 
 Setup
     - DRAW_SOURCE (bool)
-        if False, will not draw the source location and use a Bayesian setting instead
+        if False, episodes will continue until the source is almost surely found (Bayesian setting)
     - ZERO_HIT (bool)
         whether to enforce a series of zero hits
 
@@ -44,23 +43,23 @@ Visualization
     - VISU_MODE (int={0,1,2})
         - 0: run without video
         - 1: make video in the background
-        - 2: make video with live preview (slower).
-        The aspect ratio of the video may be wrong depending on your screen size or resolution,
-        if so use VISU_MODE = 1.
-    - FRAME_RATE (int)
+        - 2: make video with live preview (slower)
+
+        Note: with VISU_MODE = 2, the aspect ratio may be wrong depending on your screen size or resolution.
+    - FRAME_RATE (int > 0)
         number of frames per second in the video
     - KEEP_FRAMES (bool)
         whether individual frames should be saved (otherwise frames are deleted, only the video is kept)
 
-Stopping criteria (only if DRAW_SOURCE is False)
+Stopping criteria
     - STOP_p (float ~ 0):
-        stops when the probability that the source is found is greater than 1 - STOP_p
-    - STOP_t (int)
-        max number of iterations
+        stops when the probability that the source is found is greater than 1 - STOP_p (only if DRAW_SOURCE is False)
+    - STOP_t (int > 0)
+        maximum number of steps per episode
 
 Saving
     - RUN_NAME (str or None)
-        prefix used for all output files, if None will use timestamp
+        prefix used for all output files, if None will use a timestamp
 """
 import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
@@ -131,7 +130,7 @@ def run():
     print("N_HITS = " + str(myenv.Nhits))
 
     if POLICY == -1:
-        mymodel = reload_model(MODEL_PATH, inputshape=myenv._inputshape())
+        mymodel = reload_model(MODEL_PATH, inputshape=myenv.NN_input_shape)
         mypol = RLPolicy(
             env=myenv,
             model=mymodel,

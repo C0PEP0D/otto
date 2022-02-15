@@ -11,6 +11,12 @@ from tensorflow.keras import regularizers
 
 
 def reload_model(model_dir, inputshape):
+    """Load a model.
+
+    Args:
+        model_dir (str): path to the model
+        inputshape (ndarray): shape of the neural network input (attribute of the SourceTracking env)
+    """
     model_name = os.path.basename(model_dir)
     weights_path = os.path.abspath(os.path.join(model_dir, model_name))
     config_path = os.path.abspath(os.path.join(model_dir, model_name + ".config"))
@@ -174,7 +180,6 @@ class ValueModel(Model):
         """
         input_shape_nobatch = tuple(input_shape_nobatch)
         input_shape_withbatch = tuple([1] + list(input_shape_nobatch))
-        # input_shape_nobatch = input_shape[1:]
         self.build(input_shape_withbatch)
         inputs = tf.keras.Input(shape=input_shape_nobatch)
         _ = self.call(inputs)
@@ -265,6 +270,7 @@ class ValueModel(Model):
         return loss
 
     def save_model(self, model_dir):
+        """Save the model to model_dir."""
         if not os.path.isdir(model_dir):
             os.mkdir(model_dir)
         model_name = os.path.basename(model_dir)
