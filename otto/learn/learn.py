@@ -562,20 +562,20 @@ def plot_stats(statsRL, statsref=None, title='', file_suffix='0'):
     plt.subplots_adjust(left=0.05, bottom=0.24, right=0.99, top=0.9, wspace=0.15, hspace=0)
     palette = plt.get_cmap('tab10')
     for k in range(2):
-        if statsref is None:
-            continue
         if k == 0:
             stats = statsRL
         elif k == 1:
+            if statsref is None:
+                continue
             stats = statsref
         policy = stats["policy"]
         if policy == -1:
             label = "RL"
         else:
             label = policy_name(policy)
-        markersize = 5 / (k+1)
-        linewidth = 2 / (k+1)
         color = palette(k)
+        kwargs0 = {'markersize': 5 / (k+1), 'linewidth': 2 / (k+1), 'color': palette(k)}
+        kwargs1 = {'fontsize': 10, 'color': color, 'xycoords': 'axes fraction', 'ha': "right"}
         for i in range(3):
             if i == 0:
                 yvar = stats['pdf']
@@ -588,19 +588,19 @@ def plot_stats(statsRL, statsref=None, title='', file_suffix='0'):
                 yname = "CCDF (=1-CDF)"
             x = np.arange(len(yvar))
             if i < 2:
-                line, = ax[i].plot(x, yvar, '-o', markersize=markersize, linewidth=linewidth, color=color, label=label)
+                line, = ax[i].plot(x, yvar, '-o', label=label, **kwargs0)
             else:
-                line, = ax[i].semilogy(x, yvar, '-o', markersize=markersize, linewidth=linewidth, color=color, label=label)
+                line, = ax[i].semilogy(x, yvar, '-o', label=label, **kwargs0)
 
             ax[i].set_title(yname + " of number of steps")
             ax[i].set_xlabel("number of steps")
             if i == 0:
-                ax[i].annotate("p_not_found = " + "{:.3e}".format(stats['p_not_found']), (0.95, 0.85-0.05*k), fontsize=10, color=color, xycoords='axes fraction', ha="right")
-                ax[i].annotate("mean = " + "{:.3e}".format(stats['mean']), (0.95, 0.65-0.05*k), fontsize=10, color=color, xycoords='axes fraction', ha="right")
-                ax[i].annotate("std = " + "{:.3e}".format(stats['std']), (0.95, 0.45-0.05*k), fontsize=10, color=color, xycoords='axes fraction', ha="right")
+                ax[i].annotate("p_not_found = " + "{:.3e}".format(stats['p_not_found']), (0.95, 0.85-0.05*k), **kwargs1)
+                ax[i].annotate("mean = " + "{:.3e}".format(stats['mean']), (0.95, 0.65-0.05*k), **kwargs1)
+                ax[i].annotate("std = " + "{:.3e}".format(stats['std']), (0.95, 0.45-0.05*k), **kwargs1)
             elif i == 1:
-                ax[i].annotate("P50 = " + "{:.3e}".format(stats['p50']), (0.95, 0.45-0.05*k), fontsize=10, color=color, xycoords='axes fraction', ha="right")
-                ax[i].annotate("P99 = " + "{:.3e}".format(stats['p99']), (0.95, 0.30-0.05*k), fontsize=10, color=color, xycoords='axes fraction', ha="right")
+                ax[i].annotate("P50 = " + "{:.3e}".format(stats['p50']), (0.95, 0.45-0.05*k), **kwargs1)
+                ax[i].annotate("P99 = " + "{:.3e}".format(stats['p99']), (0.95, 0.30-0.05*k), **kwargs1)
                 ax[i].legend(fontsize=10, loc='lower center')
 
     fig.suptitle(title, y=0.98)
@@ -682,7 +682,7 @@ def plot_stats_evolution(data, ref_stats=None, title=''):
                 ax[r, i].fill_between(xvar, yvar - err, yvar + err, color=color, alpha=0.2)  # 95 % confidence interval
                 # add where p_not_found is too high
                 flag = data[:, 4] > 1e-3
-                ax[r, i].plot(xvar[flag], yvar[flag], 'x', markersize=7, markeredgewidth=2, color=color)
+                ax[r, i].plot(xvar[flag], yvar[flag], 'x', markersize=8, markeredgewidth=2, color=color)
 
             # add baseline on the same plot
             if (ref_stats is not None) and (names_list[i] in ("p_not_found", "mean", "p50", "p99")):
@@ -694,11 +694,11 @@ def plot_stats_evolution(data, ref_stats=None, title=''):
                 # for mean, add confidence interval
                 if names_list[i] == "mean":
                     err = ref_stats["mean_err"] * np.ones(len(yvar))
-                    ax[r, i].fill_between(xvar, yref - err, yref + err, color=colorref, alpha=0.2)  # 95 % confidence interval
+                    ax[r, i].fill_between(xvar, yref - err, yref + err, color=colorref, alpha=0.2)  # 95 % CI
 
             # legend
             if names_list[i] == "mean":
-                ax[r, i].legend(fontsize=10)
+                ax[r, i].legend(fontsize=12)
 
     fig.suptitle(title, y=0.98)
     plt.figtext(0.5, 0.003, param2subtitle(MYENV, MYMODEL), fontsize=7, ha="center", va="bottom")
@@ -958,14 +958,22 @@ def train_model(eps_floor, eps_0, eps_decay, max_it, ref_stats):
             print("* evaluating performance of the current model-based policy...")
             stats = compute_stats(Nepisodes=N_RUNS_STATS, policy=-1, parallel=N_RUNS_STATS >= N_PARALLEL > 1)
             print_stats(stats, ref_stats)
-            titlestr = "evaluation of learned value function, it # " + str(it) + ", transitions seen =" + "{:.2e}".format(N_transitions_seen)
-            plot_stats(statsRL=stats, statsref=ref_stats, title=titlestr, file_suffix=str(it // EVALUATE_PERFORMANCE_EVERY))
-            add_stats = np.array([it, N_transitions_seen, N_transitions_generated, eps, stats["p_not_found"], stats["mean"], stats["mean_err"], stats["p50"], stats["p99"]])
+            titlestr = "evaluation of current RL policy, training it = " + str(it) \
+                       + ", transitions seen = " + "{:.2e}".format(N_transitions_seen)
+            plot_stats(statsRL=stats,
+                       statsref=ref_stats,
+                       title=titlestr,
+                       file_suffix=str(it // EVALUATE_PERFORMANCE_EVERY))
+            add_stats = np.array([it, N_transitions_seen, N_transitions_generated, eps,
+                                  stats["p_not_found"], stats["mean"], stats["mean_err"], stats["p50"], stats["p99"]])
             stats_history = np.vstack((stats_history, add_stats))
             stats_history_file = os.path.join(DIR_OUTPUTS, str(RUN_NAME + "_table_stats" + ".npy"))
             np.save(stats_history_file, stats_history)
-            titlestr = "value learning, it # " + str(it) + ", transitions seen =" + "{:.2e}".format(N_transitions_seen)
-            plot_stats_evolution(data=stats_history, ref_stats=ref_stats, title=titlestr)
+            titlestr = "evolution of performance during training (currently: training it = " + str(it) \
+                       + ", transitions seen = " + "{:.2e}".format(N_transitions_seen) + ")"
+            plot_stats_evolution(data=stats_history,
+                                 ref_stats=ref_stats,
+                                 title=titlestr)
             print(">>> Current results saved in the directory: " + DIR_OUTPUTS)
 
         ###################### GENERATE EXP
@@ -974,10 +982,14 @@ def train_model(eps_floor, eps_0, eps_decay, max_it, ref_stats):
         eps = eps_exploration(it, e_floor=eps_floor, e_0=eps_0, e_decay=eps_decay)
         # compute new trajectories
         Nepisodes = max(int(np.ceil(NEW_TRANS_PER_IT / avg_len_episode)), 1)
-        new_states, new_statesp = new_experience(Nepisodes=Nepisodes, policy=-1, eps=eps, parallel=Nepisodes >= N_PARALLEL > 1)
+        new_states, new_statesp = new_experience(Nepisodes=Nepisodes,
+                                                 policy=-1,
+                                                 eps=eps,
+                                                 parallel=Nepisodes >= N_PARALLEL > 1)
         avg_len_episode = new_states.shape[0] / Nepisodes
         if new_states.shape[0] > MEMORY_SIZE:
-            print("Memory size is too small to fit this many new transitions; it = ", it, ", Nepisodes = ", Nepisodes, ", new = ", new_states.shape[0], ", mem = ", MEMORY_SIZE)
+            print("Memory size is too small to fit this many new transitions; it = ", it, ", Nepisodes = ", Nepisodes,
+                  ", new = ", new_states.shape[0], ", mem = ", MEMORY_SIZE)
             new_states = new_states[:MEMORY_SIZE]
             new_statesp = new_statesp[:MEMORY_SIZE]
         # delete oldest experiences and add the new ones to memory
@@ -1057,7 +1069,10 @@ def run():
     stats = compute_stats(Nepisodes=N_RUNS_STATS, policy=-1, parallel=N_RUNS_STATS >= N_PARALLEL > 1)
 
     print_stats(stats, ref_stats)
-    plot_stats(statsRL=stats, statsref=ref_stats, title="evaluation of learned value function", file_suffix='evaluation')
+    plot_stats(statsRL=stats,
+               statsref=ref_stats,
+               title="evaluation of RL policy",
+               file_suffix='evaluation')
 
 
 if __name__ == '__main__':
