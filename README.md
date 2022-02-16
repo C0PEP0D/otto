@@ -17,7 +17,6 @@ OTTO is part of the [C0PEP0D](https://C0PEP0D.github.io/) project and has been u
     * [The source-tracking POMDP](#the-source-tracking-pomdp)
     * [What does OTTO do?](#what-does-otto-do)
     * [Infotaxis](#infotaxis)
-    * [Space-aware infotaxis](#space-aware-infotaxis)
     * [Reinforcement learning](#reinforcement-learning)
 * [Installation](#installation)
     * [Requirements](#requirements)
@@ -96,10 +95,6 @@ concentration gradients in chemotaxis".
 
 Infotaxis is far superior to all naive strategies, such as going to the more likely source location.
 Yet it is known to be suboptimal.
-
-### Space-aware infotaxis
-
-Space-aware infotaxis is variant of infotaxis which has been shown to beat infotaxis in most cases.
 
 ### Reinforcement learning
 
@@ -276,7 +271,8 @@ This file is already present in `evaluate/parameters/` for this example.
 The main policies are
 
 - `POLICY = 0` for infotaxis (default)
-- `POLICY = 1` for space-aware infotaxis
+- `POLICY = 1` for space-aware infotaxis, a [recently proposed](https://arxiv.org/abs/2112.10861) heuristic 
+that beats infotaxis in most cases
 - `POLICY = -1` for a reinforcement learning policy: for that we need to learn a model first!
 
 All policies are described in the [documentation](#documentation).
