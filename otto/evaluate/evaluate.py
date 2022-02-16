@@ -107,6 +107,10 @@ if os.path.basename(sys.argv[0]) not in ["sphinx-build", "build.py"]:
     del parser, args
 
 # set other globals
+if MODEL_PATH is not None and POLICY != -1:
+    raise Exception("Models (set by MODEL_PATH) can only be used with POLICY = -1 (reinforcement learning policy). "
+                    "If you want to use the model, you must set POLICY = -1. "
+                    "If you want a different policy, set MODEL_PATH = None.")
 if POLICY == -1:
     from otto.classes.rlpolicy import RLPolicy
     from otto.classes.valuemodel import reload_model
