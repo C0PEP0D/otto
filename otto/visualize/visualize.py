@@ -67,7 +67,7 @@ import sys
 sys.path.insert(1, os.path.abspath(os.path.join(sys.path[0], '..', '..')))
 sys.path.insert(2, os.path.abspath(os.path.join(sys.path[0], '..', '..', 'zoo')))
 import time
-import argparse
+# import argparse
 import importlib
 from otto.classes.sourcetracking import SourceTracking as env
 from otto.classes.visualization import Visualization
@@ -75,20 +75,20 @@ from otto.classes.visualization import Visualization
 # import default globals
 from otto.visualize.parameters.__defaults import *
 
-# import globals from user defined parameter file
-if os.path.basename(sys.argv[0]) not in ["sphinx-build", "build.py"]:
-    parser = argparse.ArgumentParser(description='Visualize an episode')
-    parser.add_argument('-i', '--input',
-                        dest='inputfile',
-                        help='name of the file containing the parameters')
-    args = vars(parser.parse_args())
-    if args['inputfile'] is not None:
-        filename, fileextension = os.path.splitext(args['inputfile'])
-        params = importlib.import_module(name="parameters." + filename)
-        names = [x for x in params.__dict__ if not x.startswith("_")]
-        globals().update({k: getattr(params, k) for k in names})
-        del params, names
-    del parser, args
+# # import globals from user defined parameter file
+# if os.path.basename(sys.argv[0]) not in ["sphinx-build", "build.py"]:
+#     parser = argparse.ArgumentParser(description='Visualize an episode')
+#     parser.add_argument('-i', '--input',
+#                         dest='inputfile',
+#                         help='name of the file containing the parameters')
+#     args = vars(parser.parse_args())
+#     if args['inputfile'] is not None:
+#         filename, fileextension = os.path.splitext(args['inputfile'])
+#         params = importlib.import_module(name="parameters." + filename)
+#         names = [x for x in params.__dict__ if not x.startswith("_")]
+#         globals().update({k: getattr(params, k) for k in names})
+#         del params, names
+#     del parser, args
 
 # other globals
 if MODEL_PATH is not None and POLICY != -1:
