@@ -598,6 +598,6 @@ class SourceTracking:
                 self.N - 1 - agent[2]:2 * self.N - 1 - agent[2],
             ] = p
         else:
-            raise Exception("centeragent: dimension not allowed")
+            raise Exception("_centeragent is not implemented for Ndim > 3")
 
         return result

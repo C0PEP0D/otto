@@ -70,8 +70,6 @@ class ValueModel(Model):
                        }
 
         self.Ndim = Ndim
-        if Ndim != 1 and Ndim != 2:
-            raise Exception("This Ndim is not implemented")
 
         if loss_function == 'mean_absolute_error':
             self.loss_function = tf.keras.losses.MeanAbsoluteError(reduction=tf.keras.losses.Reduction.NONE)

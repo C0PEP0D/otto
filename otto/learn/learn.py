@@ -150,8 +150,10 @@ if os.path.basename(sys.argv[0]) == "learn.py":
 # other globals
 EPSILON = 1E-10
 
-if (N_DIMS != 1) and (N_DIMS != 2):
-    raise Exception("N_DIMS must be 1 or 2 (RL is not implemented in 3D and more)")
+if N_DIMS > 2:
+    if SYM_EVAL_ENSEMBLE_AVG or SYM_TRAIN_ADD_DUPLICATES or SYM_TRAIN_RANDOMIZE:
+        raise Exception("Symmetries are not implemented in more than 2 dimensions, "
+                        "set all SYM_* parameters to False.")
 
 if N_PARALLEL <= 0:
     N_PARALLEL = os.cpu_count()

@@ -332,7 +332,7 @@ class TrainingEnv(SourceTracking):
             if sym == 4 or sym == 7:
                 x = np.flip(x, axis=(0, 1))  # x -> -x, y -> -y
         else:
-            raise Exception("not implemented for this Ndim")
+            raise Exception("_sym_transformation_array is not implemented for Ndim > 2")
         return x
 
     def _sym_transformation_coords(self, x, sym):
@@ -356,6 +356,6 @@ class TrainingEnv(SourceTracking):
                 x[0] = self.N - 1 - x[0]  # x -> -x
                 x[1] = self.N - 1 - x[1]  # y -> -y
         else:
-            raise Exception("not implemented for this Ndim")
+            raise Exception("_sym_transformation_coords is not implemented for Ndim > 2")
         x = x.tolist()
         return x
