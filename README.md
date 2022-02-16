@@ -87,9 +87,9 @@ It states that the agent should choose the action from which it expects the grea
 the source location. 
 
 The physical intuition behind this strategy is, quoting the authors, that 
-``information accumulates faster close to the source because cues arrive at a higher rate, 
+"information accumulates faster close to the source because cues arrive at a higher rate, 
 hence tracking the maximum rate of information acquisition will guide the searcher to the source much like 
-concentration gradients in chemotaxis''.
+concentration gradients in chemotaxis".
 
 Infotaxis is far superior to all naive strategies, such as going to the more likely source location.
 Yet it is known to be suboptimal.
@@ -100,7 +100,7 @@ Space-aware infotaxis is variant of infotaxis which has been shown to beat infot
 
 ### Reinforcement learning
 
-Approximately optimal solutions can be obtained using deep reinforcement learning.
+Near-optimal policies can be obtained using deep reinforcement learning.
 The training algorithm is a model-based version of DQN (Mnih et al., Nature, 2015).
 
 
@@ -135,7 +135,7 @@ git clone https://github.com/C0PEP0D/otto.git
 Then go to the `otto` directory and install OTTO using
 
 ``` bash
-python setup.py install
+python3 setup.py install
 ```
 
 ### Testing
@@ -170,7 +170,7 @@ To use OTTO, go to the relevant main directory and run the corresponding script.
 For example, to visualize an episode, go to the `visualize` directory and run the `visualize.py` script with
 
 ```bash
-python visualize.py
+python3 visualize.py
 ```
 
 You should now see the rendering of a 1D search in a new window (it may be very short!).
@@ -183,7 +183,7 @@ In the rendering window, the first panel is a map of hits, and the second panel 
 The videos have been saved as `visualize/outputs/YYmmdd-HHMMSS_video.mp4` where 'YYmmdd-HHMMSS' is a 
 timestamp (the time you started the script). 
 
-If you do not have `ffmpeg`, or if you are on Windows, or if there was a problem with video making, you will find instead frames saved
+If you do not have `ffmpeg`, or if you are using Windows, or if there was a problem with video making, you will find instead frames saved
 in `visualize/outputs/YYmmdd-HHMMSS_frames`.
 
 
@@ -206,13 +206,13 @@ User-defined parameters are called by using the `--input` option followed by the
 For example, you can now visualize a search in 2D with
 
 ```bash
-python visualize.py --input myparam.py
+python3 visualize.py --input myparam.py
 ```
 
 The `--input` option can be shortened to `-i`, and the file name can be with or without `.py`. So the command
 
 ```bash
-python visualize.py -i myparam
+python3 visualize.py -i myparam
 ```
 will have the same effect.
 
@@ -241,7 +241,7 @@ It does so essentially by running thousands of episodes in parallel and averagin
 You can try with
 
 ```bash
-python evaluate.py
+python3 evaluate.py
 ```
 
 This will take some time (order of magnitude is 2 minutes on 8 cores). 
@@ -267,7 +267,7 @@ You can now try to compute the statistics of another policy on the same problem.
 For example, evaluate the "space-aware infotaxis" policy by running
 
 ```bash
-python evaluate.py --input myparam.py
+python3 evaluate.py --input myparam.py
 ```
 
 where `myparam.py` is a file containing the line 
@@ -296,7 +296,7 @@ The (approximately) optimal policy is then derived from this function.
 To train a model, go to the `learn` directory and use
 
 ```bash
-python learn.py
+python3 learn.py
 ```
 
 Now is the perfect time for a coffee since it will take quite a while. Logging information is displayed in the terminal while the 
@@ -328,7 +328,7 @@ Note: training can restart from a previously saved model.
 
 ### Visualizing and evaluating a learned policy
 
-Once is model is trained, the learned policy can be evaluated or visualized using the corresponding scripts.
+Once a model is trained, the learned policy can be evaluated or visualized using the corresponding scripts.
 For that, simply run the scripts with a parameter file (using `--input`) containing
 
 ```python
@@ -350,13 +350,13 @@ Pre-trained models are named `zoo_model_i` where i is an integer.
 To visualize the RL policy given by `zoo_model_1`, use
 
 ```bash
-python visualize.py --input zoo_model_1
+python3 visualize.py --input zoo_model_1
 ```
 
 Similarly you can evaluate this model with
 
 ```bash
-python evaluate.py --input zoo_model_1
+python3 evaluate.py --input zoo_model_1
 ```
 
 Note that since `zoo_model_1.py` is not present in the `visualize/parameters` directory, the script will automatically
@@ -384,7 +384,7 @@ Warning: all user-generated outputs and models will be deleted!
 ***TODO: documentation is currently in construction***
 
 **OTTO** uses [Sphinx](http://www.sphinx-doc.org/en/stable/) for documentation and is made available online 
-[here](https://otto-c0pep0d.readthedocs.io/en/latest/?badge=latest#). 
+[here](https://otto-c0pep0d.readthedocs.io/en/latest/). 
 To build the html version of the docs locally, go to the `docs` directory and use:
 
 ```bash
@@ -418,7 +418,8 @@ The workaround is to set `N_PARALLEL = 1` in the parameter file, which enforces 
 ## Community guidelines
 
 ### Reporting bugs
-If you discover a bug in OTTO which is not a [known issue](#known-issues), please create [new issue](https://github.com/C0PEP0D/otto/issues/new).
+If you discover a bug in OTTO which is not a [known issue](#known-issues), please create a 
+[new issue](https://github.com/C0PEP0D/otto/issues/new).
 
 ### Contributing
 Have you designed a new policy? Would you like to add a new feature? Can you fix a [known issue](#known-issues)?
@@ -429,9 +430,9 @@ To contribute, please fork the repository and submit a pull request.
 Are you having troubles with OTTO? Please first consult the instructions for [installing](#installation) 
 and [using](#how-to-use-otto) OTTO, check the [known issues](#known-issues), and explore the [documentation](#documentation).
 
-Can you still not find an answer?
-You can send an email with the subject "OTTO: your request" to the [authors](#authors) for further 
-information or questions about OTTO.
+Can you still not find an answer? Would you like more information?
+Please create [an issue](https://github.com/C0PEP0D/otto/issues/new) or send an email with the 
+subject "OTTO: your request" to the [authors](#authors).
 
 ## Authors
 
@@ -450,7 +451,7 @@ or if you use LaTeX:
 
 ```tex
 @misc{OTTO,
-  author = {A. Loisy and C. Eloy},
+  author = {Loisy, A. and Eloy, C.},
   title = {{OTTO}: a {P}ython package to simulate, solve and visualize the source-tracking {POMDP}},
   howpublished = {\url{http://github.com/C0PEP0D/otto}}
 }
