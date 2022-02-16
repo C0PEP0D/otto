@@ -189,30 +189,29 @@ def run():
         T_mean += p_not_found_yet
         p_not_found_yet *= 1 - p_end
 
-        print("nstep: %4d, action: %1d, hits: %3d, cum_hits: %6d, p_not_found_yet: %f"
+        print("nstep: %4d, action: %1d, hits: %3d, cum_hits: %6d, p_not_found_yet: %.8f"
               % (t, action, hit, myenv.cumulative_hits, p_not_found_yet))
 
         if done and DRAW_SOURCE:
-            message = "stopped because: source found"
+            message = "success: source found"
             stop = 1
         elif p_not_found_yet < STOP_p or p_end > 1 - EPSILON:
-            message = "stopped because: source (almost surely) found " \
-                      "(p_not_found_yet = " + str(p_not_found_yet) + ")"
+            message = "success: source almost surely found " \
+                      "(p_not_found_yet = " + str(round(p_not_found_yet, 8)) + ")"
             stop = 1
         elif t >= STOP_t - 1:
-            message = "stopped because failure: max number of iterations reached (nb it = " + str(c) + ")"
+            message = "failure: max number of iterations reached (nb it = " + str(c) + ")"
             stop = 2
         elif myenv.agent_stuck:
-            message = "stopped because failure: agent is stuck"
+            message = "failure: agent is stuck"
             stop = 3
 
         if stop:
             break
 
-    print("*** complete")
     print(message)
     if not DRAW_SOURCE:
-        print("mean number of steps on this episode = %.3f" % T_mean)
+        print("mean number of steps for this episode = %.3f" % T_mean)
 
     if VISU_MODE > 0:
         if DRAW_SOURCE:

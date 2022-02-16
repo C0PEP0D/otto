@@ -128,11 +128,11 @@ DIR_OUTPUTS = os.path.abspath(os.path.join(sys.path[0], "outputs", RUN_NAME))
 PARENT_DIR_TMP = os.path.abspath(os.path.join(sys.path[0], "tmp"))
 DIR_TMP = os.path.abspath(os.path.join(PARENT_DIR_TMP, RUN_NAME))
 
-
 # config
 matplotlib.use('Agg')
 
 # _______________________________________________
+
 
 def am_i_root():
     """Returns true if master process, false otherwise"""
@@ -375,7 +375,7 @@ def Worker(episode):
 
         if stop:
             if episode % 100 == 0 and sys.stdout.isatty() and not WITH_MPI:
-                txt = "episode: %7d [hit(t0) = %d]  ||  <nsteps>:  %7.2f  ||  max nb of steps:  %7.2f" \
+                txt = "episode: %7d [hit(t0) = %d]  ||  <nsteps>:  %7.2f  ||  total nb of steps:  %d" \
                       % (episode, myenv.initial_hit, T_mean, t)
                 if stop == 1:
                     print(txt)
@@ -398,8 +398,8 @@ def Worker(episode):
     episode_elapsed_time = time.monotonic() - episode_start_time
     monitoring_episode_tmp_file = os.path.join(DIR_TMP, str("monitoring_episode_" + str(episode) + ".txt"))
     with open(monitoring_episode_tmp_file, "a") as mfile:
-        mfile.write("%9d\t%4d\t%4d\t%10d\t%10.2e\t%.5e\n" % (
-            episode, myenv.initial_hit, stop, near_boundaries, p_not_found_yet, episode_elapsed_time))
+        mfile.write("%9d\t%8d\t%9d\t%13d\t%11.2e\t%15.4e\t%21.4e\n" % (
+            episode, myenv.initial_hit, stop, near_boundaries, p_not_found_yet, T_mean, episode_elapsed_time))
 
     return cdf_t, cdf_h, T_mean, failed
 
@@ -408,6 +408,8 @@ def run():
     """Main program that runs the episodes and computes the statistics.
     """
     if am_i_root():
+
+        print("*** initializing...")
 
         # Print parameters
         print("N_DIMS = " + str(N_DIMS))
@@ -434,6 +436,9 @@ def run():
         sys.stdout.flush()
 
     # Perform runs
+    if am_i_root():
+        print("*** generating episodes...")
+
     N_runs = N_RUNS
     if ADAPTIVE_N_RUNS or WITH_MPI:
         N_runs = int(N_PARALLEL * (np.ceil(N_runs / N_PARALLEL)))  # make it multiple of N_PARALLEL
@@ -528,7 +533,13 @@ def run():
                     print("N_RUNS(current) = " + str(N_runs))
                     sys.stdout.flush()
 
+    if am_i_root():
+        print("N_RUNS(performed) = " + str(N_runs))
+        sys.stdout.flush()
+
     # Reduce
+    if am_i_root():
+        print("*** post-processing...")
     if WITH_MPI:
         # locally
         cdf_t_tot_loc /= N_runs
@@ -546,10 +557,8 @@ def run():
         mean_t_episodes = mean_t_episodes[:N_runs]
         failed_episodes = failed_episodes[:N_runs]
 
-    # Further post processing, save and plot
+    # Further post-processing, save and plot
     if am_i_root():
-        print("N_RUNS(performed) = " + str(N_runs))
-        sys.stdout.flush()
 
         # from cdf to pdf
         pdf_t_tot = cdf_to_pdf(cdf_t_tot)
@@ -564,16 +573,17 @@ def run():
         mean_h, sigma_h, skew_h, kurt_h, _ = stats_from_pdf(h_bins, pdf_h_tot)
         p25_h, p50_h, p75_h, p90_h, p95_h, p99_h, _ = stats_from_cdf(h_bins, cdf_h_tot)
 
-        print("Number of steps: mean on %1d episodes  :  %.3f" % (N_runs, mean_t))
-        print("Number of steps: median on %1d episodes:  %.3f" % (N_runs, p50_t))
-        print("Number of steps: p99 on %1d episodes   :  %.3f" % (N_runs, p99_t))
-        print("Number of steps: proba source not found:  %.10f" % (1 - p_found,))
+        print("probability that the source is never found              : %.10f" % (1.0 - p_found, ))
+        print("mean number of steps to find the source                 : %.3f" % mean_t)
+        print("number of steps to find the source with 50 %% probability: %.3f" % p50_t)
+        print("number of steps to find the source with 99 %% probability: %.3f" % p99_t)
         nb_failed = np.sum(failed_episodes)
         if np.any(failed_episodes < 0):
             nb_failed = -1
-            print("Problem while recording failures")
+            print("problem while recording failures")
         else:
-            print("Number of failed episodes              :  %7d (%8.4f %%)" % (nb_failed, nb_failed / N_runs * 100))
+            print("number of failed episodes                               : %d / %d (%f %%)"
+                  % (nb_failed, N_runs, nb_failed / N_runs * 100))
         sys.stdout.flush()
 
         # save all parameters to txt file
@@ -606,43 +616,25 @@ def run():
         with open(param_txt_file, 'w') as out:
             for key, val in inputs.items():
                 print(key + " = " + str(val), file=out)
-        print(">>> Parameters saved in: " + param_txt_file)
 
         # save stats
-        stats_file = os.path.join(DIR_OUTPUTS, str(RUN_NAME + "_statistics_failures" + ".txt"))
+        stats_file = os.path.join(DIR_OUTPUTS, str(RUN_NAME + "_statistics" + ".txt"))
         with open(stats_file, "w") as sfile:
-            sfile.write("p_not_found            \t%.8e\n" % (1 - p_found,))
-            sfile.write("fraction_runs_stopnot1 \t%.8e\n" % (nb_failed / N_runs))
-        print(">>> Statistics of failures saved in: " + stats_file)
-
-        stats_file = os.path.join(DIR_OUTPUTS, str(RUN_NAME + "_statistics_nsteps" + ".txt"))
-        with open(stats_file, "w") as sfile:
-            for varname in (
-            'mean_t', 'sigma_t', 'skew_t', 'kurt_t', 'p25_t', 'p50_t', 'p75_t', 'p90_t', 'p95_t', 'p99_t'):
-                sfile.write("%s\t%.5e\n" % (varname, locals()[varname]))
-        print(">>> Statistics of nsteps saved in: " + stats_file)
-
-        stats_file = os.path.join(DIR_OUTPUTS, str(RUN_NAME + "_statistics_nhits" + ".txt"))
-        with open(stats_file, "w") as sfile:
-            for varname in (
-            'mean_h', 'sigma_h', 'skew_h', 'kurt_h', 'p25_h', 'p50_h', 'p75_h', 'p90_h', 'p95_h', 'p99_h'):
-                sfile.write("%s\t%.5e\n" % (varname, locals()[varname]))
-        print(">>> Statistics of nhits saved in: " + stats_file)
+            sfile.write("p_not_found\t%+.4e\n" % (1 - p_found,))
+            for varname in \
+                    ('mean_t', 'sigma_t', 'skew_t', 'kurt_t', 'p25_t', 'p50_t', 'p75_t', 'p90_t', 'p95_t', 'p99_t'):
+                sfile.write("%s\t\t%+.4e\n" % (varname, locals()[varname]))
+            for varname in \
+                    ('mean_h', 'sigma_h', 'skew_h', 'kurt_h', 'p25_h', 'p50_h', 'p75_h', 'p90_h', 'p95_h', 'p99_h'):
+                sfile.write("%s\t\t%+.4e\n" % (varname, locals()[varname]))
 
         # save CDF of number of steps
         table_file = os.path.join(DIR_OUTPUTS, str(RUN_NAME + "_table_CDF_nsteps" + ".npy"))
         np.save(table_file, np.vstack((t_bins, cdf_t_tot)))
-        print(">>> CDF(nsteps) saved in: " + table_file)
 
         # save CDF of number of hits
         table_file = os.path.join(DIR_OUTPUTS, str(RUN_NAME + "_table_CDF_nhits" + ".npy"))
         np.save(table_file, np.vstack((h_bins, cdf_h_tot)))
-        print(">>> CDF(nhits) saved in: " + table_file)
-
-        # save array of mean number of steps for each episode
-        table_file = os.path.join(DIR_OUTPUTS, str(RUN_NAME + "_table_mean_nsteps_episodes" + ".npy"))
-        np.save(table_file, mean_t_episodes)
-        print(">>> mean(nsteps) for each episode saved in: " + table_file)
 
         # create and save figures
         if POLICY == -1:
@@ -676,8 +668,11 @@ def run():
         )
 
         # plot PDF(nsteps), CDF(nsteps), PDF(nhits), CDF(nhits)
-        for varname in ('number of steps', 'number of hits'):
-            if varname == 'number of steps':
+        fig, ax = plt.subplots(2, 2, figsize=(12, 10))
+        plt.subplots_adjust(left=0.08, bottom=0.06, right=0.96, top=0.92, hspace=0.35, wspace=0.30)
+        kwargs = {'xycoords': 'axes fraction', 'fontsize': 8, 'ha': "right"}
+        for row, varname in enumerate(["number of steps", "number of hits"]):
+            if varname == "number of steps":
                 bins = t_bins
                 cdf_tot = cdf_t_tot
                 pdf_tot = pdf_t_tot
@@ -690,6 +685,7 @@ def run():
                 p90 = p90_t
                 p99 = p99_t
                 filesuffix = 'nsteps'
+                color = "tab:blue"
             else:
                 bins = h_bins
                 cdf_tot = cdf_h_tot
@@ -703,58 +699,38 @@ def run():
                 p90 = p90_h
                 p99 = p99_h
                 filesuffix = 'nhits'
+                color = "tab:orange"
             max_x = bins[np.nonzero(pdf_tot)[0][-1]]
-            for fct in ("PDF", "CDF"):
+            for col, fct in enumerate(["PDF", "CDF"]):
                 if fct == "PDF":
                     ydata = pdf_tot
                     ylim = (0.0, 1.02 * np.max(pdf_tot))
                 elif fct == "CDF":
                     ydata = cdf_tot
                     ylim = (0.0, 1.0)
-                fig1, ax1 = plt.subplots()
-                ax1.plot(bins, ydata, "-o", markersize=2, linewidth=0.5)
-                ax1.set_title(fct + " of " + varname)
-                ax1.set_xlabel(varname + " to find the source")
-                ax1.set_xlim((0, max_x + 1))
-                ax1.set_ylim(ylim)
-                plt.figtext(0.5, 0.995, subtitle, fontsize=3, ha="center", va="top")
+
+                ax[row, col].plot(bins, ydata, "-o", color=color, markersize=2, linewidth=1)
+                ax[row, col].set_title(fct + " of " + varname)
+                ax[row, col].set_xlabel(varname + " to find the source")
+                ax[row, col].set_xlim((0, max_x + 1))
+                ax[row, col].set_ylim(ylim)
+
                 if fct == "PDF":
-                    plt.figtext(0.90, 0.95, "mean = " + "{:.3e}".format(mean), fontsize=6, ha="right")
-                    plt.figtext(0.90, 0.93, "std = " + "{:.3e}".format(sigma), fontsize=6, ha="right")
-                    plt.figtext(0.90, 0.91, "skew = " + "{:.3e}".format(skew), fontsize=6, ha="right")
-                    plt.figtext(0.90, 0.89, "ex. kurt = " + "{:.3e}".format(kurt), fontsize=6, ha="right")
+                    ax[row, col].annotate("mean = " + "{:.3e}".format(mean), xy=(0.98, 0.56), **kwargs)
+                    ax[row, col].annotate("std = " + "{:.3e}".format(sigma), xy=(0.98, 0.52), **kwargs)
+                    ax[row, col].annotate("skew = " + "{:.3e}".format(skew), xy=(0.98, 0.48), **kwargs)
+                    ax[row, col].annotate("ex. kurt = " + "{:.3e}".format(kurt), xy=(0.98, 0.44), **kwargs)
                 elif fct == "CDF":
-                    plt.figtext(0.90, 0.95, "P50 = " + "{:.3e}".format(p50), fontsize=6, ha="right")
-                    plt.figtext(0.90, 0.93, "P75 = " + "{:.3e}".format(p75), fontsize=6, ha="right")
-                    plt.figtext(0.90, 0.91, "P90 = " + "{:.3e}".format(p90), fontsize=6, ha="right")
-                    plt.figtext(0.90, 0.89, "P99 = " + "{:.3e}".format(p99), fontsize=6, ha="right")
-                plt.grid(True)
-                plt.draw()
-                figure_file = os.path.join(DIR_OUTPUTS, str(RUN_NAME + "_figure_" + fct + "_" + filesuffix + ".pdf"))
-                fig1.savefig(figure_file)
-                plt.close(fig1)
-
-                print(">>> Plot of " + fct + " of " + varname + " saved in: " + figure_file)
-
-        # plot Hist of mean_episode(nsteps)
-        mean_min = np.floor(np.min(mean_t_episodes))
-        mean_max = np.ceil(np.max(mean_t_episodes))
-        bins = np.arange(mean_min - 0.5, mean_max + 1.5)
-        fig2, ax2 = plt.subplots()
-        ax2.hist(mean_t_episodes, bins=bins, density=True)
-        ax2.set_title("Histogram of mean number of steps")
-        ax2.set_xlabel("mean number of steps")
-        ax2.set_ylabel("frequency")
-        plt.figtext(0.5, 0.995, subtitle, fontsize=3, ha="center", va="top")
-        plt.figtext(0.90, 0.95, "mean = " + "{:.3e}".format(np.mean(mean_t_episodes)), fontsize=6, ha="right")
-        plt.figtext(0.90, 0.93, "std = " + "{:.3e}".format(np.std(mean_t_episodes)), fontsize=6, ha="right")
-        plt.figtext(0.90, 0.91, "skew = " + "{:.3e}".format(Skew(mean_t_episodes)), fontsize=6, ha="right")
-        plt.figtext(0.90, 0.89, "ex. kurt = " + "{:.3e}".format(Kurt(mean_t_episodes)), fontsize=6, ha="right")
+                    ax[row, col].annotate("P50 = " + "{:.3e}".format(p50), xy=(0.98, 0.56), **kwargs)
+                    ax[row, col].annotate("P75 = " + "{:.3e}".format(p75), xy=(0.98, 0.52), **kwargs)
+                    ax[row, col].annotate("P90 = " + "{:.3e}".format(p90), xy=(0.98, 0.48), **kwargs)
+                    ax[row, col].annotate("P99 = " + "{:.3e}".format(p99), xy=(0.98, 0.44), **kwargs)
+                plt.grid(False)
+        plt.figtext(0.5, 0.985, subtitle, fontsize=7, ha="center", va="top")
         plt.draw()
-        figure_file = os.path.join(DIR_OUTPUTS, str(RUN_NAME + "_figure_PDF_mean_nsteps.pdf"))
-        fig2.savefig(figure_file)
-        plt.close(fig2)
-        print(">>> Plot of Histogram(mean_episode(nsteps)) saved in: " + figure_file)
+        figure_file = os.path.join(DIR_OUTPUTS, str(RUN_NAME + "_figure_distributions.pdf"))
+        fig.savefig(figure_file)
+        plt.close(fig)
 
         # plot mean nb steps vs number of episodes
         number_episodes = range(1, N_runs + 1)
@@ -762,24 +738,24 @@ def run():
         if N_runs >= 100:
             number_episodes = number_episodes[20:]
             cum_mean_t_episodes = cum_mean_t_episodes[20:]
-        fig3, ax3 = plt.subplots()
-        ax3.plot(number_episodes, cum_mean_t_episodes)
-        ax3.set_title("Convergence of the mean number of steps")
-        ax3.set_xlabel("number of episodes")
-        ax3.set_ylabel("mean number of steps")
-        plt.figtext(0.5, 0.995, subtitle, fontsize=3, ha="center", va="top")
-        plt.grid(True)
+        fig, ax = plt.subplots()
+        ax.plot(number_episodes, cum_mean_t_episodes, color="r")
+        ax.set_title("Convergence of the mean number of steps")
+        ax.set_xlabel("number of episodes")
+        ax.set_ylabel("mean number of steps")
+        plt.figtext(0.5, 0.985, subtitle, fontsize=5, ha="center", va="top")
+        plt.grid(False)
         plt.draw()
-        figure_file = os.path.join(DIR_OUTPUTS, str(RUN_NAME + "_figure_convergence_mean_nsteps.pdf"))
-        fig3.savefig(figure_file)
-        plt.close(fig3)
-        print(">>> Plot of convergence saved in: " + figure_file)
+        figure_file = os.path.join(DIR_OUTPUTS, str(RUN_NAME + "_figure_convergence.pdf"))
+        fig.savefig(figure_file)
+        plt.close(fig)
 
         # save monitoring information (concatenate episodes files)
         monitoring_episodes_file = os.path.join(DIR_OUTPUTS, str(RUN_NAME + "_monitoring_episodes.txt"))
         filenames = [os.path.join(DIR_TMP, str("monitoring_episode_" + str(episode) + ".txt")) for episode in range(N_runs)]
         with open(monitoring_episodes_file, "w") as mfile:
-            mfile.write("# episode\tinit_hit\tstop\tboundaries\tp\t\telapsed(sec)\n")
+            mfile.write("# episode\thit_init\tstop_flag\tboundary_flag\t"
+                        "p_not_found\t\tmean_nsteps\t\ttime_elapsed(sec)\n")
             for fname in filenames:
                 if os.path.isfile(fname):
                     with open(fname) as infile:
@@ -808,8 +784,8 @@ def run():
                 mfile.write("hit=%1d: %6.2f %% \n" % (h, hit_hist[h - 1] * 100))
 
             mfile.write("\n*** stats convergence ***\n")
-            mfile.write("number of runs (episodes) performed   : %7d\n" % N_runs)
-            mfile.write("standard error of the mean (estimate) : %.5e = %5.2f %%\n"
+            mfile.write("number of episodes simulated         : %d\n" % N_runs)
+            mfile.write("standard error of the mean (estimate): %.4e = %5.2f %%\n"
                         % (std_error_mean, rel_std_error_mean * 100))
 
             stopping_reason = np.loadtxt(monitoring_episodes_file, usecols=2, dtype='int')
@@ -819,32 +795,33 @@ def run():
             for stop in range(1, stop_max + 1):
                 mfile.write("stop=%1d: %6.2f %% \n" % (stop, stopping_hist[stop - 1] * 100))
 
-            mfile.write("\n*** proba source not found at the end of the episodes ***\n")
+            mfile.write("\n*** probability that the source is not found at the end of the episodes ***\n")
             p_not_found = np.loadtxt(monitoring_episodes_file, usecols=4)
             p_gtr_stop = p_not_found[p_not_found > STOP_p]
             p_not_found_max = np.max(p_not_found)
-            mfile.write("STOP_p : %.5e\n" % STOP_p)
-            mfile.write("max(p) : %.5e\n" % p_not_found_max)
-            mfile.write("number of episodes where p > STOP_p : %7d (%8.4f %%)\n"
+            mfile.write("criteria (STOP_p): %.5e\n" % STOP_p)
+            mfile.write("max(p)           : %.5e\n" % p_not_found_max)
+            mfile.write("number of episodes where p > STOP_p: %7d (%8.4f %%)\n"
                         % (len(p_gtr_stop), len(p_gtr_stop) / N_runs * 100))
 
             near_boundaries = np.loadtxt(monitoring_episodes_file, usecols=3, dtype='int')
             near_boundaries = np.count_nonzero(near_boundaries)
             mfile.write("\n*** agent near boundaries ***\n")
-            mfile.write("number of episodes where it happened : %7d (%8.4f %%)\n"
+            mfile.write("number of episodes where it happened: %7d (%8.4f %%)\n"
                         % (near_boundaries, near_boundaries / N_runs * 100))
 
             episode_elapsed = np.loadtxt(monitoring_episodes_file, usecols=5)
             mfile.write("\n*** computational cost per episode ***\n")
-            mfile.write("avg elapsed hours per 'Worker(episode)' : %.5e\n" % (np.mean(episode_elapsed) / 3600.0))
-            mfile.write("max elapsed hours per 'Worker(episode)' : %.5e\n" % (np.max(episode_elapsed) / 3600.0))
+            mfile.write("avg elapsed seconds per episode: %.5e\n" % (np.mean(episode_elapsed)))
+            mfile.write("max elapsed seconds per episode: %.5e\n" % (np.max(episode_elapsed)))
 
             elapsed_time_0 = (time.monotonic() - start_time_0) / 3600.0
             mfile.write("\n*** computational cost ***\n")
-            mfile.write("total elapsed hours                             : %.5e\n" % elapsed_time_0)
-            mfile.write("cost in hours = total elapsed time * N_PARALLEL : %.5e\n" % (elapsed_time_0 * N_PARALLEL))
+            mfile.write("N_PARALLEL = %d\n" % N_PARALLEL)
+            mfile.write("total elapsed hours                            : %.5e\n" % elapsed_time_0)
+            mfile.write("cost in hours = total elapsed time * N_PARALLEL: %.5e\n" % (elapsed_time_0 * N_PARALLEL))
 
-        print(">>> Monitoring summary saved in: " + monitoring_file)
+        print(">>> Results saved in the directory: " + DIR_OUTPUTS)
 
         sys.stdout.flush()
 
@@ -905,6 +882,3 @@ if __name__ == "__main__":
     run()
     if WITH_MPI:
         COMM.Barrier()
-
-    if am_i_root():
-        print("Completed. Time elapsed (in seconds):", time.monotonic() - start_time_0)

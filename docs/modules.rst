@@ -2,21 +2,21 @@ Modules
 =======
 
 sourcetracking
-----------------
+--------------
 
 .. automodule:: otto.classes.sourcetracking
    :members:
    :undoc-members:
 
 policy
-----------------
+------
 
 .. automodule:: otto.classes.policy
    :members:
    :undoc-members:
 
 heuristicpolicy
------------------
+---------------
 
 .. automodule:: otto.classes.heuristicpolicy
    :members:
@@ -24,7 +24,7 @@ heuristicpolicy
    :show-inheritance:
 
 rlpolicy
-----------
+--------
 
 .. automodule:: otto.classes.rlpolicy
    :members:

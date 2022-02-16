@@ -532,13 +532,18 @@ def print_stats(stats1, stats2=None):
         stats1 (dict): stats of the policy (as computed by :func:`compute_stats`)
         stats2 (dict or None, optional): stats of another policy (as computed by :func:`compute_stats`) for comparison
     """
-
     vars = ['p_not_found', 'mean', 'std', 'p50', 'p99']
     for var in vars:
         if stats2 is None:
-            print(var, "\t", stats1[var])
+            if var == 'p_not_found':
+                print(var, "\t", "{:.4e}".format(stats1[var]))
+            else:
+                print(var, "\t\t", "{:.4f}".format(stats1[var]))
         else:
-            print(var, "\t", stats1[var], "\tref: ", stats2[var])
+            if var == 'p_not_found':
+                print(var, "\t", "{:.4e}".format(stats1[var]), "\t\tref: ", "{:.4e}".format(stats2[var]))
+            else:
+                print(var, "\t\t", "{:.4f}".format(stats1[var]), "\t\tref: ", "{:.4f}".format(stats2[var]))
 
 
 def plot_stats(statsRL, statsref=None, title='', file_suffix='0'):
@@ -603,7 +608,6 @@ def plot_stats(statsRL, statsref=None, title='', file_suffix='0'):
     plt.draw()
     fig.savefig(fig_file)
     plt.close(fig)
-    print(">>> Figure saved in: " + str(fig_file))
 
 
 def plot_stats_evolution(data, ref_stats=None, title=''):
@@ -703,7 +707,6 @@ def plot_stats_evolution(data, ref_stats=None, title=''):
     plt.close(fig)
     if os.path.isfile(fig_file_bkp):
         os.remove(fig_file_bkp)
-    print(">>> Figure saved in: " + fig_file)
 
 # Worker (compute trajectories) _______________________________________________________________
 def WorkerStats(episode, policy):
@@ -909,7 +912,7 @@ def train_model(eps_floor, eps_0, eps_decay, max_it, ref_stats):
             target = MYENV.get_target(modelvalue=MYFROZENMODEL, modelaction=None, statep=statep)
         return target
 
-    print("populating memory...")
+    print("* populating memory...")
     # before training starts, populate ~ 90 % of memory with data from initial policy
     Nepisodes = max(int(0.9 * MEMORY_SIZE / STOP_t), 1)
     print("Nepisodes: ", Nepisodes)
@@ -926,7 +929,7 @@ def train_model(eps_floor, eps_0, eps_decay, max_it, ref_stats):
     _ = MYENV.get_state_value(MYMODEL, states[0])
 
     # iterating
-    print("start training...")
+    print("* start training...")
     it = 0
     stats_history = np.nan * np.zeros(9)
 
@@ -952,7 +955,7 @@ def train_model(eps_floor, eps_0, eps_decay, max_it, ref_stats):
 
         # *** Generate accurate stats of current model-based policy, plot the results
         if it % EVALUATE_PERFORMANCE_EVERY == 0:
-            print("evaluating performance of the current model-based policy")
+            print("* evaluating performance of the current model-based policy...")
             stats = compute_stats(Nepisodes=N_RUNS_STATS, policy=-1, parallel=N_RUNS_STATS >= N_PARALLEL > 1)
             print_stats(stats, ref_stats)
             titlestr = "evaluation of learned value function, it # " + str(it) + ", transitions seen =" + "{:.2e}".format(N_transitions_seen)
@@ -961,9 +964,9 @@ def train_model(eps_floor, eps_0, eps_decay, max_it, ref_stats):
             stats_history = np.vstack((stats_history, add_stats))
             stats_history_file = os.path.join(DIR_OUTPUTS, str(RUN_NAME + "_table_stats" + ".npy"))
             np.save(stats_history_file, stats_history)
-            print(">>> Stats saved in: " + stats_history_file)
             titlestr = "value learning, it # " + str(it) + ", transitions seen =" + "{:.2e}".format(N_transitions_seen)
             plot_stats_evolution(data=stats_history, ref_stats=ref_stats, title=titlestr)
+            print(">>> Current results saved in the directory: " + DIR_OUTPUTS)
 
         ###################### GENERATE EXP
 
@@ -1010,7 +1013,7 @@ def train_model(eps_floor, eps_0, eps_decay, max_it, ref_stats):
         if it % PRINT_INFO_EVERY == 0:
 
             print(
-                "  >> training iteration:", it,
+                "---- training iteration:", it,
                 "  |  eps:", eps,
                 "  |  episodes added:", Nepisodes,
                 "  |  fraction memory renewed:", renewed_mem,
@@ -1050,7 +1053,7 @@ def run():
     )
 
     # Compute stats of the RL policy
-    print("\n*** Computing stats of the RL policy..")
+    print("\n*** Computing stats of the RL policy...")
     stats = compute_stats(Nepisodes=N_RUNS_STATS, policy=-1, parallel=N_RUNS_STATS >= N_PARALLEL > 1)
 
     print_stats(stats, ref_stats)
