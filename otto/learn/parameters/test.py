@@ -15,7 +15,7 @@ POLICY_REF = None
 
 
 # TESTING
-N_DIMS = 1
+N_DIMS = 2
 N_GRID = 11
 STOP_t = 50
 FC_LAYERS = 3

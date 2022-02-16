@@ -125,7 +125,6 @@ class TrainingEnv(SourceTracking):
             prob (ndarray):
                 - if current states s: array of 1.0, with shape (batch_size, )
                 - if next states s': array of transition probabilities, with shape (batch_size, Nactions, Nhits)
-        # TODO check that these shapes are correct
         """
         # if input is a single state: numpyfy
         if dims == 0 and isinstance(states, type(State(0, 0, 0))):

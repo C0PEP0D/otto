@@ -682,7 +682,7 @@ def plot_stats_evolution(data, ref_stats=None, title=''):
                 ax[r, i].fill_between(xvar, yvar - err, yvar + err, color=color, alpha=0.2)  # 95 % confidence interval
                 # add where p_not_found is too high
                 flag = data[:, 4] > 1e-3
-                ax[r, i].plot(xvar[flag], yvar[flag], 'x', markersize=8, markeredgewidth=2, color=color)
+                ax[r, i].plot(xvar[flag], yvar[flag], 'x', markersize=7, markeredgewidth=2, color=color)
 
             # add baseline on the same plot
             if (ref_stats is not None) and (names_list[i] in ("p_not_found", "mean", "p50", "p99")):

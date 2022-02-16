@@ -65,7 +65,12 @@ class RLPolicy(Policy):
     # __ POLICY DEFINITIONS _______________________________________
 
     def _value_policy(self):
-        """Chooses the action which minimizes the expected value at the next step."""
+        """Chooses the action which minimizes the expected value at the next step.
+
+        Returns:
+            action_chosen (int): the best action, according to the value model
+            expected_value (ndarray): expected value of each action, according to the value model
+        """
 
         inputs = [0] * self.env.Nactions
         probs = [0] * self.env.Nactions
@@ -111,7 +116,6 @@ class RLPolicy(Policy):
         expected_value = 1.0 + tf.math.reduce_sum(probs * values_next, axis=1)  # sum over hits: (Nactions)
         assert expected_value.shape == tuple([self.env.Nactions])
 
-        # TODO check shapes
-
         action_chosen = np.argwhere(np.abs(expected_value - np.min(expected_value)) < EPSILON_CHOICE).flatten()[0]
-        return action_chosen, expected_value
+
+        return action_chosen, expected_value.numpy()

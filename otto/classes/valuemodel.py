@@ -117,21 +117,21 @@ class ValueModel(Model):
         """Call the value model
 
         Args
-            x (numpy array or tf tensor):
-                array containing a batch of inputs, with shape (batch_size, input_shape)
+            x (ndarray or tf.Tensor with shape (batch_size, input_shape)):
+                array containing a batch of inputs
             training (bool, optional):
                 whether this call is done during training (as opposed to evaluation) (default=False)
             sym_avg (bool, optional):
                 whether to take the average value of symmetric duplicates (default=False)
 
         Returns
-            x (tf tensor)   # TODO I guess ?
-                array containing a batch of values, with shape (batch_size, 1)
+            x (tf.Tensor with shape (batch_size, 1))
+                array containing a batch of values
 
         Raises
             Exception: if symmetric duplicates are not implemented for that Ndim
         """
-        shape = x.shape  # (batch_size, inputshape)
+        shape = x.shape  # (batch_size, input_shape)
         ensemble_sym_avg = False
         if sym_avg and (shape[0] is not None):
             ensemble_sym_avg = True
@@ -190,11 +190,11 @@ class ValueModel(Model):
         """A training step.
 
         Args:
-            x (tf tensor): batch of inputs
-            y (tf tensor): batch of target values
+            x (tf.Tensor with shape=(batch_size, input_shape)): batch of inputs
+            y (tf.Tensor with shape=(batch_size, 1)): batch of target values
 
         Returns
-            loss (tf tensor): total loss    # TODO is it a float or a tf tensor
+            loss (tf.Tensor with shape=()): total loss
         """
 
         # Add symmetric duplicates
@@ -249,11 +249,11 @@ class ValueModel(Model):
         """ A test step.
 
         Args:
-            x (tf tensor): batch of inputs
-            y (tf tensor): batch of target values
+            x (tf.Tensor with shape=(batch_size, input_shape)): batch of inputs
+            y (tf.Tensor with shape=(batch_size, 1)): batch of target values
 
         Returns
-            loss (tf tensor): total loss    # TODO is it a float or a tf tensor
+            loss (tf.Tensor with shape=()): total loss
         """
 
         # Compute predictions

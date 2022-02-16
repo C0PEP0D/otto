@@ -15,6 +15,7 @@ rm -rf __pycache__
 rm -rf */__pycache__
 rm -rf */*/__pycache__
 rm -rf */*/*/__pycache__
+rm -rf tests/.pytest_cache
 rm -rf .idea
 rm -rf */.idea
 rm -rf */*/.idea

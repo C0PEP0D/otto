@@ -483,21 +483,20 @@ def run():
             COMM.Allgather([failed_loc[:ind], Nepisodes, MPI.DOUBLE], [failed_episodes, Nepisodes, MPI.DOUBLE])
             COMM.Barrier()
         elif N_PARALLEL > 1:  # multiprocessing
-                # Run episodes in parallel
-                pool = multiprocessing.Pool(N_PARALLEL)
-                result = pool.map(Worker, range(N_runso, N_runs))
-                pool.close()
-                pool.join()
-                # Reduce
-                ind = N_runso
-                for cdf_t, cdf_h, mean_t, failed in result:
-                    cdf_t_tot += cdf_t
-                    cdf_h_tot += cdf_h
-                    mean_t_episodes[ind] = mean_t
-                    failed_episodes[ind] = failed
-                    ind += 1
+            # Run episodes in parallel
+            pool = multiprocessing.Pool(N_PARALLEL)
+            result = pool.map(Worker, range(N_runso, N_runs))
+            pool.close()
+            pool.join()
+            # Reduce
+            ind = N_runso
+            for cdf_t, cdf_h, mean_t, failed in result:
+                cdf_t_tot += cdf_t
+                cdf_h_tot += cdf_h
+                mean_t_episodes[ind] = mean_t
+                failed_episodes[ind] = failed
+                ind += 1
         elif N_PARALLEL == 1:   # sequential
-            # TODO check this gives the same results as in parallel
             pdfs_t = []
             ind = N_runso
             for episode in range(N_runso, N_runs):
