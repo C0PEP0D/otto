@@ -133,7 +133,7 @@ from otto.classes.policy import policy_name
 from otto.learn.parameters.__defaults import *
 
 # import globals from user defined parameter file
-if os.path.basename(sys.argv[0]) not in ["sphinx-build", "build.py"]:
+if os.path.basename(sys.argv[0]) == "learn.py":
     parser = argparse.ArgumentParser(description='Train a neural network')
     parser.add_argument('-i', '--input',
                         dest='inputfile',

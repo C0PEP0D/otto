@@ -92,7 +92,7 @@ else:
 from otto.evaluate.parameters.__defaults import *
 
 # import globals from user defined parameter file
-if os.path.basename(sys.argv[0]) not in ["sphinx-build", "build.py"]:
+if os.path.basename(sys.argv[0]) == "evaluate.py":
     parser = argparse.ArgumentParser(description='Evaluate a policy')
     parser.add_argument('-i', '--input',
                         dest='inputfile',
