@@ -255,7 +255,7 @@ Windows users: if a `NameError` is raised, see [known issues](#known-issues).
 Once the script has completed, you can look at the results in the directory `evaluate/outputs/YYmmdd-HHMMSS` 
 where 'YYmmdd-HHMMSS' is the time you started the script.
 `Ymmdd-HHMMSS_figure_distributions.pdf` is a figures summarizing the results. 
-Other output files are described in the [documentation](#documentation).
+All output files are described in the [documentation](#documentation).
 
 These results are for the "infotaxis" policy, which is the default policy.
 You can now try to compute the statistics of another policy on the same problem. 
