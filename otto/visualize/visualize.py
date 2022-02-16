@@ -76,7 +76,6 @@ from otto.classes.visualization import Visualization
 from otto.visualize.parameters.__defaults import *
 
 # import globals from user defined parameter file
-# if os.path.basename(sys.argv[0]) not in ["sphinx-build", "build.py"]:
 if os.path.basename(sys.argv[0]) == "visualize.py":
     parser = argparse.ArgumentParser(description='Visualize an episode')
     parser.add_argument('-i', '--input',

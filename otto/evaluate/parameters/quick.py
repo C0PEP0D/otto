@@ -1,3 +1,2 @@
 N_RUNS = 48
 REL_TOL = 1
-MODEL_PATH = "toto"

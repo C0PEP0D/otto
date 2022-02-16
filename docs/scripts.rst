@@ -41,8 +41,3 @@ learn.py
 --------
 
 .. automodule:: otto.learn.learn
-
-test.py
--------
-
-.. automodule:: otto.test.test
