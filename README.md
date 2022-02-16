@@ -1,6 +1,9 @@
 
 # OTTO
 
+[![Documentation Status](https://readthedocs.org/projects/otto-c0pep0d/badge/?version=latest)](https://otto-c0pep0d.readthedocs.io/en/latest/?badge=latest)
+
+
 **OTTO** (short for **O**dor-based **T**arget **T**racking **O**ptimization) is a Python package that provides the means to 
 **visualize, evaluate and learn** policies for the source-tracking problem, a POMDP designed to provide a test-bed
 for **odor-based search strategies** such as the popular **"infotaxis"**.
