@@ -254,16 +254,8 @@ Windows users: if a `NameError` is raised, see [known issues](#known-issues).
 
 Once the script has completed, you can look at the results in the directory `evaluate/outputs/YYmmdd-HHMMSS` 
 where 'YYmmdd-HHMMSS' is the time you started the script.
-
-The output files are described in the [documentation](#documentation).
-For example:
-
-- `Ymmdd-HHMMSS_statistics_nsteps.txt` is a text file containing the mean time to find the source, its standard 
-deviation, its median, etc.
-- `Ymmdd-HHMMSS_figure_PDF_nsteps.pdf` is a pdf figure which shows the probability distribution of arrival times.
-- `Ymmdd-HHMMSS_monitoring_summary.txt` is a text file summarizing some monitoring information about the runs, 
-for example how often the agent got stuck or touched a boundary.
-- `Ymmdd-HHMMSS_parameters.txt` is a text file summarized the parameters used.
+`Ymmdd-HHMMSS_figure_distributions.pdf` is a figures summarizing the results. 
+Other output files are described in the [documentation](#documentation).
 
 These results are for the "infotaxis" policy, which is the default policy.
 You can now try to compute the statistics of another policy on the same problem. 
@@ -281,13 +273,13 @@ POLICY = 1
 
 This file is already present in `evaluate/parameters/` for this example. 
 
-Policies are described in the [documentation](#documentation).
 The main policies are
 
 - `POLICY = 0` for infotaxis (default)
 - `POLICY = 1` for space-aware infotaxis
 - `POLICY = -1` for a reinforcement learning policy: for that we need to learn a model first!
 
+All policies are described in the [documentation](#documentation).
 
 
 ### Learning a policy
@@ -321,10 +313,10 @@ For reference, the trained network should achieve p_not_found < 1e-6 and mean ~ 
 
 Training will continue until 10000 iterations, but can be stopped at any time.
 
-Models are saved in the `learn/model/YYmmdd-HHMMSS` directory:
+Models are saved in the `learn/models/YYmmdd-HHMMSS` directory:
 
-- `YYmmdd-HHMMSS_value_model` is the most recent model,
-- `YYmmdd-HHMMSS_value_model_bkp_i`, where i is an integer, are the models saved at evaluation points
+- `YYmmdd-HHMMSS_model` is the most recent model,
+- `YYmmdd-HHMMSS_model_bkp_i`, where i is an integer, are the models saved at evaluation points
   (the models which performance is shown in `YYmmdd-HHMMSS_figure_learning_progress.png`).
 
 Note: training can restart from a previously saved model.
@@ -346,6 +338,9 @@ set `N_DIMS = 2` for evaluation and visualization.
 
 ### Pre-trained RL policies
 
+***TODO: this part is in construction (current pre-trained model is just for testing that the script runs, 
+actual pre-trained models will be added soon)***
+
 A collection of pre-trained models are provided in the `zoo` directory accessible from the root of the package. 
 Models are saved in the `models` directory and corresponding parameter files are in the `parameters` directory.
 Pre-trained models are named `zoo_model_i` where i is an integer.
@@ -364,8 +359,6 @@ python3 evaluate.py --input zoo_model_1
 
 Note that since `zoo_model_1.py` is not present in the `visualize/parameters` directory, the script will automatically
 search for it in the `zoo/parameters` directory.
-
-***TODO: current pre-trained model is just for test, need to add some really pre-trained models***
 
 ### Custom policies
 
