@@ -108,7 +108,7 @@ The training algorithm is a model-based version of DQN (Mnih et al., Nature, 201
 ### Requirements
 
 OTTO requires Python 3.8 or greater.
-Dependencies are listed in [requirements.txt](https://github.com/C0PEP0D/otto/requirements.txt),
+Dependencies are listed in [requirements.txt](https://github.com/C0PEP0D/otto/blob/main/requirements.txt),
 missing dependencies will be automatically installed.
 
 Optional: OTTO requires `ffmpeg` to make videos.
@@ -373,7 +373,6 @@ Warning: all user-generated outputs and models will be deleted!
 
 
 ## Documentation
-***TODO: documentation is currently in construction***
 
 **OTTO** uses [Sphinx](http://www.sphinx-doc.org/en/stable/) for documentation and is made available online 
 [here](https://otto-c0pep0d.readthedocs.io/en/latest/). 
