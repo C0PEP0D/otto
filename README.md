@@ -215,15 +215,16 @@ python3 visualize.py -i myparam
 will have the same effect.
 
 Each `parameters` directory contain sample parameter files called `example*.py`. 
-They show the parameters you can play with, for example:
+They show essential parameters you can play with, for example:
 
 - `N_DIMS` sets the dimensionality of the search (1D, 2D, 3D), default is `N_DIMS = 1`
 - `LAMBDA_OVER_DX` controls the size the domain, default is `LAMBDA_OVER_DX = 2.0`
 - `R_DT` controls the source intensity, default is `R_DT = 2.0`
 - `POLICY` defines the policy to use, default is `POLICY = 0` (infotaxis)
 
-Note: for advanced users, you can access the list of *all* parameters and their default values by examining
-the contents of `__defaults.py`.
+You can access the list of *all* parameters and their default values by examining
+the contents of `__defaults.py` or reading the 
+[documentation](https://otto-c0pep0d.readthedocs.io/en/latest/evaluate.html).
 
 ### Evaluating a policy
 
