@@ -10,7 +10,7 @@ OTTO (Odor-based Target Tracking Optimization)
 ==============================================
 
 .. toctree::
-   :maxdepth: 3
+   :maxdepth: 2
    :caption: User Guide
 
    api

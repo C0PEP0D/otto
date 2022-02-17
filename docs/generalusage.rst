@@ -1,8 +1,5 @@
-Scripts
-=======
-
-general usage
--------------
+General Usage
+=============
 
 There are three main scripts:
 
@@ -25,19 +22,3 @@ You can access the list of *all* parameters and their default values by examinin
 the contents of ``__defaults.py``.
 
 Outputs are saved in the local ``outputs`` directory.
-
-
-visualize.py
-------------
-
-.. automodule:: otto.visualize.visualize
-
-evaluate.py
------------
-
-.. automodule:: otto.evaluate.evaluate
-
-learn.py
---------
-
-.. automodule:: otto.learn.learn
