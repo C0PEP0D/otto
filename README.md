@@ -222,9 +222,9 @@ They show essential parameters you can play with, for example:
 - `R_DT` controls the source intensity, default is `R_DT = 2.0`
 - `POLICY` defines the policy to use, default is `POLICY = 0` (infotaxis)
 
-You can access the list of *all* parameters and their default values by examining
-the contents of `__defaults.py` or reading the 
-[documentation](https://otto-c0pep0d.readthedocs.io/en/latest/evaluate.html).
+The definition of all parameters is provided in the 
+[documentation](https://otto-c0pep0d.readthedocs.io/en/latest/visualize.html), 
+and you can find their default values by examining the contents of `__defaults.py`.
 
 ### Evaluating a policy
 
