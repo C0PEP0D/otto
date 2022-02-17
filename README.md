@@ -111,8 +111,8 @@ OTTO requires Python 3.8 or greater.
 Dependencies are listed in [requirements.txt](https://github.com/C0PEP0D/otto/blob/main/requirements.txt),
 missing dependencies will be automatically installed.
 
-Optional: OTTO requires `ffmpeg` to make videos.
-If `ffmpeg` is not installed, OTTO will save video frames as images instead.
+Optional: OTTO requires `FFmpeg` to make videos.
+If `FFmpeg` is not installed, OTTO will save video frames as images instead.
 
 ### Conda users
 
@@ -181,7 +181,7 @@ In the rendering window, the first panel is a map of hits, and the second panel 
 The videos have been saved as `visualize/outputs/YYmmdd-HHMMSS_video.mp4` where 'YYmmdd-HHMMSS' is a 
 timestamp (the time you started the script). 
 
-If you do not have `ffmpeg`, or if you are using Windows, or if there was a problem with video making, you will find instead frames saved
+If you do not have `FFmpeg`, or if you are using Windows, or if there was a problem with video making, you will find instead frames saved
 in `visualize/outputs/YYmmdd-HHMMSS_frames`.
 
 
