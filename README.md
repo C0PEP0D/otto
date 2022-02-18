@@ -11,7 +11,7 @@
 <img src="docs/gifs/2D_search.gif" width="40%"/>
 <img src="docs/gifs/3D_search.gif" width="40%"/>
 
-*Examples of 2D and 3D searches with the popular **infotaxis** strategy*
+*Examples of 2D and 3D searches with the popular **infotaxis** strategy (Vergassola et al., Nature, 2007).*
  </div>
 
 OTTO is part of the [C0PEP0D](https://C0PEP0D.github.io/) project and has been used in a 
@@ -69,14 +69,18 @@ Because of turbulence, there is no odor trail to follow in this problem, which m
 The source-tracking problem is a POMDP (partially observable Markov decision process) 
 where the agent (the searcher) must find, as fast as possible, 
 a stationary target (the source) hidden in a grid world 
-using stochastic observations (odor detections, called "hits").
-It was originally designed by 
-Vergassola et al. (Nature, 2007) 
-to mimic the task faced by animals or robots searching for a source of odor in a turbulent flow.
+using stochastic observations (odor detections).
+It is designed to mimic the task faced by animals or robots searching for a source of odor in a turbulent flow.
+The optimal policy (strategy) is unknown.
 
-Finding the optimal policy (strategy) using exact methods is not possible.
-Yet various heuristic policies have been proposed over the years, 
-and the problem is also amenable to reinforcement learning.
+### Infotaxis
+
+Infotaxis is a popular heuristic strategy proposed by Vergassola et al. (Nature, 2007).
+It states that the agent should choose the action from which it expects the greatest information gain about
+the source location.
+
+Infotaxis is far superior to all naive strategies, such as going to the more likely source location.
+Yet it is known to be suboptimal.
 
 ### What does OTTO do?
 
@@ -88,27 +92,6 @@ OTTO also provides an efficient method to evaluate policies (including custom po
 using a rigorous protocol. 
 
 Finally, OTTO allows you to visualize and record videos of searches (only up to 3D!).
-
-### Infotaxis
-
-Infotaxis is a heuristic policy proposed by Vergassola et al. (Nature, 2007). 
-It states that the agent should choose the action from which it expects the greatest information gain about 
-the source location. 
-
-The physical intuition behind this strategy is, quoting the authors, that 
-"information accumulates faster close to the source because cues arrive at a higher rate, 
-hence tracking the maximum rate of information acquisition will guide the searcher to the source much like 
-concentration gradients in chemotaxis".
-
-Infotaxis is far superior to all naive strategies, such as going to the more likely source location.
-Yet it is known to be suboptimal.
-
-### Reinforcement learning
-
-Near-optimal policies can be obtained using deep reinforcement learning.
-The training algorithm is a model-based version of DQN (Mnih et al., Nature, 2015).
-
-
 
 ## Installation
 
