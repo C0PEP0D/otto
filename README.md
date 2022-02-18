@@ -10,7 +10,7 @@ for **odor-based search strategies** such as the popular **"infotaxis"**.
 
 <img src="docs/figs/illustration_source_tracking_problem.png"/>
 
-[![Illustration](docs/videos/test.gif)](docs/videos/test.gif)
+
 
 OTTO is part of the [C0PEP0D](https://C0PEP0D.github.io/) project and has been used in a 
 [publication](https://arxiv.org/abs/2112.10861).
