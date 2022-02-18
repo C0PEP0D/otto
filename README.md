@@ -8,8 +8,10 @@
 **visualize, evaluate and learn** policies for the source-tracking problem, a POMDP designed to provide a test-bed
 for **odor-based search strategies** such as the popular **"infotaxis"**.
 
-<img src="docs/gifs/2D_search.gif" width="49.5%"/>
-<img src="docs/gifs/3D_search.gif" width="49.5%"/>
+<p align="center">
+<img src="docs/gifs/2D_search.gif" width="40%"/>
+<img src="docs/gifs/3D_search.gif" width="40%"/>
+</p>
 
 OTTO is part of the [C0PEP0D](https://C0PEP0D.github.io/) project and has been used in a 
 [publication](https://arxiv.org/abs/2112.10861).
