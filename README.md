@@ -11,10 +11,8 @@
 <img src="docs/gifs/2D_search.gif" width="40%"/>
 <img src="docs/gifs/3D_search.gif" width="40%"/>
 
-*Examples of searches with the popular **infotaxis** strategy*
+*Examples of 2D and 3D searches with the popular **infotaxis** strategy*
  </div>
-
-
 
 OTTO is part of the [C0PEP0D](https://C0PEP0D.github.io/) project and has been used in a 
 [publication](https://arxiv.org/abs/2112.10861).
@@ -120,8 +118,8 @@ OTTO requires Python 3.8 or greater.
 Dependencies are listed in [requirements.txt](https://github.com/C0PEP0D/otto/blob/main/requirements.txt),
 missing dependencies will be automatically installed.
 
-Optional: OTTO requires `FFmpeg` to make videos.
-If `FFmpeg` is not installed, OTTO will save video frames as images instead.
+Optional: OTTO requires [FFmpeg](https://www.ffmpeg.org/) to make videos.
+If FFmpeg is not installed, OTTO will save video frames as images instead.
 
 ### Conda users
 
@@ -190,7 +188,7 @@ In the rendering window, the first panel is a map of hits, and the second panel 
 The videos have been saved as `visualize/outputs/YYmmdd-HHMMSS_video.mp4` where 'YYmmdd-HHMMSS' is a 
 timestamp (the time you started the script). 
 
-If you do not have `FFmpeg`, or if you are using Windows, or if there was a problem with video making, you will find instead frames saved
+If you do not have FFmpeg or if you are using Windows, you will find instead frames saved
 in `visualize/outputs/YYmmdd-HHMMSS_frames`.
 
 
