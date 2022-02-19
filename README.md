@@ -216,7 +216,7 @@ They show essential parameters you can play with, for example:
 - `POLICY` defines the policy to use, default is `POLICY = 0` (infotaxis)
 
 The definition of all parameters is provided in the 
-[documentation](https://otto-c0pep0d.readthedocs.io/en/latest/visualize.html), 
+[documentation](https://otto-c0pep0d.readthedocs.io/en/latest/api_visualize.html), 
 and you can find their default values by examining the contents of `__defaults.py`.
 
 ### Evaluating a policy
@@ -244,7 +244,7 @@ Windows users: if a `NameError` is raised, see [known issues](#known-issues).
 Once the script has completed, you can look at the results in the directory `evaluate/outputs/YYmmdd-HHMMSS` 
 where 'YYmmdd-HHMMSS' is the time you started the script.
 `Ymmdd-HHMMSS_figure_distributions.pdf` is a figure summarizing the results. 
-All output files are described in the [documentation](https://otto-c0pep0d.readthedocs.io/en/latest/evaluate.html).
+All output files are described in the [documentation](file:///home/aurore/git/otto/docs/_build/html/api_evaluate.html).
 
 These results are for the "infotaxis" policy, which is the default policy.
 You can now try to compute the statistics of another policy on the same problem. 
@@ -269,7 +269,7 @@ The main policies are
 that beats infotaxis in most cases
 - `POLICY = -1` for a reinforcement learning policy: for that we need to learn a model first!
 
-All policies are described in the [documentation](https://otto-c0pep0d.readthedocs.io/en/latest/policies.html).
+All policies are described in the [documentation](https://otto-c0pep0d.readthedocs.io/en/latest/description_policies.html).
 
 
 ### Learning a policy
@@ -295,7 +295,7 @@ In particular, it shows the evolution of 'p_not_found', the probability that the
 the mean time to find the source provided it is ever found. 
 Note that the mean is meaningless if p_not_found is larger than 1e-3, in that case it is depicted by a cross.
 
-Other outputs are explained in the [documentation](https://otto-c0pep0d.readthedocs.io/en/latest/learn.html).
+Other outputs are explained in the [documentation](https://otto-c0pep0d.readthedocs.io/en/latest/api_learn.html).
 
 Completing the training may take up to roughly 5000-10000 iterations (several hours on an 
 average laptop), but progress should be clearly visible from 500-1000 iterations. 
