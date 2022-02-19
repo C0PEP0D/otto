@@ -1,3 +1,5 @@
+.. _sec-learn.py:
+
 Learn
 =====
 

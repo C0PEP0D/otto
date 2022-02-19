@@ -52,7 +52,7 @@ Parameters of the script are:
 
     - Policy
         - POLICY (int)
-            - -1: reinforcement learning
+            - -1: neural network
             - 0: infotaxis (Vergassola, Villermaux and Shraiman, Nature 2007)
             - 1: space-aware infotaxis
             - 2: custom policy (to be implemented by the user)

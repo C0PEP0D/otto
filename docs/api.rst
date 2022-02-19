@@ -5,8 +5,8 @@ API Documentation
 .. toctree::
    :maxdepth: 1
 
-   generalusage
-   visualize
-   evaluate
-   learn
-   modules
+   api_generalusage
+   api_visualize
+   api_evaluate
+   api_learn
+   api_modules

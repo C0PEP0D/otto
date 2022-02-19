@@ -6,7 +6,7 @@
 def policy_name(policy_index):
     """Returns the name of the policy associated to policy_index"""
     if policy_index == -1:
-        name = "RL"
+        name = "neural network"
     elif policy_index == 0:
         name = "infotaxis"
     elif policy_index == 1:
@@ -34,7 +34,7 @@ class Policy:
 
         Args:
             policy (int):
-                    - -1: reinforcement learning
+                    - -1: neural network
                     - 0: infotaxis (Vergassola, Villermaux and Shraiman, Nature 2007)
                     - 1: space-aware infotaxis
                     - 2: custom policy (to be implemented by the user)

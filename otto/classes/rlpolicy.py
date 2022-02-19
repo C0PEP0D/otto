@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""Definition of the RL policy (policy based on a value model)."""
+"""Definition of the RL policy (policy based on a neural network value model)."""
 
 import os
 import numpy as np
@@ -55,7 +55,7 @@ class RLPolicy(Policy):
     def _choose_action(self, ):
 
         if self.policy_index == -1:
-            assert policy_name(self.policy_index) == "RL"
+            assert policy_name(self.policy_index) == "neural network"
             action_chosen, _ = self._value_policy()
         else:
             raise Exception("The policy " + str(self.policy) + " does not exist (yet)!")

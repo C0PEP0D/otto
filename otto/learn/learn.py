@@ -610,7 +610,7 @@ def plot_stats(statsRL, statsref=None, title='', file_suffix='0'):
             stats = statsref
         policy = stats["policy"]
         if policy == -1:
-            label = "RL"
+            label = "NN"
         else:
             label = policy_name(policy)
         color = palette(k)
@@ -708,7 +708,7 @@ def plot_stats_evolution(data, ref_stats=None, title=''):
             if names_list[i] == "p_not_found":
                 ax[r, i].semilogy(xvar, yvar, '-o', markersize=4, color=color)
             else:
-                line, = ax[r, i].plot(xvar, yvar, '-o', markersize=4, color=color, label="RL")
+                line, = ax[r, i].plot(xvar, yvar, '-o', markersize=4, color=color, label="NN")
             ax[r, i].set_xlabel(xlab)
             ax[r, i].set_title(names_list[i])
             ax[r, i].set_xlim(0, max(xmax, 1))

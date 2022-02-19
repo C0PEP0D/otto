@@ -11,7 +11,7 @@
 <img src="docs/gifs/2D_search.gif" width="40%"/>
 <img src="docs/gifs/3D_search.gif" width="40%"/>
 
-*Examples of 2D and 3D searches with the popular **infotaxis** strategy (Vergassola et al., Nature, 2007).*
+*Examples of 2D and 3D searches with the popular **infotaxis** strategy.*
  </div>
 
 OTTO is part of the [C0PEP0D](https://C0PEP0D.github.io/) project and has been used in a 
@@ -22,9 +22,8 @@ OTTO is part of the [C0PEP0D](https://C0PEP0D.github.io/) project and has been u
 * [Background](#background)
     * [Motivation](#motivation)
     * [The source-tracking POMDP](#the-source-tracking-pomdp)
-    * [What does OTTO do?](#what-does-otto-do)
     * [Infotaxis](#infotaxis)
-    * [Reinforcement learning](#reinforcement-learning)
+* [What does OTTO do?](#what-does-otto-do)
 * [Installation](#installation)
     * [Requirements](#requirements)
     * [Conda users](#conda-users)
@@ -67,22 +66,26 @@ Because of turbulence, there is no odor trail to follow in this problem, which m
 ### The source-tracking POMDP
 
 The source-tracking problem is a POMDP (partially observable Markov decision process) 
-where the agent (the searcher) must find, as fast as possible, 
-a stationary target (the source) hidden in a grid world 
-using stochastic observations (odor detections).
-It is designed to mimic the task faced by animals or robots searching for a source of odor in a turbulent flow.
-The optimal policy (strategy) is unknown.
+designed to mimic the task faced by animals or robots searching for a source of odor in a turbulent flow.
+
+The agent (the searcher) must find a stationary target (a source of odor) hidden in a grid world.
+At each step, the agent moves to a neighbor cell and receives an observation (odor detection), which provides some
+partial information on how far the source is.
+The agent has a perfect memory and a perfect knowledge of the process that generates observations. 
+
+How should the agent behave in order to reach the source in the smallest possible number of steps?
+
 
 ### Infotaxis
 
-Infotaxis is a popular heuristic strategy proposed by Vergassola et al. (Nature, 2007).
+Infotaxis is a popular strategy proposed by Vergassola et al. (Nature, 2007).
 It states that the agent should choose the action from which it expects the greatest information gain about
 the source location.
 
 Infotaxis is far superior to all naive strategies, such as going to the more likely source location.
-Yet it is known to be suboptimal.
+But infotaxis is suboptimal, so better strategies are possible.
 
-### What does OTTO do?
+## What does OTTO do?
 
 OTTO provides an efficient implementation of the source-tracking POMDP (in any number of space dimensions), 
 of various heuristic policies (including infotaxis), 
