@@ -93,7 +93,7 @@ class RLPolicy(Policy):
             for h in range(self.env.Nhits):
                 prob = np.sum(p_source_[h])  # norm is the proba to transit to this state = (1-pend) * p(hit)
                 prob = np.maximum(EPSILON, prob)
-                input = self.env._centeragent(p_source_[h], agent_)
+                input = self.env._centeragent(p_source_[h] / prob, agent_)
                 probs[action].append(prob)
                 inputs[action].append(input)
 

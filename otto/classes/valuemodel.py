@@ -145,7 +145,7 @@ class ValueModel(Model):
             elif self.Ndim == 2:
                 Nsym = 8
                 x = x[tf.newaxis, ...]
-                _ = tf.transpose(x, perm=[0, 1, 3, 2, 4])  # transposition
+                _ = tf.transpose(x, perm=[0, 1, 3, 2])  # transposition
                 x = tf.concat([x, _], axis=0)
                 _ = tf.reverse(x, axis=[2])  # symmetry: x -> -x
                 x = tf.concat([x, _], axis=0)
@@ -207,7 +207,7 @@ class ValueModel(Model):
             elif self.Ndim == 2:
                 Nsym = 8
                 x = x[tf.newaxis, ...]
-                _ = tf.transpose(x, perm=[0, 1, 3, 2, 4])  # transposition
+                _ = tf.transpose(x, perm=[0, 1, 3, 2])  # transposition
                 x = tf.concat([x, _], axis=0)
                 _ = tf.reverse(x, axis=[2])  # symmetry: x -> -x
                 x = tf.concat([x, _], axis=0)

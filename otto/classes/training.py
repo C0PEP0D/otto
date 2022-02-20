@@ -37,6 +37,7 @@ class State:
     ):
 
         self.p_source = np.asarray(p_source, dtype=np.float32)
+        assert abs(np.sum(p_source) - 1.0) < 1e-10
         self.agent = agent
         self.prob = prob
 
@@ -127,7 +128,7 @@ class TrainingEnv(SourceTracking):
                 - if next states s': array of transition probabilities, with shape (batch_size, Nactions, Nhits)
         """
         # if input is a single state: numpyfy
-        if dims == 0 and isinstance(states, type(State(0, 0, 0))):
+        if dims == 0 and isinstance(states, type(State(1, 0, 0))):
             states = np.array(states)  # ()
 
         if dims == 0:

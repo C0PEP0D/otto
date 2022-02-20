@@ -1,5 +1,0 @@
-N_DIMS = 2
-LAMBDA_OVER_DX = 2
-R_DT = 3
-KEEP_FRAMES = True
-DRAW_SOURCE = False

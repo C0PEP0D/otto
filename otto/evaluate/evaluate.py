@@ -365,7 +365,7 @@ def Worker(episode):
         action = mypol.choose_action()
 
         # step in myenv
-        hit, p_end, done = myenv.step(action)
+        hit, p_end, done = myenv.step(action, quiet=(mypol.policy_index == -1))
         near_boundaries = max(near_boundaries, myenv.agent_near_boundaries)
 
         t += 1

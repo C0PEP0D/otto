@@ -13,7 +13,11 @@ OTTO (Odor-based Target Tracking Optimization)
    :maxdepth: 2
    :caption: User Guide
 
-   description
+   pomdp
+   policies
+   rl
+   gallery
+   references
    api
 
 

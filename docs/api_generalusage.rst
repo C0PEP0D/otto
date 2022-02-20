@@ -9,7 +9,7 @@ There are three main scripts:
 
 To run any of these scripts, use::
 
-    python script.py -i custom_params
+    python script.py --input custom_params
 
 
 where ``script.py`` is the script file,

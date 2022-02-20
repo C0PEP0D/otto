@@ -191,7 +191,7 @@ def run():
         forced_hit = None
         if ZERO_HIT:
             forced_hit = 0
-        hit, p_end, done = myenv.step(action, hit=forced_hit)
+        hit, p_end, done = myenv.step(action, hit=forced_hit, quiet=(POLICY == -1))
 
         t += 1
         T_mean += p_not_found_yet

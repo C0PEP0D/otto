@@ -35,7 +35,7 @@ OTTO is part of the [C0PEP0D](https://C0PEP0D.github.io/) project and has been u
     * [Evaluating a policy](#evaluating-a-policy)
     * [Learning a policy](#learning-a-policy)
     * [Visualizing and evaluating a learned policy](#visualizing-and-evaluating-a-learned-policy)
-    * [Pre-trained RL policies](#pre-trained-rl-policies)
+    * [Trained neural networks](#trained-neural-networks)
     * [Custom policies](#custom-policies)
     * [Cleaning up](#cleaning-up)
 * [Documentation](#documentation)
@@ -267,7 +267,7 @@ The main policies are
 - `POLICY = 0` for infotaxis (default)
 - `POLICY = 1` for space-aware infotaxis, a [recently proposed](https://arxiv.org/abs/2112.10861) heuristic 
 that beats infotaxis in most cases
-- `POLICY = -1` for a reinforcement learning policy: for that we need to learn a model first!
+- `POLICY = -1` for a reinforcement learning policy: for that we need to learn first!
 
 All policies are described in the [documentation](https://otto-c0pep0d.readthedocs.io/en/latest/description_policies.html).
 
@@ -284,7 +284,8 @@ To train a model, go to the `learn` directory and use
 python3 learn.py
 ```
 
-Now is the perfect time for a coffee since it will take quite a while. Logging information is displayed in the terminal while the 
+Now is the perfect time for a coffee since it will take quite a while. 
+Logging information is displayed in the terminal while the 
 script runs (if the script seems to have frozen, see [known issues](#known-issues)).
 
 When you come back, you can look at the contents of the `learn/outputs/YYmmdd-HHMMSS` directory.
@@ -292,14 +293,13 @@ There should be a figure called `YYmmdd-HHMMSS_figure_learning_progress.png` (if
 
 This figure shows the progress of the learning agent and is periodically updated as the training progresses. 
 In particular, it shows the evolution of 'p_not_found', the probability that the source is never found, and of 'mean', 
-the mean time to find the source provided it is ever found. 
-Note that the mean is meaningless if p_not_found is larger than 1e-3, in that case it is depicted by a cross.
+the mean time to find the source *provided it is ever found* (if p_not_found is large, the mean is meaningless).
 
-Other outputs are explained in the [documentation](https://otto-c0pep0d.readthedocs.io/en/latest/api_learn.html).
+Other outputs are described in the [documentation](https://otto-c0pep0d.readthedocs.io/en/latest/api_learn.html).
 
 Completing the training may take up to roughly 5000-10000 iterations (several hours on an 
 average laptop), but progress should be clearly visible from 500-1000 iterations. 
-For reference, the trained network should achieve p_not_found < 1e-6 and mean ~ 7.1-7.2, which is essentially optimal.
+For reference, the trained network should achieve p_not_found < 1e-6 and mean ~ 7.15, which is essentially optimal.
 
 Training will continue until 10000 iterations, but can be stopped at any time.
 
@@ -313,41 +313,38 @@ Note: training can restart from a previously saved model.
 
 ### Visualizing and evaluating a learned policy
 
-Once a model is trained, the learned policy can be evaluated or visualized using the corresponding scripts.
-For that, simply run the scripts with a parameter file (using `--input`) containing
+Once a neural network model is trained, the corresponding policy can be evaluated or visualized by running the
+main scripts with a parameter file (using `--input`) containing
 
 ```python
 POLICY = -1
 MODEL_PATH = "../learn/models/YYmmdd-HHMMSS/YYmmdd-HHMMSS_value_model_bkp_i"
 ```
 
-where `MODEL_PATH` is the path to the model you want to evaluate or visualize.
+where `MODEL_PATH` is the path to the neural network model.
 
 Important: parameters should be consistent. For example, if you set `N_DIMS = 2` for learning then you must also 
 set `N_DIMS = 2` for evaluation and visualization.
 
-### Pre-trained RL policies
+### Trained neural networks
 
-***TODO: this part is in construction (current pre-trained model is just for testing that the script runs, 
-actual pre-trained models will be added soon)***
+A collection of trained neural networks are provided in the `zoo` directory accessible from the root of the package. 
+They are saved in the `models` directory and corresponding parameter files are in the `parameters` directory.
+They are named `zoo_model_i_j_k` where i, j, k are integers associated to `N_DIMS`, `LAMBDA_OVER_DX`, `R_DT`.
 
-A collection of pre-trained models are provided in the `zoo` directory accessible from the root of the package. 
-Models are saved in the `models` directory and corresponding parameter files are in the `parameters` directory.
-Pre-trained models are named `zoo_model_i` where i is an integer.
-
-To visualize the RL policy given by `zoo_model_1`, use
+To visualize the policy associated to the neural network model `zoo_model_1_2_2`, use
 
 ```bash
-python3 visualize.py --input zoo_model_1
+python3 visualize.py --input zoo_model_1_2_2
 ```
 
-Similarly you can evaluate this model with
+Similarly you can evaluate this neural network policy with
 
 ```bash
-python3 evaluate.py --input zoo_model_1
+python3 evaluate.py --input zoo_model_1_2_2
 ```
 
-Note that since `zoo_model_1.py` is not present in the `visualize/parameters` directory, the script will automatically
+Note that since `zoo_model_1_2_2.py` is not present in the `visualize/parameters` directory, the script will automatically
 search for it in the `zoo/parameters` directory.
 
 ### Custom policies
