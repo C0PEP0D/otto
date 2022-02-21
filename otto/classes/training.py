@@ -17,7 +17,7 @@ EPSILON = 1e-10
 
 class State:
     """
-    Defines a belief state. This is the class used to store transitions (s, s').
+    Defines a (belief) state. This is the class used to store transitions (s, s').
 
     Attributes:
         p_source (ndarray):

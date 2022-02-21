@@ -3,7 +3,7 @@
 Observation model
 =================
 
-The observations ("hits") are drawn randomly according to a Poisson distribution
+Observations ("hits") are drawn randomly according to a Poisson distribution
 
 .. math::
    \begin{equation}

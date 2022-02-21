@@ -42,7 +42,7 @@ The posterior distribution after not finding the source is a simple renormalizat
      \text{Bayes}(p({\bf x}), {\bf x}^a, \bar{F}) =
      \begin{cases}
         0 & \text{if ${\bf x} = {\bf x}^a$,} \\
-        \dfrac{p({\bf x})}{\sum_{{\bf x} \neq {\bf x}^a} p({\bf x})} & \text{otherwise.}
+        \dfrac{p({\bf x})}{\sum_{{\bf x}' \neq {\bf x}^a} p({\bf x}')} & \text{otherwise.}
     \end{cases}
     \end{equation}
 

@@ -87,14 +87,13 @@ But infotaxis is suboptimal, so better strategies are possible.
 
 ## What does OTTO do?
 
-OTTO provides an efficient implementation of the source-tracking POMDP (in any number of space dimensions), 
-of various heuristic policies (including infotaxis), 
-as well as a deep reinforcement learning algorithm able to learn near-optimal policies.
+OTTO provides:
 
-OTTO also provides an efficient method to evaluate policies (including custom policies defined by the user)
-using a rigorous protocol. 
-
-Finally, OTTO allows you to visualize and record videos of searches (only up to 3D!).
+  - a **simulator** of the source-tracking POMDP for any number of space dimensions,
+  - various **heuristic policies** including **infotaxis**,
+  - a custom **deep reinforcement learning** algorithm able to yield **near-optimal policies**,
+  - an **efficient algorithm to rigorously evaluate policies** (including custom policies defined by the user),
+  - a **rendering** of searches (only up to 3D!).
 
 ## Installation
 
@@ -102,7 +101,7 @@ Finally, OTTO allows you to visualize and record videos of searches (only up to 
 
 OTTO requires Python 3.8 or greater.
 Dependencies are listed in [requirements.txt](https://github.com/C0PEP0D/otto/blob/main/requirements.txt),
-missing dependencies will be automatically installed.
+missing dependencies will be installed automatically.
 
 Optional: OTTO requires [FFmpeg](https://www.ffmpeg.org/) to make videos.
 If FFmpeg is not installed, OTTO will save video frames as images instead.
@@ -135,7 +134,7 @@ You can test your installation with following command:
 ```bash
 pytest tests
 ```
-This will execute the Python pytest functions located in the folder `tests`.
+This will execute the test functions located in the folder `tests`.
 
 ## How to use OTTO?
 
@@ -168,7 +167,7 @@ You should now see the rendering of a 1D search in a new window (it may be very 
 You can visualize another episode by using again the same command.
 
 Some logging information is displayed in the terminal as the script runs.
-In the rendering window, the first panel is a map of hits, and the second panel is the agent's belief 
+In the rendering window, the first panel is a map of odor detections, and the second panel is the agent's belief 
 (probability distribution over source locations).
 
 The videos have been saved as `visualize/outputs/YYmmdd-HHMMSS_video.mp4` where 'YYmmdd-HHMMSS' is a 
@@ -221,7 +220,8 @@ and you can find their default values by examining the contents of `__defaults.p
 
 ### Evaluating a policy
 
-The `evaluate.py` script (in the `evaluate` directory) computes many statistics that characterize the search, such as
+The `evaluate.py` script (in the `evaluate` directory) computes many statistics that characterize the performance
+of a policy, such as
 
 - probability of never finding the source,
 - average time to find the source,
@@ -328,9 +328,10 @@ set `N_DIMS = 2` for evaluation and visualization.
 
 ### Trained neural networks
 
-A collection of trained neural networks are provided in the `zoo` directory accessible from the root of the package. 
+A collection of trained neural networks is provided in the `zoo` directory accessible from the root of the package. 
 They are saved in the `models` directory and corresponding parameter files are in the `parameters` directory.
 They are named `zoo_model_i_j_k` where i, j, k are integers associated to `N_DIMS`, `LAMBDA_OVER_DX`, `R_DT`.
+The list of all trained neural networks is available in the [documentation](https://otto-c0pep0d.readthedocs.io/en/latest/rl_trained.html)
 
 To visualize the policy associated to the neural network model `zoo_model_1_2_2`, use
 
@@ -343,9 +344,6 @@ Similarly you can evaluate this neural network policy with
 ```bash
 python3 evaluate.py --input zoo_model_1_2_2
 ```
-
-Note that since `zoo_model_1_2_2.py` is not present in the `visualize/parameters` directory, the script will automatically
-search for it in the `zoo/parameters` directory.
 
 ### Custom policies
 
@@ -367,7 +365,7 @@ Warning: all user-generated outputs and models will be deleted!
 
 **OTTO** uses [Sphinx](http://www.sphinx-doc.org/en/stable/) for documentation and is made available online 
 [here](https://otto-c0pep0d.readthedocs.io/en/latest/). 
-To build the html version of the docs locally, go to the `docs` directory and use:
+To build the html version of the documentation locally, go to the `docs` directory and use:
 
 ```bash
 make html

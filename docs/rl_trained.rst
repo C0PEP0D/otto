@@ -14,6 +14,7 @@ For example, to visualize an episode using the neural network policy defined by 
 
 
 The list of available models and corresponding parameters is given below.
+They are named `zoo_model_i_j_k` where i, j, k are integers associated to `N_DIMS`, `LAMBDA_OVER_DX`, `R_DT`.
 
 .. csv-table:: Trained neural networks and their parameters.
    :file: zoo.csv

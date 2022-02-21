@@ -65,7 +65,8 @@ Architecture
 
 The neural network consists of fully connected layers:
 the input layer, followed by hidden layers with rectifier linear units (ReLU) activations, and a linear output layer.
-The network size (number of neurons per layer and number of hidden layers) can be chosen by the user.
+The network size (number of hidden layers and number of neurons per hidden layer) can be chosen by the user with the
+``FC_LAYERS`` and ``FC_UNITS`` parameters.
 
 Near-optimal policies can be obtained if large enough neural networks are used.
 Typically 3 hidden layers are sufficient for most cases, and an increasing number of neurons per layer

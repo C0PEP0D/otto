@@ -7,7 +7,7 @@ Definitions
 The agent's behavior is controlled by a policy, denoted :math:`\pi`, which maps each belief state :math:`s`
 to an action :math:`a`. That is, at each step the action is chosen according to :math:`a = \pi(s)`.
 
-The various policies defined in the following are already implemented in OTTO (except the optimal policy, which is not
+The various policies defined in the following are implemented in OTTO (except the optimal policy, which is not
 computable).
 
 Optimal policy
@@ -45,7 +45,7 @@ or not finding the source (event :math:`\bar{F}`) and receiving :math:`h` hits, 
   :align: center
   :alt: tree of possible transitions
 
-  Tree of possible successor belief states :math:`s'` starting from a belief state :math:`s` and executing action :math:`a`
+  Tree of possible successor belief states :math:`s'` starting from a belief state :math:`s` and executing action :math:`a`.
 
 Given :math:`v^*(s)`, the *optimal policy* consists in choosing the action that minimizes the expected number of
 remaining steps :math:`v^*(s')`:
@@ -74,7 +74,7 @@ multi-layer neural network with weights :math:`{\bf w}`.
 To optimize their weights, neural networks are :ref:`trained using reinforcement learning<sec-training>`.
 
 Near-optimal policies can be obtained if large enough neural networks are used.
-:ref:`sec-trained` yielding a near-optimal policy are provided in the ``zoo`` directory.
+:ref:`sec-trained` yielding near-optimal policies are provided in the ``zoo`` directory.
 
 Infotaxis
 =========
@@ -145,13 +145,13 @@ and :math:`D(s)` is the mean Manhattan distance between the agent and the source
 
 
 Space-aware infotaxis was proposed by Loisy and Eloy [Loisy2022]_.
-It has been shown to beat infotaxis in most cases, and it believed to be a good approximation of the optimal policy.
+It has been shown to beat infotaxis in most cases, and is believed to be a good approximation of the optimal policy.
 
 Greedy policy
 =============
 
-The *greedy* policy is a short-sighted policy which chooses the action maximizes the probability of
-finding the source in the next cell
+The *greedy* policy is a short-sighted policy which chooses the action that maximizes the probability of
+finding the source in the next cell:
 
 .. math::
    \begin{equation}
@@ -171,7 +171,7 @@ For a belief state :math:`s=[{\bf x}^a, p({\bf x})]`, the mean distance to the s
 
 .. math::
    \begin{equation}
-   D(s) = \sum_{{\bf x}} p({\bf x}) \lVert {\bf x} - {\bf x}^a \rVert_1.
+   D(s) = \sum_{{\bf x}} p({\bf x}) \lVert {\bf x} - {\bf x}^a \rVert_1
    \end{equation}
 
 where we use the Manhattan norm :math:`\lVert \cdot \rVert_1`.
@@ -216,7 +216,7 @@ optimal action for a source located in :math:`{\bf x}`, which is given by
 
 .. math::
    \begin{equation}
-   a^*({\bf x}) = \text{argmin}_a \, \lVert {\bf x} - {\bf x}^a(a) \rVert_1.
+   a^*({\bf x}) = \text{argmin}_a \, \lVert {\bf x} - {\bf x}^a(a) \rVert_1
    \end{equation}
 
 where :math:`{\bf x}^a(a)` is the new agent position after executing action :math:`a` and where
