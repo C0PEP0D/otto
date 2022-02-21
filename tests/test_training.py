@@ -100,5 +100,3 @@ def test_sym_1d():
     assert myenv.agent == [myenv.N // 2 + 5]
     assert myenv.p_source[myenv.N // 2 + 3] == pytest.approx(0.8)
 
-
-## TODO: choose_action vs choose_action_from_statep
