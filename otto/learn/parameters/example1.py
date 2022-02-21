@@ -15,6 +15,6 @@ ALGO_MAX_IT = 10000  # max number of training iterations
 # Evaluation of the RL policy
 EVALUATE_PERFORMANCE_EVERY = 200  # how often is the RL policy evaluated, in number of training iterations
 # Restart from saved model, if None start from scratch
-MODEL_PATH = None  # path to saved model, e.g., "./models/20220201-230054/20220201-230054_value_model"
+MODEL_PATH = None  # path to saved model, e.g., "./models/20220201-230054/20220201-230054_model"
 # Parallelization: how many episodes are computed in parallel (how many cores are used)
 N_PARALLEL = -1    # -1 for using all cores, 1 for sequential (useful as parallel code may hang with larger NN)

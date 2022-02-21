@@ -24,7 +24,7 @@ Parameters of the script are:
             norm used for hit detections, usually 'Euclidean'
         - N_HITS (int >= 2 or None)
             number of possible hit values, set automatically if None
-        - N_GRID (int >= 3 or None)
+        - N_GRID (odd int >= 3 or None)
             linear size of the domain, set automatically if None
 
     - Policy
@@ -40,6 +40,8 @@ Parameters of the script are:
             - 9: most likely state policy (Cassandra, Kaelbling & Kurien, IEEE 1996)
         - STEPS_AHEAD (int >= 1)
             number of anticipated moves, can be > 1 only for POLICY=0
+        - MODEL_PATH (str or None)
+            path of the model (neural network) for POLICY=-1, None otherwise
 
     - Setup
         - DRAW_SOURCE (bool)
@@ -99,15 +101,18 @@ if os.path.basename(sys.argv[0]) == "visualize.py":
     del parser, args
 
 # other globals
+if N_DIMS > 3:
+    raise Exception("Visualization is possible only up to 3D!")
+
 if MODEL_PATH is not None and POLICY != -1:
-    raise Exception("Models (set by MODEL_PATH) can only be used with POLICY = -1 (reinforcement learning policy). "
+    raise Exception("Models (set by MODEL_PATH) can only be used with POLICY = -1 (neural network policy). "
                     "If you want to use the model, you must set POLICY = -1. "
                     "If you want a different policy, set MODEL_PATH = None.")
 if POLICY == -1:
     from otto.classes.rlpolicy import RLPolicy
     from otto.classes.valuemodel import reload_model
     if MODEL_PATH is None:
-        raise Exception("MODEL_PATH cannot be None with an RL policy!")
+        raise Exception("MODEL_PATH cannot be None with a neural network policy!")
 else:
     from otto.classes.heuristicpolicy import HeuristicPolicy
 
@@ -140,6 +145,7 @@ def run():
     print("NORM_POISSON = " + myenv.norm_Poisson)
     print("N_GRID = " + str(myenv.N))
     print("N_HITS = " + str(myenv.Nhits))
+    print("DRAW_SOURCE = " + str(myenv.draw_source))
 
     if POLICY == -1:
         mymodel = reload_model(MODEL_PATH, inputshape=myenv.NN_input_shape)
@@ -207,8 +213,8 @@ def run():
             message = "success: source almost surely found " \
                       "(p_not_found_yet = " + str(round(p_not_found_yet, 8)) + ")"
             stop = 1
-        elif t >= STOP_t - 1:
-            message = "failure: max number of iterations reached (nb it = " + str(c) + ")"
+        elif t > STOP_t - 1:
+            message = "failure: max number of iterations reached (nb it = " + str(t) + ")"
             stop = 2
         elif myenv.agent_stuck:
             message = "failure: agent is stuck"

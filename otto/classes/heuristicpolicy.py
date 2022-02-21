@@ -86,14 +86,14 @@ class HeuristicPolicy(Policy):
                 else:
                     raise Exception("discount must be between 0 and 1")
             else:
-                raise Exception("steps_ahead has to be an integer larger than 1")
+                raise Exception("steps_ahead has to be an integer >= 1")
 
         elif self.policy_index == 1:
             assert policy_name(self.policy_index) == "space-aware infotaxis"
             action_chosen, _ = self._space_aware_infotaxis()
 
         elif self.policy_index == 2:
-            assert policy_name(self.policy_index) == "space-aware infotaxis"
+            assert policy_name(self.policy_index) == "custom policy"
             action_chosen, _ = self._custom_policy()
 
         elif self.policy_index == 5:
@@ -524,5 +524,6 @@ class HeuristicPolicy(Policy):
         to_minimize = np.ones(self.env.Nactions)
         # implement your policy here
         # ....
+        print("Implement your own policy!")
         action_chosen = np.argwhere(np.abs(to_minimize - np.min(to_minimize)) < EPSILON_CHOICE).flatten()[0]
         return action_chosen, to_minimize

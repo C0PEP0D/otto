@@ -47,7 +47,7 @@ Parameters of the script are:
             norm used for hit detections, usually 'Euclidean'
         - N_HITS (int >= 2 or None)
             number of possible hit values, set automatically if None
-        - N_GRID (int >= 3 or None)
+        - N_GRID (odd int >= 3 or None)
             linear size of the domain, set automatically if None
 
     - Policy
@@ -63,6 +63,14 @@ Parameters of the script are:
             - 9: most likely state policy (Cassandra, Kaelbling & Kurien, IEEE 1996)
         - STEPS_AHEAD (int >= 1)
             number of anticipated moves, can be > 1 only for POLICY=0
+        - MODEL_PATH (str or None)
+            path of the model (neural network) for POLICY=-1, None otherwise
+
+    - Criteria for episode termination
+        - STOP_t (int > 0 or None)
+            maximum number of steps per episode, set automatically if None
+        - STOP_p (float ~ 0.0)
+            episode stops when the probability that the source has been found is greater than 1 - STOP_p
 
     - Statistics computation
         - ADAPTIVE_N_RUNS (bool)
@@ -73,8 +81,6 @@ Parameters of the script are:
             if ADAPTIVE_N_RUNS: maximum number of runs, set automatically if None
         - N_RUNS (int > 0 or None)
             if not ADAPTIVE_N_RUNS: number of episodes to simulate, set automatically if None
-        - STOP_p (float ~ 0.0)
-            episode stops when the probability that the source has been found is greater than 1 - STOP_p
 
     - Saving
         - RUN_NAME (str or None)
@@ -130,14 +136,14 @@ if os.path.basename(sys.argv[0]) == "evaluate.py":
 
 # set other globals
 if MODEL_PATH is not None and POLICY != -1:
-    raise Exception("Models (set by MODEL_PATH) can only be used with POLICY = -1 (reinforcement learning policy). "
+    raise Exception("Models (set by MODEL_PATH) can only be used with POLICY = -1 (neural network policy). "
                     "If you want to use the model, you must set POLICY = -1. "
                     "If you want a different policy, set MODEL_PATH = None.")
 if POLICY == -1:
     from otto.classes.rlpolicy import RLPolicy
     from otto.classes.valuemodel import reload_model
     if MODEL_PATH is None:
-        raise Exception("MODEL_PATH cannot be None with an RL policy!")
+        raise Exception("MODEL_PATH cannot be None with a neural network policy!")
 else:
     from otto.classes.heuristicpolicy import HeuristicPolicy
 
@@ -185,15 +191,18 @@ def autoset_numerical_parameters():
         Nhits=N_HITS,
         dummy=True,
     )
-    if N_DIMS == 1:
-        stop_t = int(round(4 * testenv.N))
-    else:
-        if testenv.mu0_Poisson < 1e-3:
-            stop_t = 10 * testenv.N ** N_DIMS
-        elif testenv.mu0_Poisson < 1:
-            stop_t = int(round(5 * 10 ** N_DIMS * LAMBDA_OVER_DX / np.sqrt(testenv.mu0_Poisson)))
+    if STOP_t is None:
+        if N_DIMS == 1:
+            stop_t = int(round(4 * testenv.N))
         else:
-            stop_t = int(round(5 * 10 ** N_DIMS * LAMBDA_OVER_DX))
+            if testenv.mu0_Poisson < 1e-3:
+                stop_t = 10 * testenv.N ** N_DIMS
+            elif testenv.mu0_Poisson < 1:
+                stop_t = int(round(5 * 10 ** N_DIMS * LAMBDA_OVER_DX / np.sqrt(testenv.mu0_Poisson)))
+            else:
+                stop_t = int(round(5 * 10 ** N_DIMS * LAMBDA_OVER_DX))
+    else:
+        stop_t = STOP_t
 
     if N_RUNS is None:
         # predefined for REL_TOL = 0.01
@@ -388,7 +397,7 @@ def Worker(episode):
 
         if p_not_found_yet < STOP_p or p_end > 1 - EPSILON or done:
             stop = 1
-        elif t >= STOP_t - 1:
+        elif t > STOP_t - 1:
             stop = 2
             failed = 1
         elif myenv.agent_stuck:
@@ -733,7 +742,7 @@ def run():
                 ax[row, col].plot(bins, ydata, "-o", color=color, markersize=2, linewidth=1)
                 ax[row, col].set_title(fct + " of " + varname)
                 ax[row, col].set_xlabel(varname + " to find the source")
-                ax[row, col].set_xlim((0, max_x + 1))
+                ax[row, col].set_xlim((0, max_x))
                 ax[row, col].set_ylim(ylim)
 
                 if fct == "PDF":
@@ -798,7 +807,7 @@ def run():
 
         # summary
         monitoring_file = os.path.join(DIR_OUTPUTS, str(RUN_NAME + "_monitoring_summary" + ".txt"))
-        with open(monitoring_file, "a") as mfile:
+        with open(monitoring_file, "w") as mfile:
             mfile.write("*** initial hit ***\n")
             first_hit = np.loadtxt(monitoring_episodes_file, usecols=1, dtype='int')
             hit_max = np.max(first_hit)
@@ -888,7 +897,7 @@ if __name__ == "__main__":
     # define PDF bins
     BIN_START_T = -0.5
     BIN_SIZE_T = 1
-    BIN_END_T = STOP_t + 1
+    BIN_END_T = STOP_t + 0.5
     LEN_CDF_T = int(np.ceil((BIN_END_T - BIN_START_T) / BIN_SIZE_T))
 
     BIN_START_H = -0.5

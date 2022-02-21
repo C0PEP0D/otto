@@ -64,7 +64,7 @@ Parameters of the script are:
             norm used for hit detections, usually 'Euclidean'
         - N_HITS (int >= 2 or None)
             number of possible hit values, set automatically if None
-        - N_GRID (int >= 3 or None)
+        - N_GRID (odd int >= 3 or None)
             linear size of the domain, set automatically if None
 
     - Reinforcement learning
@@ -786,7 +786,7 @@ def _Worker(episode, policy, eps, memorize):
 
     # Initialization parameters
     p_not_found_yet = 1  # probability of not having found the source
-    pdf_t = np.zeros(STOP_t)
+    pdf_t = np.zeros(STOP_t + 1)
     t = 0
     stop = 0
     memory_s, memory_sp = [], []
@@ -834,7 +834,7 @@ def _Worker(episode, policy, eps, memorize):
         # Has the source been found?
         if p_not_found_yet < STOP_p or p_end > 1 - EPSILON:
             stop = 1
-        elif t >= STOP_t - 1:
+        elif t > STOP_t - 1:
             stop = 2
         elif myenv.agent_stuck:
             stop = 3

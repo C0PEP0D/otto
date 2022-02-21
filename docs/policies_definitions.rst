@@ -7,8 +7,20 @@ Definitions
 The agent's behavior is controlled by a policy, denoted :math:`\pi`, which maps each belief state :math:`s`
 to an action :math:`a`. That is, at each step the action is chosen according to :math:`a = \pi(s)`.
 
-The various policies defined in the following are implemented in OTTO (except the optimal policy, which is not
-computable).
+The following policies are implemented in OTTO:
+
+  - ``POLICY = -1``: neural network policy
+  - ``POLICY = 0``: infotaxis
+  - ``POLICY = 0``, ``STEPS_AHEAD = 3``: N-step infotaxis (here with a 3-step anticipation)
+  - ``POLICY = 1``: space-aware infotaxis
+  - ``POLICY = 2``: user-defined policy
+  - ``POLICY = 5``: random walk
+  - ``POLICY = 6``: greedy policy
+  - ``POLICY = 7``: mean distance policy
+  - ``POLICY = 8``: voting policy
+  - ``POLICY = 9``: most likely state policy
+
+They are defined hereinafter.
 
 Optimal policy
 ==============
@@ -147,6 +159,19 @@ and :math:`D(s)` is the mean Manhattan distance between the agent and the source
 Space-aware infotaxis was proposed by Loisy and Eloy [Loisy2022]_.
 It has been shown to beat infotaxis in most cases, and is believed to be a good approximation of the optimal policy.
 
+User-defined policy
+===================
+
+Heuristic policies are implemented in ``otto.classes.heuristicpolicy``.
+A template for a new policy is provided by the method ``_custom_policy`` of the class ``HeuristicPolicy``.
+One can then set ``POLICY = 2`` in the parameter file to use this custom policy.
+
+Random walk
+===========
+
+The *random walk* policy chooses an action at random with equal probabilities.
+It is not a good policy for the source-tracking POMDP.
+
 Greedy policy
 =============
 
@@ -257,10 +282,3 @@ where :math:`{\bf x}^{\text{mls}}` is the most likely source location
 
 It was originally proposed for robotic navigation [Cassandra1996]_.
 It is not a good policy for the source-tracking POMDP.
-
-User-defined policy
-===================
-
-Heuristic policies are implemented in ``otto.classes.heuristicpolicy``.
-A template for a new policy is provided by the method ``_custom_policy`` of the class ``HeuristicPolicy``.
-One can then set ``POLICY = 2`` in the parameter file to use this custom policy.

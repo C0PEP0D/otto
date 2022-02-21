@@ -53,6 +53,8 @@ class Policy:
             self,
             policy,
     ):
+        if not isinstance(policy, int):
+            raise Exception("policy must be an integer")
         self.policy_index = policy
         self.policy_name = policy_name(self.policy_index)
 

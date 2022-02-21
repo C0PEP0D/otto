@@ -99,10 +99,8 @@ class SourceTracking:
 
         self.lambda_over_dx = lambda_over_dx
         self.R_dt = R_dt
-        if self.lambda_over_dx < 0 or self.R_dt < 0:
-            raise Exception("lambda_over_dx and R_dt must be > 0")
-        if self.lambda_over_dx < 1:
-            warnings.warn("lambda_over_dx should be >= 1 for the problem to make sense")
+        if self.lambda_over_dx < 1.0 or self.R_dt <= 0.0:
+            raise Exception("lambda_over_dx must be >= 1.0 and R_dt must be > 0.0")
 
         self.norm_Poisson = norm_Poisson
         if not (self.norm_Poisson in ('Euclidean', 'Manhattan', 'Chebyshev')):
@@ -120,7 +118,7 @@ class SourceTracking:
         if Ngrid is None:
             self.N = self._autoset_Ngrid()
         else:
-            self.N = (Ngrid // 2) * 2 + 1   # make it odd
+            self.N = int((Ngrid // 2) * 2 + 1)   # make it odd
         if self.N < 3:
             raise Exception("Ngrid must be at least 3")
 
