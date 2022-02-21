@@ -89,7 +89,7 @@ But infotaxis is suboptimal, so better strategies are possible.
 
 OTTO provides an efficient implementation of the source-tracking POMDP (in any number of space dimensions), 
 of various heuristic policies (including infotaxis), 
-as well as a reinforcement learning algorithm able to learn near-optimal policies.
+as well as a deep reinforcement learning algorithm able to learn near-optimal policies.
 
 OTTO also provides an efficient method to evaluate policies (including custom policies defined by the user)
 using a rigorous protocol. 
@@ -274,7 +274,7 @@ All policies are described in the [documentation](https://otto-c0pep0d.readthedo
 
 ### Learning a policy
 
-The `learn.py` script learns a policy using reinforcement learning (RL). 
+The `learn.py` script learns a policy using deep reinforcement learning. 
 It actually trains a neural network model of the optimal value function.
 The (approximately) optimal policy is then derived from this function.
 
@@ -299,7 +299,7 @@ Other outputs are described in the [documentation](https://otto-c0pep0d.readthed
 
 Completing the training may take up to roughly 5000-10000 iterations (several hours on an 
 average laptop), but progress should be clearly visible from 500-1000 iterations. 
-For reference, the trained network should achieve p_not_found < 1e-6 and mean ~ 7.15, which is essentially optimal.
+For reference, the optimal policy yields p_not_found < 1e-6 and mean ~ 7.15.
 
 Training will continue until 10000 iterations, but can be stopped at any time.
 

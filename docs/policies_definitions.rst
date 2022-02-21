@@ -56,7 +56,7 @@ remaining steps :math:`v^*(s')`:
    \end{equation}
 
 The continuous nature of the belief state prevents from computing the optimal value function exactly.
-But near-optimal value functions can be approximated by neural networks trained using :ref:`reinforcement learning<sec-rl>`.
+But near-optimal value functions can be approximated by neural networks trained using :ref:`deep reinforcement learning<sec-rl>`.
 
 Neural network policy
 =====================
@@ -104,6 +104,17 @@ concentration gradients in chemotaxis".
 
 Infotaxis is far superior to all naive strategies, such as going to the more likely source location, but it is
 not optimal.
+
+N-step infotaxis
+================
+
+Infotaxis is based on a one-step anticipation of possible outcomes of each action.
+N-step infotaxis is the generalization of infotaxis to an anticipation over an arbitrary number of steps.
+It maximizes the cumulated information gain over those steps.
+
+The detailed algorithm relies on an exhaustive tree search [Loisy2022]_.
+
+The number of anticipated steps is called ``STEPS_AHEAD`` in the code.
 
 Space-aware infotaxis
 =====================
@@ -246,3 +257,10 @@ where :math:`{\bf x}^{\text{mls}}` is the most likely source location
 
 It was originally proposed for robotic navigation [Cassandra1996]_.
 It is not a good policy for the source-tracking POMDP.
+
+User-defined policy
+===================
+
+Heuristic policies are implemented in ``otto.classes.heuristicpolicy``.
+A template for a new policy is provided by the method ``_custom_policy`` of the class ``HeuristicPolicy``.
+One can then set ``POLICY = 2`` in the parameter file to use this custom policy.

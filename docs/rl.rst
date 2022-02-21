@@ -1,8 +1,8 @@
 .. _sec-rl:
 
-======================
-Reinforcement Learning
-======================
+===========================
+Deep Reinforcement Learning
+===========================
 
 .. toctree::
    :maxdepth: 1

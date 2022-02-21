@@ -75,7 +75,7 @@ is required for increasing problem sizes.
 Algorithm
 =========
 
-The training algorithm is a model-based version of DQN (Mnih et al., Nature, 2015).
+The training algorithm is a custom model-based version of DQN (Mnih et al., Nature, 2015).
 The pseudo-code is given below.
 
 .. figure:: figs/pseudo_code_training.png

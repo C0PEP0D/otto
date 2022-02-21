@@ -36,8 +36,9 @@ class State:
     prob=1.0,
     ):
 
+        if prob > EPSILON:
+            assert abs(np.sum(p_source) - 1.0) < EPSILON
         self.p_source = np.asarray(p_source, dtype=np.float32)
-        assert abs(np.sum(p_source) - 1.0) < 1e-10
         self.agent = agent
         self.prob = prob
 

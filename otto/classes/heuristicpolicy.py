@@ -521,8 +521,8 @@ class HeuristicPolicy(Policy):
 
     def _custom_policy(self, ):
         """Implement your custom policy"""
+        to_minimize = np.ones(self.env.Nactions)
         # implement your policy here
         # ....
-        to_minimize = np.ones(self.env.Nactions)
         action_chosen = np.argwhere(np.abs(to_minimize - np.min(to_minimize)) < EPSILON_CHOICE).flatten()[0]
         return action_chosen, to_minimize
