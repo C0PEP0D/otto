@@ -269,7 +269,7 @@ The main policies are
 that beats infotaxis in most cases
 - `POLICY = -1` for a reinforcement learning policy: for that we need to learn first!
 
-All policies are described in the [documentation](https://otto-c0pep0d.readthedocs.io/en/latest/description_policies.html).
+All policies are described in the [documentation](https://otto-c0pep0d.readthedocs.io/en/latest/policies_definitions.html).
 
 
 ### Learning a policy
