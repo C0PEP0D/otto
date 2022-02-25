@@ -226,7 +226,7 @@ class SourceTracking:
             else:
                 done = True
                 p_end = 1
-                hit = - 1
+                hit = -2
 
         else:
             done = False
@@ -266,7 +266,7 @@ class SourceTracking:
                     hit = np.random.RandomState().choice(range(self.Nhits), p=p_hit_table)
 
             else:
-                hit = self.Nhits - 1
+                hit = -2
 
         if not done:
             self.cumulative_hits += hit
