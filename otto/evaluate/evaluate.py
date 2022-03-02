@@ -528,7 +528,6 @@ def run():
                 failed_episodes[ind] = failed
                 ind += 1
         elif N_PARALLEL == 1:   # sequential
-            pdfs_t = []
             ind = N_runso
             for episode in range(N_runso, N_runs):
                 cdf_t, cdf_h, mean_t, failed = Worker(episode)
