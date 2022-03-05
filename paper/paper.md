@@ -36,7 +36,7 @@ Computating the optimal policy is not possible, and the challenge resides in fin
 It has become popular in robotics [@Moraud2010;@Lochmatter2010thesis] and to interpret animal searches [@Vergassola2007;@Voges2014;@Calhoun2014]. 
 
 Several variants have been proposed since [@Masson2013;@Ristic2016;@Karpas2017;@Hutchinson2018;@Chen2020], but the quest for better policies has been hindered by the lack of a trustable, open-source implementation of the source-tracking POMDP.
-Comparing policies across publications is unreliable because no well-defined methodology for policy evaluation exists. 
+Existing comparisons of policies are not reliable because no well-defined methodology for policy evaluation exists. 
 Besides, the recent successes of reinforcement learning for solving complex navigation problems in turbulence [@Reddy2016;@Alageshan2020] calls for an adaptation of these methods to the source-tracking POMDP.
 
 
@@ -49,19 +49,19 @@ package to visualize, evaluate and learn strategies for odor-based searches.
 
   1. a simulator of the source-tracking POMDP for any number of space dimensions, domain sizes and source intensities, together with rendering in 1D, 2D and 3D;
   2. an implementation of several heuristic policies including "infotaxis" [@Vergassola2007] and its recently proposed "space-aware" variant [@Loisy2022];
-  3. a parallelized algorithm to evaluate and compare policies (probability of finding the source, distribution of search times, etc.) using a rigorous, well-defined protocol;
-  4. a custom deep reinforcement learning algorithm for training neural-network policies, together with a library ("zoo") of trained neural networks that achieve near-optimal performance;
+  3. a parallelized algorithm to evaluate policies (probability of finding the source, distribution of search times, etc.) using a rigorous, well-defined protocol;
+  4. a custom model-based deep reinforcement learning algorithm for training neural-network policies, together with a library ("zoo") of trained neural networks that achieve near-optimal performance;
   5. a wrapper of the source-tracking POMDP that follows the OpenAI Gym interface.
 
 `OTTO` aims at facilitating future research:
 
   1. New heuristic policies can easily be implemented, visualized, and evaluated. Their performance can be compared to that of other policies, and to the near-optimal performance for a number of cases where this performance is known.
-  2. The gym wrapper makes the source-tracking POMDP easily accessible to the reinforcement learning community. OpenAI Gym [@gym] is the _de facto_ standard for simulators. It is compatible with most general-purpose reinforcement learning libraries (e.g., Stable Baselines [@stable-baselines3], OpenAI-Baselines [@openai-baselines], RLlib [@RLlib], CleanRL [@CleanRL], ChainerRL/PFRL [PFRL]).
+  2. The gym wrapper makes the source-tracking POMDP easily accessible to the reinforcement learning community. OpenAI Gym [@gym] is the _de facto_ standard for simulators. It is compatible with most general-purpose model-free reinforcement learning libraries (e.g., Stable Baselines [@stable-baselines3], OpenAI-Baselines [@openai-baselines], RLlib [@RLlib], CleanRL [@CleanRL], ChainerRL/PFRL [@PFRL]).
 
 
 # Mentions
 
-The methodological aspects of `OTTO` (generalization to an arbitrary number of space dimensions, policy evaluation protocol, custom reinforcement learning algorithm) have been proposed as part of a publication by its authors [@Loisy2022] (currently under review, preprint on arxiv).
+The methodological aspects of `OTTO` (generalization of the POMDP to an arbitrary number of space dimensions, policy evaluation protocol, model-based reinforcement learning algorithm) have been proposed as part of a publication by its authors [@Loisy2022] (currently under review, preprint on arxiv).
 
 # Acknowledgements
 
