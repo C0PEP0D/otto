@@ -60,3 +60,4 @@ gymwrapper
 .. automodule:: otto.classes.gymwrapper
    :members:
    :undoc-members:
+   :show-inheritance:
