@@ -1,8 +1,4 @@
-on:
-  push:
-    paths:
-    - 'paper/**'
-    - '.github/workflows/draft-pdf.yml'
+on: [push]
 
 jobs:
   paper:
