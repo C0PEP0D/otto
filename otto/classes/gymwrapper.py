@@ -1,4 +1,4 @@
-"""Provides an OpenAI Gym interface for the source-tracking POMDP (requires the ``gym`` module)."""
+"""Provides an OpenAI Gym interface for the source-tracking POMDP."""
 import gym
 import numpy as np
 
