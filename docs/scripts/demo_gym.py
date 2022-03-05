@@ -1,4 +1,4 @@
-"""How to use the gym environment for the source-tracking POMDP"""
+"""How to use the gym environment for the source-tracking POMDP (GymWrapper requires the ``gym`` module)."""
 import os
 import sys
 sys.path.insert(1, os.path.abspath(os.path.join(sys.path[0], '..', '..')))
