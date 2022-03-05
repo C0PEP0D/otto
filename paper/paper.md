@@ -39,6 +39,7 @@ Several variants have been proposed since [@Masson2013;@Ristic2016;@Karpas2017;@
 Existing comparisons of policies are not reliable because no well-defined methodology for policy evaluation exists. 
 Besides, the recent successes of reinforcement learning for solving complex navigation problems in turbulence [@Reddy2016;@Alageshan2020] calls for an adaptation of these methods to the source-tracking POMDP.
 
+The target audience of OTTO consists of researchers in biophysics, applied mathematics and robotics working on optimal strategies for olfactory searches in turbulent conditions.
 
 # Summary
 
