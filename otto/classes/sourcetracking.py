@@ -162,10 +162,12 @@ class SourceTracking:
         self._repeated_visits = 0  # to detect back and forth motion
 
     def step(self, action, hit=None, quiet=False):
-        """Make a step in the source-tracking environment:
-         - The agent moves to its new position according to `action`,
-         - The agent receives an observation (hit),
-         - The belief (self.p_source) and the hit map (self.hit_map) are updated.
+        """
+        Make a step in the source-tracking environment:
+
+           1. The agent moves to its new position according to `action`,
+           2. The agent receives a hit or the source is found,
+           3. The belief (self.p_source) and the hit map (self.hit_map) are updated.
 
         Args:
             action (int): action of the agent

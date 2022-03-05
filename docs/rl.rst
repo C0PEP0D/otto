@@ -9,4 +9,5 @@ Deep Reinforcement Learning
 
    rl_training
    rl_trained
+   rl_gym
 

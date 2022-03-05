@@ -14,8 +14,10 @@ def reload_model(model_dir, inputshape):
     """Load a model.
 
     Args:
-        model_dir (str): path to the model
-        inputshape (ndarray): shape of the neural network input (attribute of the SourceTracking env)
+        model_dir (str):
+            path to the model
+        inputshape (ndarray):
+            shape of the neural network input given by :attr:`otto.classes.sourcetracking.SourceTracking.NN_input_shape`
     """
     model_name = os.path.basename(model_dir)
     weights_path = os.path.abspath(os.path.join(model_dir, model_name))
@@ -114,20 +116,17 @@ class ValueModel(Model):
     def call(self, x, training=False, sym_avg=False):
         """Call the value model
 
-        Args
-            x (ndarray or tf.Tensor with shape (batch_size, input_shape)):
+        Args:
+            x (ndarray or tf.tensor with shape (batch_size, input_shape)):
                 array containing a batch of inputs
             training (bool, optional):
                 whether this call is done during training (as opposed to evaluation) (default=False)
             sym_avg (bool, optional):
                 whether to take the average value of symmetric duplicates (default=False)
 
-        Returns
-            x (tf.Tensor with shape (batch_size, 1))
+        Returns:
+            x (tf.tensor with shape (batch_size, 1))
                 array containing a batch of values
-
-        Raises
-            Exception: if symmetric duplicates are not implemented for that Ndim
         """
         shape = x.shape  # (batch_size, input_shape)
         ensemble_sym_avg = False
@@ -175,6 +174,10 @@ class ValueModel(Model):
     def build_graph(self, input_shape_nobatch):
         """Builds the model. Use this function instead of model.build() so that a call to
         model.summary() gives shape information.
+
+        Args:
+            input_shape_nobatch (tuple(int)):
+                shape of the neural network input given by :attr:`otto.classes.sourcetracking.SourceTracking.NN_input_shape`
         """
         input_shape_nobatch = tuple(input_shape_nobatch)
         input_shape_withbatch = tuple([1] + list(input_shape_nobatch))
@@ -188,11 +191,11 @@ class ValueModel(Model):
         """A training step.
 
         Args:
-            x (tf.Tensor with shape=(batch_size, input_shape)): batch of inputs
-            y (tf.Tensor with shape=(batch_size, 1)): batch of target values
+            x (tf.tensor with shape=(batch_size, input_shape)): batch of inputs
+            y (tf.tensor with shape=(batch_size, 1)): batch of target values
 
-        Returns
-            loss (tf.Tensor with shape=()): total loss
+        Returns:
+            loss (tf.tensor with shape=()): total loss
         """
 
         # Add symmetric duplicates
@@ -247,11 +250,11 @@ class ValueModel(Model):
         """ A test step.
 
         Args:
-            x (tf.Tensor with shape=(batch_size, input_shape)): batch of inputs
-            y (tf.Tensor with shape=(batch_size, 1)): batch of target values
+            x (tf.tensor with shape=(batch_size, input_shape)): batch of inputs
+            y (tf.tensor with shape=(batch_size, 1)): batch of target values
 
-        Returns
-            loss (tf.Tensor with shape=()): total loss
+        Returns:
+            loss (tf.tensor with shape=()): total loss
         """
 
         # Compute predictions

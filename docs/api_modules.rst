@@ -53,3 +53,10 @@ visualization
 .. automodule:: otto.classes.visualization
    :members:
    :undoc-members:
+
+gymwrapper
+----------
+
+.. automodule:: otto.classes.gymwrapper
+   :members:
+   :undoc-members:

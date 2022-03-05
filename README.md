@@ -91,7 +91,8 @@ OTTO provides:
 
   - a **simulator** of the source-tracking POMDP for any number of space dimensions,
   - various **heuristic policies** including **infotaxis**,
-  - a custom **deep reinforcement learning** algorithm able to yield **near-optimal policies**,
+  - a custom **deep reinforcement learning** algorithm able to yield **near-optimal policies**, 
+  - a **gym wrapper** allowing the use of general-purpose reinforcement learning libraries,
   - an **efficient algorithm to rigorously evaluate policies** (including custom policies defined by the user),
   - a **rendering** of searches (only up to 3D!).
 
