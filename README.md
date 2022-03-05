@@ -425,15 +425,15 @@ subject "OTTO: your request" to the [authors](#authors).
 
 If you use **OTTO** in your publications, you can cite the package as follows:
 
-> OTTO: a Python package to simulate, solve and visualize the source-tracking POMDP. http://github.com/C0PEP0D/otto
+> OTTO: A Python package to simulate, solve and visualize the source-tracking POMDP. https://github.com/C0PEP0D/otto
 
 or if you use LaTeX:
 
 ```tex
 @misc{OTTO,
   author = {Loisy, A. and Eloy, C.},
-  title = {{OTTO}: a {P}ython package to simulate, solve and visualize the source-tracking {POMDP}},
-  howpublished = {\url{http://github.com/C0PEP0D/otto}}
+  title = {{OTTO}: {A} {P}ython package to simulate, solve and visualize the source-tracking {POMDP}},
+  howpublished = {\url{https://github.com/C0PEP0D/otto}}
 }
 ```
 
