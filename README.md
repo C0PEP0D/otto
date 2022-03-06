@@ -354,6 +354,7 @@ You can define your own in the function `_custom_policy`.
 
 To use it in the main scripts, set `POLICY = 2` in your parameter file.
 
+To facilitate the evaluation of new policies compared to existing baselines, the performance of several policies (infotaxis, space-aware infotaxis and near-optimal) are summarized in a [dataset](https://doi.org/10.5281/zenodo.6125391).
 
 ### Cleaning up
 

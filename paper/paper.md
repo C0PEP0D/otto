@@ -56,13 +56,12 @@ package to visualize, evaluate and learn strategies for odor-based searches.
 
 `OTTO` aims at facilitating future research:
 
-  1. New heuristic policies can easily be implemented, visualized, and evaluated. Their performance can be compared to that of other policies, and to the near-optimal performance for a number of cases where this performance is known.
+  1. New heuristic policies can easily be implemented, visualized, and evaluated. To facilitate comparison to existing baselines, the performance of several policies (including infotaxis and near-optimal) are summarized in a freely available dataset generated with `OTTO` [@dataset].
   2. The gym wrapper makes the source-tracking POMDP easily accessible to the reinforcement learning community. OpenAI Gym [@gym] is the _de facto_ standard for simulators. It is compatible with most general-purpose model-free reinforcement learning libraries (e.g., Stable Baselines [@stable-baselines3], OpenAI-Baselines [@openai-baselines], RLlib [@RLlib], CleanRL [@CleanRL], ChainerRL/PFRL [@PFRL]).
-
 
 # Mentions
 
-The methodological aspects of `OTTO` (generalization of the POMDP to an arbitrary number of space dimensions, policy evaluation protocol, model-based reinforcement learning algorithm) have been proposed as part of a publication by its authors [@Loisy2022] (currently under review, preprint on arxiv).
+The methodological aspects of `OTTO` (generalization of the POMDP to an arbitrary number of space dimensions, policy evaluation protocol, model-based reinforcement learning algorithm) have been developed as part of a publication by its authors [@Loisy2022] (currently under review, preprint on arxiv).
 
 # Acknowledgements
 

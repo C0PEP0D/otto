@@ -3,6 +3,9 @@
 Observation model
 =================
 
+The observation model is based on a physical modeling of dispersion and detection in a turbulent medium proposed in
+[Vergassola2007]_ and generalized to an arbitrary number of dimensions in [Loisy2022]_.
+
 Observations ("hits") are drawn randomly according to a Poisson distribution
 
 .. math::
@@ -41,7 +44,4 @@ In the code
   - `n` is called ``N_DIMS``,
   - :math:`L` is called ``LAMBDA_OVER_DX``,
   - :math:`I` is called ``R_DT``.
-
-This model is based on a physical modeling of dispersion and detection in a turbulent medium proposed in
-[Vergassola2007]_ and generalized to an arbitrary number of dimensions in [Loisy2022]_.
 
