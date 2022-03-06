@@ -24,7 +24,7 @@ bibliography: paper.bib
 The source-tracking problem is a POMDP (partially observable Markov decision process) designed by @Vergassola2007 to mimic the problem of searching for a source of odor in a turbulent flow. 
 Far from a "toy" POMDP, it incorporates physical models of odor dispersion and detection that reproduce the major features of olfactory searches in turbulence. 
 Solutions to this problem, even approximate, have direct applications to sniffer robots used to track chemicals emitted by explosives, drugs or chemical leaks [@Russell1999;@Marques2006]. 
-They may also shed light on how cognitive animals use olfaction to search for food and mates [@Vickers2000].
+They may also shed light on how cognitive animals use olfaction to search for food and mates [@Vickers2000;@Reddy2022].
 
 In the source-tracking POMDP, the agent must find a source of odor hidden in a grid world. 
 At each step, the agent chooses a neighbor cell where to move next.
@@ -56,7 +56,7 @@ package to visualize, evaluate and learn strategies for odor-based searches.
 
 `OTTO` aims at facilitating future research:
 
-  1. New heuristic policies can easily be implemented, visualized, and evaluated. To facilitate comparison to existing baselines, the performance of several policies (including infotaxis and near-optimal) are summarized in a freely available dataset generated with `OTTO` [@dataset].
+  1. New heuristic policies can easily be implemented, visualized, and evaluated. To facilitate comparison to existing baselines, the performance of several policies (including infotaxis and near-optimal) is reported in a freely available dataset generated with `OTTO` [@dataset].
   2. The gym wrapper makes the source-tracking POMDP easily accessible to the reinforcement learning community. OpenAI Gym [@gym] is the _de facto_ standard for simulators. It is compatible with most general-purpose model-free reinforcement learning libraries (e.g., Stable Baselines [@stable-baselines3], OpenAI-Baselines [@openai-baselines], RLlib [@RLlib], CleanRL [@CleanRL], ChainerRL/PFRL [@PFRL]).
 
 # Mentions
