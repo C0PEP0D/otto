@@ -44,7 +44,7 @@ The target audience of OTTO consists of researchers in biophysics, applied mathe
 # Summary
 
 `OTTO` (short for Odor-based Target Tracking Optimization) is a Python 
-package to visualize, evaluate and learn strategies for odor-based searches.
+package to learn, evaluate and visualize strategies for odor-based searches.
 
 `OTTO` provides:
 

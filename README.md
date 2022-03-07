@@ -5,7 +5,7 @@
 [![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/C0PEP0D/otto/blob/main/LICENSE)
 
 **OTTO** (short for **O**dor-based **T**arget **T**racking **O**ptimization) is a Python package to 
-**visualize, evaluate and learn strategies** for odor-based searches.
+**learn, evaluate and visualize strategies** for odor-based searches.
 
 <div align="center">
 <img src="docs/gifs/2D_search.gif" width="40%"/>
