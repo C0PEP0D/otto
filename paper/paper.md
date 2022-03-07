@@ -32,7 +32,7 @@ Once in a new cell, the agent receives an observation (odor detection) that prov
 The search terminates when the agent enters the cell containing the source.
 Solving the POMDP means finding the optimal way of choosing moves (policy) so as to reach the source in the smallest possible number of steps.
 
-Computing the optimal policy is not possible, and the challenge resides in finding good approximate policies. A strong baseline is provided by "infotaxis", a heuristic policy devised by @Vergassola2007. 
+Computing the optimal policy is not possible, and the challenge resides in finding good approximate solutions. A strong baseline is provided by "infotaxis", a heuristic policy devised by @Vergassola2007. 
 It has become popular in robotics [@Moraud2010;@Lochmatter2010thesis] and to interpret animal searches [@Vergassola2007;@Voges2014;@Calhoun2014]. 
 
 Several variants have been proposed since [@Masson2013;@Ristic2016;@Karpas2017;@Hutchinson2018;@Chen2020], but the quest for better policies has been hindered by the lack of a trustable, open-source implementation of the source-tracking POMDP.
