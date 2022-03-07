@@ -1,8 +1,9 @@
 ---
 title: 'OTTO: A Python package to simulate, solve and visualize the source-tracking POMDP'
 tags:
-  - POMDP
   - olfactory search
+  - source tracking
+  - POMDP
   - reinforcement learning
 authors:
   - name: Aurore Loisy^[corresponding author]
@@ -12,8 +13,8 @@ authors:
     orcid: 0000-0003-4114-7263
     affiliation: 1
 affiliations:
- - name: Aix Marseille Univ, CNRS, Centrale Marseille, IRPHE, Marseille, France
-   index: 1
+  - name: Aix Marseille Univ, CNRS, Centrale Marseille, IRPHE, Marseille, France
+    index: 1
 date: 7 March 2022
 bibliography: paper.bib
 
