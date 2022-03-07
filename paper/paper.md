@@ -27,19 +27,19 @@ Solutions to this problem, even approximate, have direct applications to sniffer
 They may also shed light on how cognitive animals use olfaction to search for food and mates [@Vickers2000;@Reddy2022].
 
 In the source-tracking POMDP, the agent must find a source of odor hidden in a grid world. 
-At each step, the agent chooses a neighbor cell where to move next.
-Once in a new cell, the agent receives an observation (odor detection) that provides some partial information on how far the source is. 
+At each step, the agent moves to a neighbor cell.
+Once in a new cell, the agent receives an observation (odor detection) that provides some noisy information on its current distance to the source. 
 The search terminates when the agent enters the cell containing the source.
 Solving the POMDP means finding the optimal way of choosing moves (policy) so as to reach the source in the smallest possible number of steps.
 
-Computating the optimal policy is not possible, and the challenge resides in finding good approximate policies. A strong baseline is provided by "infotaxis", a heuristic policy devised by @Vergassola2007. 
+Computing the optimal policy is not possible, and the challenge resides in finding good approximate policies. A strong baseline is provided by "infotaxis", a heuristic policy devised by @Vergassola2007. 
 It has become popular in robotics [@Moraud2010;@Lochmatter2010thesis] and to interpret animal searches [@Vergassola2007;@Voges2014;@Calhoun2014]. 
 
 Several variants have been proposed since [@Masson2013;@Ristic2016;@Karpas2017;@Hutchinson2018;@Chen2020], but the quest for better policies has been hindered by the lack of a trustable, open-source implementation of the source-tracking POMDP.
-Existing comparisons of policies are not reliable because no well-defined methodology for policy evaluation exists. 
+Existing comparisons suffer from this lack of a common implementation.
 Besides, the recent successes of reinforcement learning for solving complex navigation problems in turbulence [@Reddy2016;@Alageshan2020] calls for an adaptation of these methods to the source-tracking POMDP.
 
-The target audience of OTTO consists of researchers in biophysics, applied mathematics and robotics working on optimal strategies for olfactory searches in turbulent conditions.
+The target audience of OTTO consists of researchers in biophysics, applied mathematics and robotics working on optimal strategies for olfactory searches in turbulent flows.
 
 # Summary
 
@@ -48,7 +48,7 @@ package to visualize, evaluate and learn strategies for odor-based searches.
 
 `OTTO` provides:
 
-  1. a simulator of the source-tracking POMDP for any number of space dimensions, domain sizes and source intensities, together with rendering in 1D, 2D and 3D;
+  1. a simulator of the source-tracking POMDP for any number of space dimensions, domain sizes and source intensities, together with a rendering tool in 1D, 2D and 3D;
   2. an implementation of several heuristic policies including "infotaxis" [@Vergassola2007] and its recently proposed "space-aware" variant [@Loisy2022];
   3. a parallelized algorithm to evaluate policies (probability of finding the source, distribution of search times, etc.) using a rigorous, well-defined protocol;
   4. a custom model-based deep reinforcement learning algorithm for training neural-network policies, together with a library ("zoo") of trained neural networks that achieve near-optimal performance;
@@ -61,7 +61,7 @@ package to visualize, evaluate and learn strategies for odor-based searches.
 
 # Mentions
 
-The methodological aspects of `OTTO` (generalization of the POMDP to an arbitrary number of space dimensions, policy evaluation protocol, model-based reinforcement learning algorithm) have been developed as part of a publication by its authors [@Loisy2022] (currently under review, preprint on arxiv).
+The methodological aspects of `OTTO` (generalization of the POMDP to an arbitrary number of space dimensions, policy evaluation protocol, model-based reinforcement learning algorithm) have been developed as part of a publication by its authors [@Loisy2022].
 
 # Acknowledgements
 
