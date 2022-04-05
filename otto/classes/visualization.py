@@ -410,8 +410,9 @@ class Visualization:
 
         # *** hit map
         # colored markers for hits
-        x, y, z = np.nonzero(self.env.hit_map + 1)
-        c = self.env.hit_map[self.env.hit_map > -1]
+        x, y, z = np.nonzero(self.env.hit_map != -1)
+        c = self.env.hit_map[self.env.hit_map != -1]
+        c[c == -2] = self.env.Nhits
         alpha0 = self._alpha0()
         cmap0 = self._cmap0()
         s = [15000 / self.env.N ** 2] * len(c)

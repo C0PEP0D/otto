@@ -23,7 +23,7 @@ bibliography: paper.bib
 # Statement of need
 
 The source-tracking problem is a POMDP (partially observable Markov decision process) designed by @Vergassola2007 to mimic the problem of searching for a source of odor in a turbulent flow. 
-Far from a "toy" POMDP, it incorporates physical models of odor dispersion and detection that reproduce the major features of olfactory searches in turbulence. 
+Far from being a "toy" POMDP, it incorporates physical models of odor dispersion and detection that reproduce the major features of olfactory searches in turbulence. 
 Solutions to this problem, even approximate, have direct applications to sniffer robots used to track chemicals emitted by explosives, drugs or chemical leaks [@Russell1999;@Marques2006]. 
 They may also shed light on how cognitive animals use olfaction to search for food and mates [@Vickers2000;@Reddy2022].
 

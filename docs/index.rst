@@ -14,6 +14,8 @@ OTTO (Odor-based Target Tracking Optimization)
    :caption: User Guide
 
    what
+   install
+   quickstart
    pomdp
    policies
    rl

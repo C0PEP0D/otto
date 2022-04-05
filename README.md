@@ -1,6 +1,7 @@
 
 # OTTO
 
+[![status](https://joss.theoj.org/papers/51c451ddeeb1affdb1533a4fa1582f4c/status.svg)](https://joss.theoj.org/papers/51c451ddeeb1affdb1533a4fa1582f4c)
 [![Documentation Status](https://readthedocs.org/projects/otto-c0pep0d/badge/?version=latest)](https://otto-c0pep0d.readthedocs.io/en/latest/?badge=latest)
 [![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/C0PEP0D/otto/blob/main/LICENSE)
 
@@ -133,7 +134,7 @@ python3 setup.py install
 You can test your installation with following command:
 
 ```bash
-pytest tests
+python3 -m pytest tests
 ```
 This will execute the test functions located in the folder `tests`.
 
@@ -319,7 +320,7 @@ main scripts with a parameter file (using `--input`) containing
 
 ```python
 POLICY = -1
-MODEL_PATH = "../learn/models/YYmmdd-HHMMSS/YYmmdd-HHMMSS_value_model_bkp_i"
+MODEL_PATH = "../learn/models/YYmmdd-HHMMSS/YYmmdd-HHMMSS_model_bkp_i"
 ```
 
 where `MODEL_PATH` is the path to the neural network model.
@@ -332,7 +333,7 @@ set `N_DIMS = 2` for evaluation and visualization.
 A collection of trained neural networks is provided in the `zoo` directory accessible from the root of the package. 
 They are saved in the `models` directory and corresponding parameter files are in the `parameters` directory.
 They are named `zoo_model_i_j_k` where i, j, k are integers associated to `N_DIMS`, `LAMBDA_OVER_DX`, `R_DT`.
-The list of all trained neural networks is available in the [documentation](https://otto-c0pep0d.readthedocs.io/en/latest/rl_trained.html)
+The list of all trained neural networks is available in the [documentation](https://otto-c0pep0d.readthedocs.io/en/latest/rl_trained.html).
 
 To visualize the policy associated to the neural network model `zoo_model_1_2_2`, use
 
