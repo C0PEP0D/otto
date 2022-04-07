@@ -2,8 +2,9 @@
 # OTTO
 
 [![status](https://joss.theoj.org/papers/51c451ddeeb1affdb1533a4fa1582f4c/status.svg)](https://joss.theoj.org/papers/51c451ddeeb1affdb1533a4fa1582f4c)
-[![Documentation Status](https://readthedocs.org/projects/otto-c0pep0d/badge/?version=latest)](https://otto-c0pep0d.readthedocs.io/en/latest/?badge=latest)
+[![DOI](https://zenodo.org/badge/457950076.svg)](https://zenodo.org/badge/latestdoi/457950076)
 [![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/C0PEP0D/otto/blob/main/LICENSE)
+[![Documentation Status](https://readthedocs.org/projects/otto-c0pep0d/badge/?version=latest)](https://otto-c0pep0d.readthedocs.io/en/latest/?badge=latest)
 
 **OTTO** (short for **O**dor-based **T**arget **T**racking **O**ptimization) is a Python package to 
 **learn, evaluate and visualize strategies** for odor-based searches.
