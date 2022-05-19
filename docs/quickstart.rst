@@ -69,9 +69,13 @@ Each ``parameters`` directory contain sample parameter files called ``example*.p
 They show essential parameters you can play with, for example:
 
   - ``N_DIMS`` sets the dimensionality of the search (1D, 2D, 3D), default is ``N_DIMS = 1``
-  - ``LAMBDA_OVER_DX`` controls the size the domain, default is ``LAMBDA_OVER_DX = 2.0``
+  - ``LAMBDA_OVER_DX`` controls the size of the domain, default is ``LAMBDA_OVER_DX = 2.0``
   - ``R_DT`` controls the source intensity, default is ``R_DT = 2.0``
   - ``POLICY`` defines the policy to use, default is ``POLICY = 0`` (infotaxis)
+
+Note: the actual size of the computational domain, called ``N_GRID``, is determined internally based
+on ``N_DIMS``, ``LAMBDA_OVER_DX`` and ``R_DT`` to make the domain "large enough" for the boundaries
+to have (almost) no effect on the search. As a rule of thumb, ``N_GRID ≈ 15 LAMBDA_OVER_DX``.
 
 The definition of all parameters is provided :ref:`here<sec-visualize.py>`,
 and you can find their default values by examining the contents of ``__defaults.py``.
