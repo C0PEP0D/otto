@@ -454,3 +454,5 @@ See the [LICENSE](LICENSE) file for license rights and limitations.
 This project has received funding from the European Research Council (ERC) under the European Union's Horizon 2020 
 research and innovation programme (grant agreement No 834238).
 
+The name OTTO was inspired by [Otto the copepod](https://www.heuschele.com/otto/mainstory.html), 
+an interactive story by [Jan Heuschele](https://www.heuschele.com/).
