@@ -13,7 +13,7 @@ with open('requirements.txt') as f:
 def main():
     setup(
         name="otto",
-        version="1.0",
+        version="1.1",
         author="A. Loisy, C. Eloy",
         author_email="aurore.loisy@gmail.com, eloy@irphe.univ-mrs.fr",
         description="OTTO (Odor-based Target Tracking Optimization): "
