@@ -17,7 +17,7 @@
  </div>
 
 OTTO is part of the [C0PEP0D](https://C0PEP0D.github.io/) project and has been used in a 
-[publication](https://arxiv.org/abs/2112.10861).
+[publication](https://doi.org/10.1098/rspa.2022.0118).
 
 
 ## Table of contents
@@ -272,7 +272,7 @@ This file is already present in `evaluate/parameters/` for this example.
 The main policies are
 
 - `POLICY = 0` for infotaxis (default)
-- `POLICY = 1` for space-aware infotaxis, a [recently proposed](https://arxiv.org/abs/2112.10861) heuristic 
+- `POLICY = 1` for space-aware infotaxis, a [recently proposed](https://doi.org/10.1098/rspa.2022.0118) heuristic 
 that beats infotaxis in most cases
 - `POLICY = -1` for a reinforcement learning policy: for that we need to learn first!
 
