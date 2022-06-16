@@ -8,8 +8,14 @@
     "creators": [
         {
             "affiliation": "Aix Marseille Univ, CNRS, Centrale Marseille, IRPHE, Marseille, France", 
-            "name": "Aurore Loisy, Christophe Eloy"
-        }
+            "name": "Loisy, Aurore",
+            "orcid": "0000-0002-8089-8636"
+        },
+        {
+            "affiliation": "Aix Marseille Univ, CNRS, Centrale Marseille, IRPHE, Marseille, France", 
+            "name": "Eloy, Christophe",
+            "orcid": "0000-0003-4114-7263"
+        },
     ], 
     "access_right": "open", 
     "related_identifiers": [
