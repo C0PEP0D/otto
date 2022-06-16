@@ -1,0 +1,27 @@
+{
+    "description": "OTTO: A Python package to simulate, solve and visualize the source-tracking POMDP", 
+    "license": "MIT", 
+    "title": "OTTO: A Python package to simulate, solve and visualize the source-tracking POMDP", 
+    "version": "v1.1", 
+    "upload_type": "software", 
+    "publication_date": "2022-06-15", 
+    "creators": [
+        {
+            "affiliation": "Aix Marseille Univ, CNRS, Centrale Marseille, IRPHE, Marseille, France", 
+            "name": "Aurore Loisy, Christophe Eloy"
+        }
+    ], 
+    "access_right": "open", 
+    "related_identifiers": [
+        {
+            "scheme": "url", 
+            "identifier": "https://github.com/C0PEP0D/otto/tree/v1.1", 
+            "relation": "isSupplementTo"
+        }, 
+        {
+            "scheme": "doi", 
+            "identifier": "10.5281/zenodo.6420860", 
+            "relation": "isVersionOf"
+        }
+    ]
+}
