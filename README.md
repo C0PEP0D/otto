@@ -438,7 +438,7 @@ If you use **OTTO** in your publications, you can cite the package as follows:
 or if you use LaTeX:
 
 ```tex
-@article{Loisy2022, 
+@article{otto, 
  doi = {10.21105/joss.04266}, 
  year = {2022},
  volume = {7}, 
