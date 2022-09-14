@@ -577,11 +577,16 @@ def print_stats(stats1, stats2=None):
         if stats2 is None:
             if var == 'p_not_found':
                 print(var, "\t", "{:.4e}".format(stats1[var]))
+            elif var == 'mean':
+                print(var, "\t\t", "{:.4f}".format(stats1[var]),  "+/- {:.4f}".format(stats1["mean_err"]))
             else:
                 print(var, "\t\t", "{:.4f}".format(stats1[var]))
         else:
             if var == 'p_not_found':
                 print(var, "\t", "{:.4e}".format(stats1[var]), "\t\tref: ", "{:.4e}".format(stats2[var]))
+            elif var == 'mean':
+                print(var, "\t\t", "{:.4f}".format(stats1[var]), "+/- {:.4f}".format(stats1["mean_err"]),
+                      "\tref: ", "{:.4f}".format(stats2[var]), "+/- {:.4f}".format(stats2["mean_err"]))
             else:
                 print(var, "\t\t", "{:.4f}".format(stats1[var]), "\t\tref: ", "{:.4f}".format(stats2[var]))
 

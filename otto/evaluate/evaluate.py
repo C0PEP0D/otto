@@ -603,7 +603,7 @@ def run():
         p25_h, p50_h, p75_h, p90_h, p95_h, p99_h, _ = stats_from_cdf(h_bins, cdf_h_tot)
 
         print("probability that the source is never found              : %.10f" % (1.0 - p_found, ))
-        print("mean number of steps to find the source                 : %.3f" % mean_t)
+        print("mean number of steps to find the source                 : %.3f +/- %.3f" % (mean_t, 1.96 * std_error_mean))
         print("number of steps to find the source with 50 %% probability: %.3f" % p50_t)
         print("number of steps to find the source with 99 %% probability: %.3f" % p99_t)
         nb_failed = np.sum(failed_episodes)
