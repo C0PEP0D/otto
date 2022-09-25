@@ -36,8 +36,8 @@ class State:
     prob=1.0,
     ):
 
-        if prob > EPSILON:
-            assert abs(np.sum(p_source) - 1.0) < EPSILON
+        # if prob > EPSILON:
+        #     assert abs(np.sum(p_source) - 1.0) < EPSILON
         self.p_source = np.asarray(p_source, dtype=np.float32)
         self.agent = agent
         self.prob = prob
@@ -97,8 +97,10 @@ class TrainingEnv(SourceTracking):
 
             for h in range(self.Nhits):
                 prob = np.sum(p_source_[h])  # norm is the proba to transit to this state = (1-pend) * p(hit)
-                prob = np.maximum(EPSILON, prob)
-                state_ = State(p_source_[h] / prob, agent_, prob=prob)
+                if prob > EPSILON:
+                    state_ = State(p_source_[h] / prob, agent_, prob=prob)
+                else:  # pathological, just give the current state
+                    state_ = State(self.p_source, self.agent, prob=0.0)
                 statep[action].append(state_)
 
         state = State(self.p_source, self.agent, prob=1.0)
