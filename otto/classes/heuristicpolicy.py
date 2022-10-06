@@ -469,7 +469,7 @@ class HeuristicPolicy(Policy):
                     D = self.env._extract_N_from_2N(input=self.distance_array, origin=agent_)
                     D = np.sum(p_source_ * D, axis=tuple(range(1, p_source_.ndim)))
 
-                    # minimize a linear combination of the two
+                    # expected distance
                     to_minimize[a] = (1.0 - p_end) * np.sum(p_hit * D)
 
         action_chosen = np.argwhere(np.abs(to_minimize - np.min(to_minimize)) < EPSILON_CHOICE).flatten()[0]

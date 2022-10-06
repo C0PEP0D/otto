@@ -319,8 +319,8 @@ class Visualization:
         elif self.env.Ndim == 3:
             self._draw_3D(fig, ax)
 
-        bottomtext = "$\lambda / \Delta x = $" + str(self.env.lambda_over_dx) \
-                     + "$\qquad$ $R \Delta t = $" + str(self.env.R_dt) \
+        bottomtext = "$\mathcal{L} = \lambda / \Delta x = $" + str(self.env.lambda_over_dx) \
+                     + "$\qquad$ $\mathcal{I} = R \Delta t = $" + str(self.env.R_dt) \
                      + "$\qquad$ $h_{\mathrm{init}}$ = " + str(self.env.initial_hit)
         sup = plt.figtext(0.5, 0.99, toptext, fontsize=13, ha="center", va="top")
         bot = plt.figtext(0.5, 0.01, bottomtext, fontsize=10, ha="center", va="bottom")
