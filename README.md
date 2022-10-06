@@ -111,21 +111,26 @@ If FFmpeg is not installed, OTTO will save video frames as images instead.
 
 ### Conda users
 
-If you use conda to manage your Python environments, you can install OTTO in a dedicated environment `ottoenv`
+If you use conda to manage your Python environments, you can install OTTO in a dedicated environment `otto`
 
 ``` bash
-conda create --name ottoenv python=3.8
-conda activate ottoenv
+conda create --name otto python=3.8
+conda activate otto
 ```
 
 ### Installing
-First download the package or clone the git repository with
+
+First go to the directory where you wish to install `otto`.
+
+Then clone the git repository with
 
 ``` bash
 git clone https://github.com/C0PEP0D/otto.git
 ```
 
-Then go to the `otto` directory and install OTTO using
+If `git` is not installed on your system, you can alternatively [download the package](https://github.com/C0PEP0D/otto/archive/refs/heads/main.zip) and unzip it.
+
+Finally go to the `otto` directory and install OTTO using
 
 ``` bash
 python3 setup.py install
