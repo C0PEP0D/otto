@@ -98,7 +98,10 @@ class HeuristicPolicy(Policy):
 
         elif self.policy_index == 5:
             assert policy_name(self.policy_index) == "random walk"
-            action_chosen = random.randint(0, self.env.Nactions - 1)
+            move_possible = False
+            while not move_possible:
+                action_chosen = random.randint(0, self.env.Nactions - 1)
+                _, move_possible = self.env._move(action_chosen, self.env.agent)
 
         elif self.policy_index == 6:
             assert policy_name(self.policy_index) == "greedy"
