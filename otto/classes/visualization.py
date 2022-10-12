@@ -3,6 +3,7 @@
 """Provides the Visualization class, for rendering episodes."""
 import os
 import shutil
+import re
 import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
@@ -558,8 +559,14 @@ class Visualization:
 
     def _make_video(self, frame_rate, keep_frames):
         out = self.video_path + ".mp4"
+        out = re.sub(" ", "\ ", out)
+
+        frame_name = os.path.join(self.frame_path, "*.png'")
+        frame_name = re.sub(" ", "\ ", frame_name)
+
         cmd = "ffmpeg -loglevel quiet -r " + str(frame_rate) + " -pattern_type glob -i '" + \
-              os.path.join(self.frame_path, "*.png'") + " -c:v libx264 " + out
+              frame_name + " -c:v libx264 " + out
+
         exit_code = os.system(cmd)
         if exit_code != 0:
             print("Warning: could not make a video, is ffmpeg installed?")
