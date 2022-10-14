@@ -548,14 +548,14 @@ class HeuristicPolicy(Policy):
             print('\nNumber of different actions to choose from: {}'.format(Nactions))
 
             # The possible action values are 0, 1, ..., Nactions - 1
-            print('\nPossible actions: {}'.format([a for a in range(Nactions)]))
+            print('\nList of possible actions: {}'.format([a for a in range(Nactions)]))
 
             # The number of different hit values is
             Nhits = self.env.Nhits
-            print('\nNumber of different hit values: {}'.format(Nhits))
+            print('\nNumber of different hit values that can be observed: {}'.format(Nhits))
 
             # The possible hit values are 0, 1, ..., Nhits-1
-            print('\nPossible hit values: {}'.format([h for h in range(Nhits)]))
+            print('\nList of possible hit values: {}'.format([h for h in range(Nhits)]))
 
             # The current belief is here:
             current_belief = self.env.p_source
