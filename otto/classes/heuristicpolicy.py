@@ -539,9 +539,23 @@ class HeuristicPolicy(Policy):
         debug_mode = True
 
         if debug_mode:
-            print('\n------------------------------------------------------------')
+            print('----------------------------------------------------------------------------------')
             # ----- HELPERS: JUST TO SHOW YOU HOW TO ACCESS DIFFERENT QUANTITIES AND TO HELP YOU DEBUG
             # Environment definition is in the file "otto/otto/classes/sourcetracking.py"
+
+            # The number of actions to choose from is:
+            Nactions = self.env.Nactions
+            print('\nNumber of different actions to choose from: {}'.format(Nactions))
+
+            # The possible action values are 0, 1, ..., Nactions - 1
+            print('\nPossible actions: {}'.format([a for a in range(Nactions)]))
+
+            # The number of different hit values is
+            Nhits = self.env.Nhits
+            print('\nNumber of different hit values: {}'.format(Nhits))
+
+            # The possible hit values are 0, 1, ..., Nhits-1
+            print('\nPossible hit values: {}'.format([h for h in range(Nhits)]))
 
             # The current belief is here:
             current_belief = self.env.p_source
@@ -557,14 +571,7 @@ class HeuristicPolicy(Policy):
             print('\ncurrent_likelihood shape: {}'.format(current_likelihood.shape))
             # The likelihood of h=1 is the n-dimensional tensor (same size as the domain):
             print('\ncurrent_likelihood for hit=1: {}'.format(current_likelihood[1, ...]))
-
-            # The number of actions to choose from is:
-            Nactions = self.env.Nactions
-            print('\nNumber of possible actions: {}'.format(Nactions))
-
-            # The number of possible hit values is
-            Nhits = self.env.Nhits
-            print('\nNumber of possible hit values: {}'.format(Nhits))
+            # Similarly, you can access the likelihood for h=0 with: current_likelihood[0, ...]
 
             # The hit map is here (-1 means that the cell has not been visited)
             hit_map = self.env.hit_map
@@ -589,8 +596,12 @@ class HeuristicPolicy(Policy):
             # For example:
             action = 0  # By definition, 0=WEST(-x), 1=EAST(+x), 2=SOUTH(-y), 3=NORTH(+y), 4=BOTTOM(-z), 5=TOP(+z)
             new_position, is_move_possible = self.env._move(action , current_position)
-            print('\nAction {} is possible? {}. The new position if executed will be: {}'
-                  .format(action, is_move_possible, new_position))
+            print('\nCurrent position is {}. '
+                  'Action {} is possible? {}. '
+                  'The new position if action {} is executed will be: {}'
+                  .format(current_position, action, is_move_possible, action, new_position))
+
+            print('\n----------------------------------------------------------------------------------')
 
         # ----- IMPLEMENTATION: HERE YOU GO!
 
