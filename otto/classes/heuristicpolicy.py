@@ -522,11 +522,86 @@ class HeuristicPolicy(Policy):
 
         return action_chosen, to_minimize
 
+    def _init_custom_policy(self, ):
+        # If you need extra global variables, you can initialize them here as attributes
+        self.clock = 0  # for example a clock
+        # self.internal_state = None # or some internal state
+        pass
+
     def _custom_policy(self, ):
-        """Implement your custom policy"""
-        to_minimize = np.ones(self.env.Nactions)
-        # implement your policy here
-        # ....
-        print("Implement your own policy!")
+        """Implement your custom policy"
+
+        Returns
+            action_chosen (int): the action chosen
+            to_minimize (anything): something else you want to return, used for debugging only
+        """
+
+        debug_mode = True
+
+        if debug_mode:
+            print('\n------------------------------------------------------------')
+            # ----- HELPERS: JUST TO SHOW YOU HOW TO ACCESS DIFFERENT QUANTITIES AND TO HELP YOU DEBUG
+            # Environment definition is in the file "otto/otto/classes/sourcetracking.py"
+
+            # The current belief is here:
+            current_belief = self.env.p_source
+            print('\ncurrent_belief shape: {}'.format(current_belief.shape))
+
+            # The current position of the agent is here:
+            current_position = self.env.agent
+            print('\ncurrent position: {}'.format(current_position))
+
+            # The likelihood of each hit value is stored as a tensor
+            # with the first dimension being the possible hit values:
+            current_likelihood = self.env._extract_N_from_2N(input=self.env.p_Poisson, origin=current_position)
+            print('\ncurrent_likelihood shape: {}'.format(current_likelihood.shape))
+            # The likelihood of h=1 is the n-dimensional tensor (same size as the domain):
+            print('\ncurrent_likelihood for hit=1: {}'.format(current_likelihood[1, ...]))
+
+            # The number of actions to choose from is:
+            Nactions = self.env.Nactions
+            print('\nNumber of possible actions: {}'.format(Nactions))
+
+            # The number of possible hit values is
+            Nhits = self.env.Nhits
+            print('\nNumber of possible hit values: {}'.format(Nhits))
+
+            # The hit map is here (-1 means that the cell has not been visited)
+            hit_map = self.env.hit_map
+            print('\nCurrent hit map: {}'.format(hit_map))
+
+            # The last hit received can be accessed with
+            last_hit = self.env.hit_map[tuple(current_position)]
+            print('\nLast hit observed: {}'.format(last_hit))
+
+            # Need other persistent variables?
+            # Initialize them in _init_custom_policy (line 525)
+            # The variables must be initialized the first time the policy is called.
+            # For example for keeping a clock, initialize it using the following
+            if not hasattr(self, 'clock'):
+                self._init_custom_policy()
+            # You can then update the variables here. For example, increment the clock
+            self.clock += 1
+            print('\nClock is now: {}'.format(self.clock))
+
+            # To check the consequences of a (virtual) action, you can use
+            # the env._move function, which returns the new position and whether the move is allowed.
+            # For example:
+            action = 0  # By definition, 0=WEST(-x), 1=EAST(+x), 2=SOUTH(-y), 3=NORTH(+y), 4=BOTTOM(-z), 5=TOP(+z)
+            new_position, is_move_possible = self.env._move(action , current_position)
+            print('\nAction {} is possible? {}. The new position if executed will be: {}'
+                  .format(action, is_move_possible, new_position))
+
+        # ----- IMPLEMENTATION: HERE YOU GO!
+
+        # Initialize a quantity that you want to minimize, defined for each action
+        to_minimize = np.ones(self.env.Nactions) * float("inf")
+
+        # Implement your policy here!
+        for a in range(self.env.Nactions):
+            to_minimize[a] = random.random()  # here we just assign a random number
+
+        # Take the min over actions: this is just an argmin, but deterministic for reproducibility
         action_chosen = np.argwhere(np.abs(to_minimize - np.min(to_minimize)) < EPSILON_CHOICE).flatten()[0]
+        
         return action_chosen, to_minimize
