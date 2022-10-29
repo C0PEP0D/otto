@@ -13,6 +13,8 @@ def policy_name(policy_index):
         name = "space-aware infotaxis"
     elif policy_index == 2:
         name = "custom policy"
+    elif policy_index == 4:
+        name = "p-over-d"
     elif policy_index == 5:
         name = "random walk"
     elif policy_index == 6:
@@ -38,6 +40,7 @@ class Policy:
                     - 0: infotaxis (Vergassola, Villermaux and Shraiman, Nature 2007)
                     - 1: space-aware infotaxis
                     - 2: custom policy (to be implemented by the user)
+                    - 4: p-over-d
                     - 5: random walk
                     - 6: greedy policy
                     - 7: mean distance policy
