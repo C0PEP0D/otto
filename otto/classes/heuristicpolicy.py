@@ -533,11 +533,12 @@ class HeuristicPolicy(Policy):
         self.distance_array = self.env._distance(N=size, origin=origin, norm="Manhattan")
 
     def _p_over_d_policy(self, ):
-        """A simple yet effective reactive policy developed by Luka Negrojevic and Manuel Maeritz."""
+        """A simple yet effective reactive policy developed by Manuel Maeritz and Luka Negrojevic."""
         if not hasattr(self, 'distance_array'):
             self._init_p_over_d_policy()
 
         to_minimize = np.ones(self.env.Nactions)*float('inf')
+        p_found = np.zeros(self.env.Nactions)
 
         # distance array
         d = self.env._extract_N_from_2N(input=self.distance_array, origin=self.env.agent)
@@ -552,8 +553,17 @@ class HeuristicPolicy(Policy):
             if move_possible:
                 # Manhattan distance between agent and source
                 to_minimize[a] = np.linalg.norm(np.asarray(agent_) - np.asarray(most_likely_source), ord=1)
-
-        action_chosen = np.argwhere(np.abs(to_minimize - np.min(to_minimize)) < EPSILON_CHOICE).flatten()[0]
+                # prob to found the source upon moving
+                p_found[a] = self.env.p_source[tuple(agent_)]
+        best_actions = np.argwhere(np.abs(to_minimize - np.min(to_minimize)) < EPSILON_CHOICE).flatten()
+        if len(best_actions) > 1:
+            best_p_found = -EPSILON
+            for a in best_actions:
+                if p_found[a] > best_p_found:
+                    best_p_found = p_found[a]
+                    action_chosen = a
+        else:
+            action_chosen = best_actions[0]
         return action_chosen, to_minimize
 
     def _init_custom_policy(self, ):
