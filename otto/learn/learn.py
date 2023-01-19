@@ -211,7 +211,7 @@ DIR_MODELS = os.path.abspath(os.path.join(sys.path[0], "models", RUN_NAME))
 
 # config
 np.set_printoptions(precision=4)
-
+matplotlib.use('Agg')
 
 # Build and compile model ________________________________________________________________
 def build_new_model(
