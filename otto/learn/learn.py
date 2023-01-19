@@ -158,6 +158,7 @@ import importlib
 import random
 import multiprocessing
 import numpy as np
+import matplotlib
 import matplotlib.pyplot as plt
 import tensorflow as tf
 from copy import deepcopy
