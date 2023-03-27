@@ -17,7 +17,7 @@
  </div>
 
 OTTO is part of the [C0PEP0D](https://C0PEP0D.github.io/) project. It has been used in a 
-[publication](https://doi.org/10.1098/rspa.2022.0118) and for a friendly [competition](https://indico.ictp.it/event/9867/other-view?view=ictptimetable) amongst PhD students.
+[publication](https://doi.org/10.1098/rspa.2022.0118) and for a friendly [competition](https://indico.ictp.it/event/9867/other-view?view=ictptimetable) amongst PhD students. It has also been [benchmarked](https://doi.org/10.1140/epje/s10189-023-00277-8) against traditional solvers.
 
 
 ## Table of contents
