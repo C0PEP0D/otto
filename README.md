@@ -114,7 +114,7 @@ If FFmpeg is not installed, OTTO will save video frames as images instead.
 If you use conda to manage your Python environments, you can install OTTO in a dedicated environment `ottoenv`
 
 ``` bash
-conda create --name ottoenv python=3.8
+conda create --name ottoenv python=3.8 setuptools=58.0
 conda activate ottoenv
 ```
 
