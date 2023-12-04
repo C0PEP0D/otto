@@ -1,11 +1,15 @@
-numpy >= 1.21
-scipy >= 1.7
-matplotlib >= 3.5
+numpy == 1.22
+scipy == 1.8
+matplotlib == 3.5
 protobuf == 4.0.0rc2
 tensorflow == 2.8
 gym == 0.22
 docutils == 0.17.1
-sphinx == 4.4
-sphinx-rtd-theme
-pytest
-
+sphinx == 4.4.0
+sphinx-rtd-theme == 1.0.0
+sphinxcontrib-serializinghtml == 1.1.5
+sphinxcontrib-applehelp == 1.0.2
+sphinxcontrib-qthelp == 1.0 
+sphinxcontrib-devhelp == 1.0.2
+sphinxcontrib-htmlhelp == 2.0.0
+pytest == 7.0
