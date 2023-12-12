@@ -151,8 +151,24 @@ class ValueModel(Model):
                 _ = tf.reverse(x, axis=[2, 3])  # symmetry: x -> -x, y -> -y
                 x = tf.concat([x, _], axis=0)
                 x = tf.reshape(x, shape=tuple([Nsym * shape[0]] + list(shape[1:])))
+            elif self.Ndim == 3:
+                Nsym = 48
+                x = x[tf.newaxis, ...]
+                t1 = tf.transpose(x, perm=[0, 1, 3, 2, 4])  # transposition x <-> y
+                t2 = tf.transpose(x, perm=[0, 1, 4, 3, 2])  # transposition x <-> z
+                t3 = tf.transpose(x, perm=[0, 1, 2, 4, 3])  # transposition y <-> z
+                t4 = tf.transpose(x, perm=[0, 1, 4, 2, 3])  # transposition x <-> y, y <-> z
+                t5 = tf.transpose(x, perm=[0, 1, 3, 4, 2])  # transposition x <-> z, y <-> x
+                x = tf.concat([x, t1, t2, t3, t4, t5], axis=0)
+                _ = tf.reverse(x, axis=[2])  # symmetry: x -> -x
+                x = tf.concat([x, _], axis=0)
+                _ = tf.reverse(x, axis=[2, 3])  # symmetry: x -> -x, y -> -y
+                x = tf.concat([x, _], axis=0)
+                _ = tf.reverse(x, axis=[2, 3, 4])  # symmetry: x -> -x, y -> -y, z -> -z
+                x = tf.concat([x, _], axis=0)
+                x = tf.reshape(x, shape=tuple([Nsym * shape[0]] + list(shape[1:])))
             else:
-                raise Exception("symmetric duplicates for Ndim > 2 is not implemented")
+                raise Exception("symmetric duplicates for Ndim > 3 is not implemented")
 
         # flatten input
         x = self.flatten(x)
@@ -217,8 +233,24 @@ class ValueModel(Model):
                 _ = tf.reverse(x, axis=[2, 3])  # symmetry: x -> -x, y -> -y
                 x = tf.concat([x, _], axis=0)
                 x = tf.reshape(x, shape=tuple([Nsym * shape[0]] + list(shape[1:])))
+            elif self.Ndim == 3:
+                Nsym = 48
+                x = x[tf.newaxis, ...]
+                t1 = tf.transpose(x, perm=[0, 1, 3, 2, 4])  # transposition x <-> y
+                t2 = tf.transpose(x, perm=[0, 1, 4, 3, 2])  # transposition x <-> z
+                t3 = tf.transpose(x, perm=[0, 1, 2, 4, 3])  # transposition y <-> z
+                t4 = tf.transpose(x, perm=[0, 1, 4, 2, 3])  # transposition x <-> y, y <-> z
+                t5 = tf.transpose(x, perm=[0, 1, 3, 4, 2])  # transposition x <-> z, y <-> x
+                x = tf.concat([x, t1, t2, t3, t4, t5], axis=0)
+                _ = tf.reverse(x, axis=[2])  # symmetry: x -> -x
+                x = tf.concat([x, _], axis=0)
+                _ = tf.reverse(x, axis=[2, 3])  # symmetry: x -> -x, y -> -y
+                x = tf.concat([x, _], axis=0)
+                _ = tf.reverse(x, axis=[2, 3, 4])  # symmetry: x -> -x, y -> -y, z -> -z
+                x = tf.concat([x, _], axis=0)
+                x = tf.reshape(x, shape=tuple([Nsym * shape[0]] + list(shape[1:])))
             else:
-                raise Exception("augmentation with symmetric duplicates is not implemented for Ndim > 2")
+                raise Exception("augmentation with symmetric duplicates is not implemented for Ndim > 3")
 
             # repeat target
             y = y[tf.newaxis, ...]
