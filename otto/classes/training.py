@@ -335,8 +335,37 @@ class TrainingEnv(SourceTracking):
                 x = np.flip(x, axis=1)  # y -> -y
             if sym == 4 or sym == 7:
                 x = np.flip(x, axis=(0, 1))  # x -> -x, y -> -y
+        elif x.ndim == 3:
+            if not 0 <= sym <= 47:
+                raise Exception("sym must be between 0 and 47")
+            # transpose
+            if sym // 8 == 1:
+                x = np.transpose(x, axes=(1, 0, 2))  # x -> y
+            elif sym // 8 == 2:
+                x = np.transpose(x, axes=(2, 1, 0))  # x -> z
+            elif sym // 8 == 3:
+                x = np.transpose(x, axes=(0, 2, 1))  # y -> z
+            elif sym // 8 == 4:
+                x = np.transpose(x, axes=(2, 0, 1))  # x -> y, y -> z
+            elif sym // 8 == 5:
+                x = np.transpose(x, axes=(1, 2, 0))  # x -> z, y -> x
+            # flip
+            if sym % 8 == 1:
+                x = np.flip(x, axis=0)  # x -> -x
+            elif sym % 8 == 2:
+                x = np.flip(x, axis=1)  # y -> -y
+            elif sym % 8 == 3:
+                x = np.flip(x, axis=2)  # z -> -z
+            elif sym % 8 == 4:
+                x = np.flip(x, axis=(0, 1))  # x -> -x, y -> -y
+            elif sym % 8 == 5:
+                x = np.flip(x, axis=(0, 2))  # x -> -x, z -> -z
+            elif sym % 8 == 6:
+                x = np.flip(x, axis=(1, 2))  # y -> -y, z -> -z
+            elif sym % 8 == 7:
+                x = np.flip(x, axis=(0, 1, 2))  # x -> -x, y -> -y, z -> -z
         else:
-            raise Exception("_sym_transformation_array is not implemented for Ndim > 2")
+            raise Exception("_sym_transformation_array is not implemented for Ndim > 3")
         return x
 
     def _sym_transformation_coords(self, x, sym):
@@ -359,7 +388,41 @@ class TrainingEnv(SourceTracking):
             if sym == 4 or sym == 7:
                 x[0] = self.N - 1 - x[0]  # x -> -x
                 x[1] = self.N - 1 - x[1]  # y -> -y
+        elif len(x) == 3:
+            if not 0 <= sym <= 47:
+                raise Exception("sym must be between 0 and 47")
+            # transpose (this syntax works only for array of dim 1)
+            if sym // 8 == 1:
+                x[0], x[1] = x[1], x[0]  # x -> y
+            elif sym // 8 == 2:
+                x[0], x[2] = x[2], x[0]  # x -> z
+            elif sym // 8 == 3:
+                x[1], x[2] = x[2], x[1]  # y -> z
+            elif sym // 8 == 4:
+                x[0], x[1], x[2] = x[2], x[0], x[1]  # x -> y, y -> z
+            elif sym // 8 == 5:
+                x[0], x[1], x[2] = x[1], x[2], x[0]  # x -> z, y -> x
+            # flip
+            if sym % 8 == 1:
+                x[0] = self.N - 1 - x[0]  # x -> -x
+            elif sym % 8 == 2:
+                x[1] = self.N - 1 - x[1]  # y -> -y
+            elif sym % 8 == 3:
+                x[2] = self.N - 1 - x[2]  # z -> -z
+            elif sym % 8 == 4:
+                x[0] = self.N - 1 - x[0]  # x -> -x
+                x[1] = self.N - 1 - x[1]  # y -> -y
+            elif sym % 8 == 5:
+                x[0] = self.N - 1 - x[0]  # x -> -x
+                x[2] = self.N - 1 - x[2]  # z -> -z
+            elif sym % 8 == 6:
+                x[1] = self.N - 1 - x[1]  # y -> -y
+                x[2] = self.N - 1 - x[2]  # z -> -z
+            elif sym % 8 == 7:
+                x[0] = self.N - 1 - x[0]  # x -> -x
+                x[1] = self.N - 1 - x[1]  # y -> -y
+                x[2] = self.N - 1 - x[2]  # z -> -z
         else:
-            raise Exception("_sym_transformation_coords is not implemented for Ndim > 2")
+            raise Exception("_sym_transformation_coords is not implemented for Ndim > 3")
         x = x.tolist()
         return x

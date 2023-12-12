@@ -802,12 +802,14 @@ def _Worker(episode, policy, eps, memorize):
 
         # compute possible next states for all actions/hits
         if SYM_TRAIN_RANDOMIZE and memorize:
-            if myenv.Ndim > 2:
-                raise Exception("SYM_TRAIN_RANDOMIZE only implemented in 1D and 2D")
+            if myenv.Ndim > 3:
+                raise Exception("SYM_TRAIN_RANDOMIZE only implemented in 1D and 2D and 3D")
             if myenv.Ndim == 1:
                 Nsym = 2
             elif myenv.Ndim == 2:
                 Nsym = 8
+            elif myenv.Ndim == 3:
+                Nsym = 48
             sym = np.random.RandomState().choice(Nsym)
             if sym != 0:
                 myenv.apply_sym_transformation(sym)  # transforms p_source, state, agent, ...
