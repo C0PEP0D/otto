@@ -430,7 +430,7 @@ subject "OTTO: your request" to the [authors](#authors).
 ## Authors
 
 **OTTO** is developed by 
-[Aurore Loisy](mailto:aurore.loisy@gmail.com) and 
+[Aurore Loisy](mailto:aurore.loisy@univ-amu.fr) and 
 [Christophe Eloy](mailto:christophe.eloy@centrale-marseille.fr)
 *(Aix Marseille Univ, CNRS, Centrale Marseille, IRPHE, Marseille, France)*.
 
