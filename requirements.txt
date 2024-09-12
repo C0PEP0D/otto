@@ -4,6 +4,7 @@ matplotlib == 3.5
 protobuf == 4.0.0rc2
 tensorflow == 2.8
 gym == 0.22
+pyparsing == 3.1.1
 docutils == 0.17.1
 sphinx == 4.4.0
 sphinx-rtd-theme == 1.0.0
