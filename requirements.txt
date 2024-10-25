@@ -2,6 +2,7 @@ numpy == 1.22
 scipy == 1.8
 matplotlib == 3.5
 protobuf == 4.0.0rc2
+pillow == 10.1.0
 tensorflow == 2.8
 gym == 0.22
 pyparsing == 3.1.1
