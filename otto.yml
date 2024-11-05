@@ -1,4 +1,4 @@
-name: ottoenv
+name: otto
 channels:
   - defaults
 dependencies:
@@ -101,4 +101,4 @@ dependencies:
     - wheel==0.37.1
     - wrapt==1.13.3
     - zipp==3.7.0
-prefix: /opt/anaconda3/envs/ottoenv
+prefix: /opt/anaconda3/envs/otto
