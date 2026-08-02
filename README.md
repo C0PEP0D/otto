@@ -114,7 +114,7 @@ If FFmpeg is not installed, OTTO will save video frames as images instead.
 If you use conda to manage your Python environments, you can install OTTO in a dedicated environment `otto`
 
 ``` bash
-conda create --name otto python=3.8 setuptools=58.0
+conda create -n otto python=3.8
 conda activate otto
 ```
 
@@ -133,14 +133,15 @@ If `git` is not installed on your system, you can alternatively [download the pa
 Finally go to the `otto` directory and install OTTO using
 
 ``` bash
-python3 setup.py install
+python -m pip install --upgrade pip setuptools wheel
+python -m pip install -e .
 ```
 
 ### Testing
 You can test your installation with following command:
 
 ```bash
-python3 -m pytest tests
+python -m pytest tests
 ```
 This will execute the test functions located in the folder `tests`.
 
@@ -168,7 +169,7 @@ To use OTTO, go to the relevant main directory and run the corresponding script.
 For example, to visualize an episode, go to the `visualize` directory and run the `visualize.py` script with
 
 ```bash
-python3 visualize.py
+python visualize.py
 ```
 
 You should now see the rendering of a 1D search in a new window (it may be very short!).
@@ -204,13 +205,13 @@ User-defined parameters are called by using the `--input` option followed by the
 For example, you can now visualize a search in 2D with
 
 ```bash
-python3 visualize.py --input myparam.py
+python visualize.py --input myparam.py
 ```
 
 The `--input` option can be shortened to `-i`, and the file name can be with or without `.py`. So the command
 
 ```bash
-python3 visualize.py -i myparam
+python visualize.py -i myparam
 ```
 will have the same effect.
 
@@ -245,7 +246,7 @@ It does so essentially by running thousands of episodes in parallel and averagin
 You can try with
 
 ```bash
-python3 evaluate.py
+python evaluate.py
 ```
 
 This will take some time (order of magnitude is 2 minutes on 8 cores). 
@@ -263,7 +264,7 @@ You can now try to compute the statistics of another policy on the same problem.
 For example, evaluate the "space-aware infotaxis" policy by running
 
 ```bash
-python3 evaluate.py --input myparam.py
+python evaluate.py --input myparam.py
 ```
 
 where `myparam.py` is a file containing the line 
@@ -293,7 +294,7 @@ The (approximately) optimal policy is then derived from this function.
 To train a model, go to the `learn` directory and use
 
 ```bash
-python3 learn.py
+python learn.py
 ```
 
 Now is the perfect time for a coffee since it will take quite a while. 
@@ -348,13 +349,13 @@ The list of all trained neural networks is available in the [documentation](http
 To visualize the policy associated to the neural network model `zoo_model_1_2_2`, use
 
 ```bash
-python3 visualize.py --input zoo_model_1_2_2
+python visualize.py --input zoo_model_1_2_2
 ```
 
 Similarly you can evaluate this neural network policy with
 
 ```bash
-python3 evaluate.py --input zoo_model_1_2_2
+python evaluate.py --input zoo_model_1_2_2
 ```
 
 ### Custom policies

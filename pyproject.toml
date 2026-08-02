@@ -1,0 +1,56 @@
+[build-system]
+requires = ["setuptools>=61", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "otto"
+version = "1.1"
+description = "OTTO (Odor-based Target Tracking Optimization): a Python package to simulate, solve and visualize the source-tracking POMDP"
+readme = "README.md"
+requires-python = ">=3.8"
+license = { text = "MIT" }
+
+authors = [
+  { name = "A. Loisy", email = "aurore.loisy@irphe.univ-mrs.fr" },
+  { name = "C. Eloy", email = "eloy@irphe.univ-mrs.fr" }
+]
+
+keywords = [
+  "olfactory navigation",
+  "odor source localization",
+  "olfactory search",
+  "infotaxis",
+  "POMDP",
+  "reinforcement learning",
+]
+
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.8",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent",
+]
+
+dependencies = [
+  "numpy==1.22.3",
+  "scipy==1.8.0",
+  "matplotlib==3.5.1",
+  "tensorflow==2.8.0",
+  "gym==0.22.0",
+  "protobuf==3.20.1",
+  "grpcio==1.46.3",
+  "h5py==3.6.0",
+  "Pillow==9.1.0",
+  "pytest==7.1.1",
+  "Sphinx==4.4.0",
+  "sphinx-rtd-theme==1.0.0",
+]
+
+
+[project.urls]
+Homepage = "https://github.com/C0PEP0D/otto"
+Repository = "https://github.com/C0PEP0D/otto"
+Issues = "https://github.com/C0PEP0D/otto/issues"
+
+[tool.setuptools.packages.find]
+where = ["."]
