@@ -102,9 +102,7 @@ OTTO provides:
 
 ### Requirements
 
-OTTO requires Python 3.8 or greater.
-Dependencies are listed in [requirements.txt](https://github.com/C0PEP0D/otto/blob/main/requirements.txt),
-missing dependencies will be installed automatically.
+OTTO requires Python 3.8. Dependencies will be installed automatically.
 
 Optional: OTTO requires [FFmpeg](https://www.ffmpeg.org/) to make videos.
 If FFmpeg is not installed, OTTO will save video frames as images instead.
