@@ -2,7 +2,7 @@
 # OTTO
 
 [![status](https://joss.theoj.org/papers/51c451ddeeb1affdb1533a4fa1582f4c/status.svg)](https://joss.theoj.org/papers/51c451ddeeb1affdb1533a4fa1582f4c)
-[![DOI](https://zenodo.org/badge/457950076.svg)](https://zenodo.org/badge/latestdoi/457950076)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.6651884.svg)](https://doi.org/10.5281/zenodo.6651884)
 [![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/C0PEP0D/otto/blob/main/LICENSE)
 [![Documentation Status](https://readthedocs.org/projects/otto-c0pep0d/badge/?version=latest)](https://otto-c0pep0d.readthedocs.io/en/latest/?badge=latest)
 
