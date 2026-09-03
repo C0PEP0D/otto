@@ -7,7 +7,8 @@ Running visualize.py will save the trajectory to a file, e.g.,
 ```bash
 python visualize/visualize.py -i reference_onix_zero_hit_1d
 ```
-The various policies can be edited manually for each input file.
+
+The policy is chosen manually by editing the input file.
 
 
 
