@@ -81,6 +81,8 @@ import argparse
 import importlib
 from otto.classes.sourcetracking import SourceTracking as env
 from otto.classes.visualization import Visualization
+import numpy as np
+from copy import deepcopy
 
 # import default globals
 from otto.visualize.parameters.__defaults import *
@@ -101,7 +103,7 @@ if os.path.basename(sys.argv[0]) == "visualize.py":
     del parser, args
 
 # other globals
-if N_DIMS > 3:
+if N_DIMS > 4:
     raise Exception("Visualization is possible only up to 3D!")
 
 if MODEL_PATH is not None and POLICY != -1:
@@ -138,7 +140,26 @@ def run():
         Ngrid=N_GRID,
         Nhits=N_HITS,
         draw_source=DRAW_SOURCE,
+        initial_hit=1 if not ZERO_HIT else None,
     )
+    if ZERO_HIT:
+        if N_DIMS == 1:
+            myenv.source = (22, )
+        elif N_DIMS == 2:
+            myenv.source = (1, 14)
+        elif N_DIMS == 3:
+            myenv.source = (10, 4, 8)
+        elif N_DIMS == 4:
+            myenv.source = (3, 1, 0, 5)
+    else:
+        if N_DIMS == 1:
+            myenv.source = (40,)
+        elif N_DIMS == 2:
+            myenv.source = (20, 16)
+        elif N_DIMS == 3:
+            myenv.source = (9, 13, 5)
+        HIT_SEQ = [0, 1, 0, 2, 0, 0, 3]
+
     print("N_DIMS = " + str(myenv.Ndim))
     print("LAMBDA_OVER_DX = " + str(myenv.lambda_over_dx))
     print("R_DT = " + str(myenv.R_dt))
@@ -180,6 +201,11 @@ def run():
             filename=filename
         )
 
+    positions = [deepcopy(myenv.agent)]
+    observations = [myenv.initial_hit]
+    actions = []
+    beliefs = [deepcopy(myenv.p_source)]
+
     while True:
 
         if VISU_MODE > 0:
@@ -197,7 +223,16 @@ def run():
         forced_hit = None
         if ZERO_HIT:
             forced_hit = 0
+        else:
+            forced_hit = HIT_SEQ[t]
         hit, p_end, done = myenv.step(action, hit=forced_hit, quiet=(POLICY == -1))
+        if done:
+            hit = -1
+
+        positions.append(deepcopy(myenv.agent))
+        observations.append(hit)
+        actions.append(action)
+        beliefs.append(deepcopy(myenv.p_source))
 
         t += 1
         T_mean += p_not_found_yet
@@ -222,6 +257,19 @@ def run():
 
         if stop:
             break
+
+    POLNAME = {
+        0: "infotaxis",
+        1: "space_aware_infotaxis",
+        4: "probability_to_distance"
+    }
+    np.savez_compressed(
+        f"trajectory_zero_hit_{N_DIMS}d_{POLNAME[POLICY]}" if ZERO_HIT else f"trajectory_seq_hit_{N_DIMS}d_{POLNAME[POLICY]}",
+        positions=np.asarray(positions, dtype=np.int64),
+        observations=np.asarray(observations, dtype=np.int64),
+        actions=np.asarray(actions, dtype=np.int64),
+        beliefs=np.asarray(beliefs, dtype=np.float64),
+    )
 
     print(message)
     if not DRAW_SOURCE:
